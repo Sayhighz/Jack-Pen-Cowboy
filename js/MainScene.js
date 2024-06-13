@@ -42,7 +42,27 @@ export default class MainScene extends Phaser.Scene {
     }
 
     executeCommand(command) {
-        switch (command) {
+        const match = command.match(/(\w+)\((\d+)\)/);
+        if (match) {
+            const action = match[1];
+            const repetitions = parseInt(match[2], 10);
+            this.performActionWithDelay(action, repetitions, 0);
+        } else {
+            this.performAction(command);
+        }
+    }
+
+    performActionWithDelay(action, repetitions, index) {
+        if (index < repetitions) {
+            this.performAction(action);
+            setTimeout(() => {
+                this.performActionWithDelay(action, repetitions, index + 1);
+            }, 500); // หน่วงเวลา 100 มิลลิวินาที
+        }
+    }
+
+    performAction(action) {
+        switch (action) {
             case 'left':
                 this.player.moveLeft();
                 break;
