@@ -86,6 +86,7 @@ export default class MainScene extends Phaser.Scene {
     async performActionWithDelay(action, repetitions) {
         // Perform actions with delays between repetitions
         for (let i = 0; i < repetitions; i++) {
+            console.log("repeat")
             await this.performAction(action);
             await new Promise(resolve => setTimeout(resolve, 500)); // Delay 500 milliseconds
         }
