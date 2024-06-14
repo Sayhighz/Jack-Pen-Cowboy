@@ -4,79 +4,118 @@ export default class MainScene extends Phaser.Scene {
     constructor() {
         super("MainScene");
     }
-    
+
     preload() {
+        // Preload assets and player animations
         Player.preload(this);
         this.load.image('tiles', 'assets/images/RPG Nature Tileset.png');
         this.load.tilemapTiledJSON('map', 'assets/images/map.json');
     }
 
     create() {
+        // Create tilemap and layers
         const map = this.make.tilemap({ key: 'map' });
-        console.log("Map:", map);
-        
         const tileset = map.addTilesetImage('RPG Nature Tileset', 'tiles', 32, 32, 0, 0);
-        console.log("Tileset:", tileset);
 
         if (tileset) {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
-            console.log("Layer1:", layer1);
+            layer1.setCollisionByProperty({ collides: true });
+            this.matter.world.convertTilemapLayer(layer1);
+
+            const layer2 = map.createLayer('Tile Layer 2', tileset, 0, 0);
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'RPG Nature Tileset'.");
         }
-        
-        this.player = new Player({ scene: this, x: 100, y: 100, texture: 'female', frame: 'townsfolk_f_idle_1' });
+
+        // Create player instance
+        this.player = new Player({ scene: this, x: 50, y: 40, texture: 'female', frame: 'townsfolk_f_idle_1' });
+
+        // Setup input listener for command input and button
+        this.setupCommandInput();
     }
 
     update() {
-        const commandInput = document.getElementById('command-input');
-        commandInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const commands = commandInput.value.toLowerCase().split(',');
-                commands.forEach(command => {
-                    this.executeCommand(command.trim());
-                });
-                commandInput.value = ''; // Clear input after executing commands
+        // Update game logic
+        this.player.anims.play('female_idle', true);
+        // Additional game logic updates can be added here
+    }
+
+    setupCommandInput() {
+        const commandLabel = document.getElementById('command-label');
+        const commandButton = document.getElementById('command-button');
+        const commandList = document.getElementById('command-list');
+
+        // Function to handle button click
+        const executeCommands = async () => {
+            const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
+            for (const command of commands) {
+                if (command.trim() !== '') { // Skip empty lines
+                    await this.executeCommand(command.trim());
+                    this.updateCommandList(command.trim()); // Update command list after each command
+                }
+            }
+            commandLabel.value = ''; // Clear input after executing commands
+        };
+
+        // Button click event listener
+        commandButton.addEventListener('click', () => {
+            executeCommands();
+        });
+
+        // Also handle Enter key press in textarea
+        commandLabel.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent default Enter key behavior (submitting form)
+                await executeCommands(); // Execute commands when Enter is pressed
             }
         });
     }
 
-    executeCommand(command) {
+    async executeCommand(command) {
+        // Execute player movement commands with async-await to ensure sequential execution
         const match = command.match(/(\w+)\((\d+)\)/);
         if (match) {
             const action = match[1];
             const repetitions = parseInt(match[2], 10);
-            this.performActionWithDelay(action, repetitions, 0);
+            await this.performActionWithDelay(action, repetitions);
         } else {
-            this.performAction(command);
+            await this.performAction(command);
         }
     }
 
-    performActionWithDelay(action, repetitions, index) {
-        if (index < repetitions) {
-            this.performAction(action);
-            setTimeout(() => {
-                this.performActionWithDelay(action, repetitions, index + 1);
-            }, 500); // หน่วงเวลา 100 มิลลิวินาที
+    async performActionWithDelay(action, repetitions) {
+        // Perform actions with delays between repetitions
+        for (let i = 0; i < repetitions; i++) {
+            await this.performAction(action);
+            await new Promise(resolve => setTimeout(resolve, 500)); // Delay 500 milliseconds
         }
     }
 
-    performAction(action) {
+    async performAction(action) {
+        // Switch case for handling different player movement actions
         switch (action) {
             case 'left':
-                this.player.moveLeft();
+                await this.player.moveLeft();
                 break;
             case 'right':
-                this.player.moveRight();
+                await this.player.moveRight();
                 break;
             case 'up':
-                this.player.moveUp();
+                await this.player.moveUp();
                 break;
             case 'down':
-                this.player.moveDown();
+                await this.player.moveDown();
                 break;
             default:
                 console.log('Invalid command');
         }
+    }
+
+    updateCommandList(command) {
+        // Update command list in HTML with executed commands
+        const commandList = document.getElementById('command-list');
+        const listItem = document.createElement('li');
+        listItem.textContent = command.trim();
+        commandList.appendChild(listItem);
     }
 }

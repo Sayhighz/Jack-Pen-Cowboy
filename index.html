@@ -5,28 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Survival Game</title>
     <style>
+        /* CSS styles for command container */
         #command-container {
             position: fixed;
             top: 0;
-            right: 0; /* เปลี่ยนจาก left เป็น right */
+            right: 0; /* Changed from 'left' to 'right' */
             width: 300px;
             background-color: rgba(255, 255, 255, 0.8);
             padding: 10px;
             box-sizing: border-box;
         }
 
-        #command-input {
-            width: 100%;
+        #command-label1 {
+            display: block; /* Ensure label displays as a block element */
+            margin-bottom: 5px; /* Add some space between label and textarea */
+        }
+
+        #command-label {
+            width: calc(100% - 20px); /* Adjusted width to accommodate button */
+            height: 100px; /* Adjusted height for multi-line input */
+            font-size: 16px;
+            margin-bottom: 10px; /* Add margin below textarea */
+            resize: vertical; /* Allow vertical resizing */
+            overflow: auto; /* Show scrollbars if content overflows */
+        }
+
+        #command-button {
             height: 30px;
             font-size: 16px;
+            padding: 0 15px;
+            margin-bottom: 10px; /* Add margin below button */
+        }
+
+        #command-list {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0;
+            margin: 0;
+        }
+
+        #command-list li {
+            margin-bottom: 5px; /* Add spacing between list items */
         }
     </style>
 </head>
 <body>
     <div id="command-container">
-        <input type="text" id="command-input" placeholder="Enter command...">
+        <label id="command-label1" for="command-label">คำสั่ง</label>
+        <textarea id="command-label" placeholder="ใส่คำสั่ง..." rows="5"></textarea>
+        <button id="command-button">เริ่ม!</button> <!-- Added button for executing commands -->
+        <ul id="command-list"></ul> <!-- List to display executed commands -->
     </div>
     <div id="survival-game"></div>
+    <!-- Phaser and custom game scripts -->
     <script src="//cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser-matter-collision-plugin"></script>
     <script type="module" src="js/survival-game.js"></script>
