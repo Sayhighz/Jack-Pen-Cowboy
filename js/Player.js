@@ -31,7 +31,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             this.scene.tweens.add({
                 targets: this,
                 x: this.x - this.tileSize,
-                duration: 500,
+                duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
                     this.stopAnimation();
@@ -47,7 +47,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             this.scene.tweens.add({
                 targets: this,
                 x: this.x + this.tileSize,
-                duration: 500,
+                duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
                     this.stopAnimation();
@@ -63,7 +63,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             this.scene.tweens.add({
                 targets: this,
                 y: this.y - this.tileSize,
-                duration: 500,
+                duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
                     this.stopAnimation();
@@ -79,7 +79,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             this.scene.tweens.add({
                 targets: this,
                 y: this.y + this.tileSize,
-                duration: 500,
+                duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
                     this.stopAnimation();

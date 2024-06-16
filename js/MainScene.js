@@ -23,6 +23,10 @@ export default class MainScene extends Phaser.Scene {
             this.matter.world.convertTilemapLayer(layer1);
 
             const layer2 = map.createLayer('Tile Layer 2', tileset, 0, 0);
+
+            const layer3 = map.createLayer('Tile Layer 3', tileset, 0, 0);
+            // layer1.setCollisionByProperty({ collides: true });
+            // this.matter.world.convertTilemapLayer(layer1);
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'RPG Nature Tileset'.");
         }
@@ -47,14 +51,19 @@ export default class MainScene extends Phaser.Scene {
 
         // Function to handle button click
         const executeCommands = async () => {
-            const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
-            for (const command of commands) {
-                if (command.trim() !== '') { // Skip empty lines
-                    await this.executeCommand(command.trim());
-                    this.updateCommandList(command.trim()); // Update command list after each command
+            this.scene.restart(); // Restart the scene
+
+            // Wait for the scene to restart
+            this.events.once('create', async () => {
+                const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
+                for (const command of commands) {
+                    if (command.trim() !== '') { // Skip empty lines
+                        await this.executeCommand(command.trim());
+                        // this.updateCommandList(command.trim()); // Update command list after each command
+                    }
                 }
-            }
-            commandLabel.value = ''; // Clear input after executing commands
+                // commandLabel.value = ''; // Clear input after executing commands
+            });
         };
 
         // Button click event listener
@@ -86,7 +95,6 @@ export default class MainScene extends Phaser.Scene {
     async performActionWithDelay(action, repetitions) {
         // Perform actions with delays between repetitions
         for (let i = 0; i < repetitions; i++) {
-            console.log("repeat")
             await this.performAction(action);
             await new Promise(resolve => setTimeout(resolve, 500)); // Delay 500 milliseconds
         }
@@ -112,11 +120,11 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-    updateCommandList(command) {
-        // Update command list in HTML with executed commands
-        const commandList = document.getElementById('command-list');
-        const listItem = document.createElement('li');
-        listItem.textContent = command.trim();
-        commandList.appendChild(listItem);
-    }
+    // updateCommandList(command) {
+    //     // Update command list in HTML with executed commands
+    //     const commandList = document.getElementById('command-list');
+    //     const listItem = document.createElement('li');
+    //     listItem.textContent = command.trim();
+    //     commandList.appendChild(listItem);
+    // }
 }
