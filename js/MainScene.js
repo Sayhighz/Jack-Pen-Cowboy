@@ -8,14 +8,14 @@ export default class MainScene extends Phaser.Scene {
     preload() {
         // Preload assets and player animations
         Player.preload(this);
-        this.load.image('tiles', 'assets/images/RPG Nature Tileset.png');
-        this.load.tilemapTiledJSON('map', 'assets/images/map.json');
+        this.load.image('tiles', 'assets/images/Dungeon_Tileset_at.png');
+        this.load.tilemapTiledJSON('map', 'assets/images/newmap.json');
     }
 
     create() {
         // Create tilemap and layers
         const map = this.make.tilemap({ key: 'map' });
-        const tileset = map.addTilesetImage('RPG Nature Tileset', 'tiles', 32, 32, 0, 0);
+        const tileset = map.addTilesetImage('Dungeon_Tileset_at', 'tiles', 32, 32, 0, 0);
 
         if (tileset) {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
@@ -25,14 +25,15 @@ export default class MainScene extends Phaser.Scene {
             const layer2 = map.createLayer('Tile Layer 2', tileset, 0, 0);
 
             const layer3 = map.createLayer('Tile Layer 3', tileset, 0, 0);
-            // layer1.setCollisionByProperty({ collides: true });
-            // this.matter.world.convertTilemapLayer(layer1);
         } else {
-            console.error("Tileset not found. Check if the tileset name in the JSON matches 'RPG Nature Tileset'.");
+            console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
 
         // Create player instance
-        this.player = new Player({ scene: this, x: 50, y: 40, texture: 'female', frame: 'townsfolk_f_idle_1' });
+        this.player = new Player({ scene: this, x: 50, y: 50, texture: 'female', frame: 'townsfolk_f_idle_1' });
+
+        // Listen for collision event
+        this.matter.world.on('collisionstart', this.handleCollision, this);
 
         // Setup input listener for command input and button
         this.setupCommandInput();
@@ -44,10 +45,20 @@ export default class MainScene extends Phaser.Scene {
         // Additional game logic updates can be added here
     }
 
+    handleCollision(event) {
+        event.pairs.forEach(pair => {
+            const { bodyA, bodyB } = pair;
+
+            if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
+                alert('แพ้แล้ว! เกมจะเริ่มใหม่');
+                this.scene.restart();
+            }
+        });
+    }
+
     setupCommandInput() {
         const commandLabel = document.getElementById('command-label');
         const commandButton = document.getElementById('command-button');
-        const commandList = document.getElementById('command-list');
 
         // Function to handle button click
         const executeCommands = async () => {
@@ -59,10 +70,8 @@ export default class MainScene extends Phaser.Scene {
                 for (const command of commands) {
                     if (command.trim() !== '') { // Skip empty lines
                         await this.executeCommand(command.trim());
-                        // this.updateCommandList(command.trim()); // Update command list after each command
                     }
                 }
-                // commandLabel.value = ''; // Clear input after executing commands
             });
         };
 
@@ -81,7 +90,6 @@ export default class MainScene extends Phaser.Scene {
     }
 
     async executeCommand(command) {
-        // Execute player movement commands with async-await to ensure sequential execution
         const match = command.match(/(\w+)\((\d+)\)/);
         if (match) {
             const action = match[1];
@@ -93,7 +101,6 @@ export default class MainScene extends Phaser.Scene {
     }
 
     async performActionWithDelay(action, repetitions) {
-        // Perform actions with delays between repetitions
         for (let i = 0; i < repetitions; i++) {
             await this.performAction(action);
             await new Promise(resolve => setTimeout(resolve, 500)); // Delay 500 milliseconds
@@ -101,7 +108,6 @@ export default class MainScene extends Phaser.Scene {
     }
 
     async performAction(action) {
-        // Switch case for handling different player movement actions
         switch (action) {
             case 'left':
                 await this.player.moveLeft();
@@ -119,12 +125,4 @@ export default class MainScene extends Phaser.Scene {
                 console.log('Invalid command');
         }
     }
-
-    // updateCommandList(command) {
-    //     // Update command list in HTML with executed commands
-    //     const commandList = document.getElementById('command-list');
-    //     const listItem = document.createElement('li');
-    //     listItem.textContent = command.trim();
-    //     commandList.appendChild(listItem);
-    // }
 }
