@@ -7,18 +7,55 @@
     <title>Survival Game</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        #game-over-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 2px solid black;
+            z-index: 1000;
+            width: 50%;
+            height: 20%;
+        }
+
+        #game-over-dialog p {
+            margin: 0 0 20px 0;
+        }
+
+        #game-over-dialog button {
+            display: block;
+            margin: 0 auto;
+        }
+        #restart-button{
+            color: black;
+        }
+    </style>
 </head>
 
 <body class="bg-center bg-cover" style="background-image: url('/assets/images/game_bg.jpg')">
     <div class="container mx-auto flex justify-center space-x-4">
         <div id="game-wrapper" class="flex-1 bg-white bg-opacity-80 rounded-lg shadow-md p-4">
-            <div id="survival-game" class="h-full w-full border-2 border-gray-500 rounded-lg shadow-md bg-gray-100 mb-4"></div>
+            <div id="survival-game"
+                class="h-full w-full border-2 border-gray-500 rounded-lg shadow-md bg-gray-100 mb-4"></div>
         </div>
         <div id="command-container" class="flex-1 bg-white bg-opacity-80 rounded-lg shadow-md p-4">
             <h2 id="command-label1" class="text-lg font-bold text-gray-700 mb-2 text-center">CODE QUEST</h2>
-            <textarea id="command-label" placeholder="ใส่คำสั่ง..." class="textarea textarea-primary bg-gray-700 text-gray-300 border border-gray-500 rounded-lg p-2 resize-none w-full h-full"
+            <textarea id="command-label" placeholder="ใส่คำสั่ง..."
+                class="textarea textarea-primary bg-gray-700 text-gray-300 border border-gray-500 rounded-lg p-2 resize-none w-full h-full"
                 style="height: calc(100% - 6rem);"></textarea>
             <button id="command-button" class="btn btn-primary w-full mt-2">เริ่ม!</button>
+        </div>
+    </div>
+    <div id="game-over-dialog" style="display:none;">
+        <p style="color: black;">แพ้แล้ว! เกมจะเริ่มใหม่</p>
+        <div class="mb-5">
+            <button>ย้อนกลับ</button>
+        </div>
+        <div class="mt-5">
+            <button id="restart-button">เริ่มใหม่</button>
         </div>
     </div>
 

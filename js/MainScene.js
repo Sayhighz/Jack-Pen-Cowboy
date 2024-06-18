@@ -1,5 +1,8 @@
 import Player from "./Player.js";
 
+let playerHeart = 3
+let heartGrp 
+
 export default class MainScene extends Phaser.Scene {
     constructor() {
         super("MainScene");
@@ -8,11 +11,16 @@ export default class MainScene extends Phaser.Scene {
     preload() {
         // Preload assets and player animations
         Player.preload(this);
+        this.load.image('heart', 'assets/images/heart.jpg')
         this.load.image('tiles', 'assets/images/Dungeon_Tileset_at.png');
         this.load.tilemapTiledJSON('map', 'assets/images/newmap.json');
     }
 
     create() {
+        //heart
+        heartGrp = this.add.group()
+        this.createPlayerHeart()
+
         // Create tilemap and layers
         const map = this.make.tilemap({ key: 'map' });
         const tileset = map.addTilesetImage('Dungeon_Tileset_at', 'tiles', 32, 32, 0, 0);
@@ -39,6 +47,15 @@ export default class MainScene extends Phaser.Scene {
         this.setupCommandInput();
     }
 
+    createPlayerHeart() {
+        for (let i = 0; i < playerHeart; i++) {
+            let heart = this.add.sprite(40 + (i * 50), 20, "heart")
+            heart.setScale(0.05)
+            heart.depth = 10
+            heartGrp.add(heart)
+        }
+    }
+
     update() {
         // Update game logic
         this.player.anims.play('female_idle', true);
@@ -50,14 +67,53 @@ export default class MainScene extends Phaser.Scene {
             const { bodyA, bodyB } = pair;
 
             if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
-                alert('แพ้แล้ว! เกมจะเริ่มใหม่');
+                // this.player.setPosition(50, 50);
+                // alert('แพ้แล้ว! เกมจะเริ่มใหม่');
+                
+
+                playerHeart--
+                if (playerHeart <= 0) {
+                    playerHeart = 0
+                    console.log("gameOver")         ///////////ถ้าหัวใจเหลือ 0 ให้ regame จริงๆ
+                    this.showGameOverDialog();
+                }
+                this.updatePlayerHeart()
+                
                 this.scene.restart();
             }
         });
+        
+    }
+
+    showGameOverDialog() {
+        const dialog = document.getElementById('game-over-dialog');
+        const restartButton = document.getElementById('restart-button');
+    
+        dialog.style.display = 'block';
+    
+        const handleRestart = () => {
+            dialog.style.display = 'none';
+            playerHeart = 3; // Reset hearts to initial value
+            this.scene.restart(); // Restart the game
+            restartButton.removeEventListener('click', handleRestart);
+        };
+    
+        restartButton.addEventListener('click', handleRestart);
+    }
+
+    updatePlayerHeart() {
+        for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
+            if (playerHeart < i + 1) {
+                heartGrp.getChildren()[i].setVisible(false)
+            }
+            else {
+                heartGrp.getChildren()[i].setVisible(true)
+            }
+        }
     }
 
     setupCommandInput() {
-        const commandLabel = document.getElementById('command-label');
+        const commandLabel = document.getElementById('command-label');      //textarea
         const commandButton = document.getElementById('command-button');
 
         // Function to handle button click
@@ -90,15 +146,18 @@ export default class MainScene extends Phaser.Scene {
     }
 
     async executeCommand(command) {
-        const match = command.match(/(\w+)\((\d+)\)/);
+        const match = command.match(/(\w+)\((\d*)\)/);
         if (match) {
             const action = match[1];
-            const repetitions = parseInt(match[2], 10);
+            const repetitions = match[2] ? parseInt(match[2], 10) : 1; // Default to 1 if no repetitions provided
             await this.performActionWithDelay(action, repetitions);
         } else {
-            await this.performAction(command);
+            console.log('Invalid command');
+            // alert("มึงใส่ไร");
         }
     }
+    
+    
 
     async performActionWithDelay(action, repetitions) {
         for (let i = 0; i < repetitions; i++) {
