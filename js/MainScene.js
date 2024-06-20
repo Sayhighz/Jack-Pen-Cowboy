@@ -1,7 +1,8 @@
 import Player from "./Player.js";
 
-let playerHeart = 3
-let heartGrp 
+let playerHeart = 3;
+let heartGrp;
+let isRestarting = false;
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -11,15 +12,15 @@ export default class MainScene extends Phaser.Scene {
     preload() {
         // Preload assets and player animations
         Player.preload(this);
-        this.load.image('heart', 'assets/images/heart.jpg')
+        this.load.image('heart', 'assets/images/heart.jpg');
         this.load.image('tiles', 'assets/images/Dungeon_Tileset_at.png');
         this.load.tilemapTiledJSON('map', 'assets/images/newmap.json');
     }
 
     create() {
         //heart
-        heartGrp = this.add.group()
-        this.createPlayerHeart()
+        heartGrp = this.add.group();
+        this.createPlayerHeart();
 
         // Create tilemap and layers
         const map = this.make.tilemap({ key: 'map' });
@@ -49,10 +50,10 @@ export default class MainScene extends Phaser.Scene {
 
     createPlayerHeart() {
         for (let i = 0; i < playerHeart; i++) {
-            let heart = this.add.sprite(40 + (i * 50), 20, "heart")
-            heart.setScale(0.05)
-            heart.depth = 10
-            heartGrp.add(heart)
+            let heart = this.add.sprite(40 + (i * 50), 20, "heart");
+            heart.setScale(0.05);
+            heart.depth = 10;
+            heartGrp.add(heart);
         }
     }
 
@@ -67,64 +68,61 @@ export default class MainScene extends Phaser.Scene {
             const { bodyA, bodyB } = pair;
 
             if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
-                // this.player.setPosition(50, 50);
-                // alert('แพ้แล้ว! เกมจะเริ่มใหม่');
-                
+                isRestarting = true; // Set restarting flag
+                playerHeart--;
 
-                playerHeart--
                 if (playerHeart <= 0) {
-                    playerHeart = 0
-                    console.log("gameOver")         ///////////ถ้าหัวใจเหลือ 0 ให้ regame จริงๆ
+                    playerHeart = 0;
+                    console.log("gameOver");
                     this.showGameOverDialog();
                 }
-                this.updatePlayerHeart()
-                
+                this.updatePlayerHeart();
                 this.scene.restart();
             }
         });
-        
     }
 
     showGameOverDialog() {
         const dialog = document.getElementById('game-over-dialog');
         const restartButton = document.getElementById('restart-button');
-    
+
         dialog.style.display = 'block';
-    
+
         const handleRestart = () => {
             dialog.style.display = 'none';
             playerHeart = 3; // Reset hearts to initial value
             this.scene.restart(); // Restart the game
             restartButton.removeEventListener('click', handleRestart);
         };
-    
+
         restartButton.addEventListener('click', handleRestart);
     }
 
     updatePlayerHeart() {
         for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
             if (playerHeart < i + 1) {
-                heartGrp.getChildren()[i].setVisible(false)
-            }
-            else {
-                heartGrp.getChildren()[i].setVisible(true)
+                heartGrp.getChildren()[i].setVisible(false);
+            } else {
+                heartGrp.getChildren()[i].setVisible(true);
             }
         }
     }
 
     setupCommandInput() {
-        const commandLabel = document.getElementById('command-label');      //textarea
+        const commandLabel = document.getElementById('command-label'); // textarea
         const commandButton = document.getElementById('command-button');
 
         // Function to handle button click
         const executeCommands = async () => {
+            isRestarting = true; // Set restarting flag
             this.scene.restart(); // Restart the scene
 
             // Wait for the scene to restart
             this.events.once('create', async () => {
+                isRestarting = false; // Clear restarting flag
                 const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
                 for (const command of commands) {
-                    if (command.trim() !== '') { // Skip empty lines
+                    if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restarting
                         await this.executeCommand(command.trim());
                     }
                 }
@@ -153,35 +151,33 @@ export default class MainScene extends Phaser.Scene {
             await this.performActionWithDelay(action, repetitions);
         } else {
             console.log('Invalid command');
-            // alert("มึงใส่ไร");
         }
     }
-    
-    
 
     async performActionWithDelay(action, repetitions) {
         for (let i = 0; i < repetitions; i++) {
+            if (isRestarting) break; // Stop executing if restarting
             await this.performAction(action);
-            await new Promise(resolve => setTimeout(resolve, 500)); // Delay 500 milliseconds
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
 
     async performAction(action) {
         switch (action) {
             case 'left':
-                await this.player.moveLeft();
+                this.player.moveLeft();
                 break;
             case 'right':
-                await this.player.moveRight();
+                this.player.moveRight();
                 break;
             case 'up':
-                await this.player.moveUp();
+                this.player.moveUp();
                 break;
             case 'down':
-                await this.player.moveDown();
+                this.player.moveDown();
                 break;
             default:
-                console.log('Invalid command');
+                console.log('Unknown action');
         }
     }
 }
