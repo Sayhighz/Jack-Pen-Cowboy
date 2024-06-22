@@ -18,6 +18,9 @@ export default class MainScene extends Phaser.Scene {
         Coins.preload(this);
 
         this.load.image('heart', 'assets/images/heart.jpg');
+
+        this.load.image('coin', 'assets/coins/coin.png')
+
         this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
         this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
     }
@@ -49,7 +52,8 @@ export default class MainScene extends Phaser.Scene {
         // Create enemy instance
         this.enemy = new Enemy({ scene: this, x: 210, y: 210, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
 
-        this.coins = new Coins({ scene: this, x: 300, y: 300, texture: 'coins', frame: 'coin_anim_f0' });
+        this.coins = new Coins({ scene: this, x: 150, y: 150, texture: 'coins', frame: 'coin_anim_f0' });
+        
 
         // Listen for collision event
         this.matter.world.on('collisionstart', this.handleCollision, this);
@@ -69,10 +73,11 @@ export default class MainScene extends Phaser.Scene {
 
     update() {
         // Update game logic
-        this.player.anims.play('female_idle', true);
-        this.enemy.anims.play('lizard_idle', true);
+        this.player.anims.play('female_idle', true);//movement
 
-        this.coins.anims.play('coins_idle', true);
+        this.enemy.anims.play('lizard_idle', true);//movement
+
+        this.coins.anims.play('coins_idle', true);//movement
 
         // Additional game logic updates can be added here
     }
