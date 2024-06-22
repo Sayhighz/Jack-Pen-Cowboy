@@ -4,25 +4,11 @@
  "layers":[
         {
          "compression":"",
-         "data":"YQAAAGgAAABoAAAAZQAAAFUAAABmAAAAaAAAAGgAAABoAAAAawAAAGwAAABnAAAAaAAAAGcAAABoAAAAcAAAAGEAAACFAAAAmQAAAHUAAAB1AAAAdQAAAIoAAACKAAAAigAAAGsAAABsAAAA5wAAoOcAAKCKAAAAigAAAJAAAABhAAAAmQAAAIoAAACKAAAAigAAAIoAAADnAACg5wAAoOcAAKB7AAAAewAAAOcAAKDnAACg5wAAoIoAAACQAAAAYQAAAIoAAACKAAAAigAAAIoAAACKAAAAigAAAIoAAADnAACgkgAAAJIAAADnAACgigAAAIoAAACKAAAAkAAAAGEAAAB0AAAAdAAAAHQAAAB0AAAAigAAAJkAAACZAAAA5wAAoOcAAKDnAACg5wAAoJkAAACZAAAAmQAAAJAAAABhAAAAmQAAAJkAAACKAAAAigAAAJkAAACZAAAAmQAAAJkAAACHAAAAmQAAAJkAAACZAAAAmQAAAJkAAACQAAAAoQAAAKIAAACiAAAAogAAAKIAAACiAAAAogAAAKcAAACHAAAAhwAAAJkAAACSAAAAkgAAAJkAAACZAAAAkAAAADMAAAAzAAAAMwAAADMAAAAzAAAAMwAAADMAAAC2AAAAhwAAAIcAAACZAAAAmwAAAJwAAACZAAAAmQAAAJAAAAAzAAAAMwAAADMAAAAzAAAAMwAAADMAAAAzAAAAtgAAAIcAAACHAAAAqgAAAKsAAACsAAAArQAAAK0AAACwAAAANAAAADQAAAA0AAAAtgAAAGIAAABiAAAAYgAAAGIAAAC4AAAAuQAAALoAAAC7AAAATgAAAE4AAABOAAAATgAAADQAAAA0AAAANAAAALYAAADnAAAA5wAAAOcAAADnAAAAhwAAAIcAAADKAAAAkAAAAEYAAABGAAAARgAAAEYAAAA0AAAANAAAADQAAAC2AAAA5wAAAOcAAACZAAAAmQAAAJkAAACZAAAAmQAAAJAAAABGAAAARgAAAEYAAABGAAAANAAAADQAAAA0AAAAtgAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAABoAAAAaAAAAGgAAABoAAAAawAAADQAAAA0AAAANAAAAJEAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAGsAAAA0AAAANAAAADQAAACRAAAAmQAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAACQAAAANAAAADQAAAA0AAAAoQAAAKIAAACiAAAAogAAAKIAAACiAAAAogAAAKIAAACiAAAAogAAAKIAAACiAAAApQAAAA==",
+         "data":"UgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAGEAAABiAAAAagAAAGUAAAAzAAAAZgAAAGQAAABkAAAAZwAAAGQAAABkAAAAcAAAAFIAAABSAAAAUgAAAFIAAABhAAAAmQAAAJkAAABlAAAAMwAAAGYAAACZAAAAmQAAAIYAAACZAAAAmQAAAHAAAABSAAAAUgAAAFIAAABSAAAAcQAAAJkAAACZAAAAZQAAADMAAABmAAAAmQAAAJkAAACZAAAAmQAAAJkAAACAAAAAUgAAAFIAAABSAAAAUgAAAHEAAACZAAAAmQAAAHUAAAB1AAAAdQAAAJkAAACZAAAAmQAAAJkAAACZAAAAgAAAAFIAAABSAAAAUgAAAFIAAABhAAAAmQAAAJkAAACGAAAAmQAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAHAAAABSAAAAUgAAAFIAAABSAAAAYQAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAACAAAAAUgAAAFIAAABSAAAAUgAAAHEAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAACZAAAAmQAAAJkAAACZAAAAgAAAAFIAAABSAAAAUgAAAFIAAABxAAAAmQAAAJUAAACuAAAArgAAAK4AAACcAAAAmQAAAJkAAACZAAAAmQAAAHAAAABSAAAAUgAAAFIAAABSAAAAYQAAAJkAAABlAAAA3QAAAN0AAADdAAAAgQAAAJkAAACZAAAAmQAAAJkAAACAAAAAUgAAAFIAAABSAAAAUgAAAHEAAACZAAAAZQAAAN0AAADdAAAA3QAAAIEAAACZAAAAmQAAAJkAAACZAAAAgAAAAFIAAABSAAAAUgAAAFIAAABxAAAAmQAAAGUAAADdAAAA3QAAAN0AAACBAAAAmQAAAJkAAACZAAAAmQAAAHAAAABSAAAAUgAAAFIAAABSAAAArAAAAK8AAAClAAAA3QAAAN0AAADdAAAAoQAAAK8AAACvAAAArwAAAK8AAACwAAAAUgAAAFIAAABSAAAAUgAAAL0AAAC9AAAAvQAAAL0AAAC9AAAAvQAAAL0AAAC9AAAAvQAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAA==",
          "encoding":"base64",
          "height":16,
          "id":1,
          "name":"Tile Layer 1",
-         "opacity":1,
-         "type":"tilelayer",
-         "visible":true,
-         "width":16,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "compression":"",
-         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhQAAAIUAAACFAAAAhQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-         "encoding":"base64",
-         "height":16,
-         "id":4,
-         "name":"coins",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
@@ -37,6 +23,19 @@
  "tiledversion":"1.10.2",
  "tileheight":32,
  "tilesets":[
+        {
+         "columns":5,
+         "firstgid":1,
+         "image":"Dungeon_Tileset.png",
+         "imageheight":160,
+         "imagewidth":160,
+         "margin":0,
+         "name":"Dungeon_Tileset",
+         "spacing":0,
+         "tilecount":0,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
         {
          "columns":16,
          "firstgid":1,
@@ -204,15 +203,6 @@
                         }]
                 }, 
                 {
-                 "id":115,
-                 "properties":[
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
                  "id":116,
                  "properties":[
                         {
@@ -290,7 +280,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -337,8 +327,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":160,
                  "properties":[
@@ -347,7 +336,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":161,
                  "properties":[
@@ -482,10 +472,19 @@
                          "type":"bool",
                          "value":true
                         }]
+                }, 
+                {
+                 "id":185,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
                 },
             
                 {
-                 "id":185,
+                 "id":186,
                  "properties":[
                         {
                          "name":"collides",
@@ -495,15 +494,6 @@
                 }, 
                 {
                  "id":197,
-                 "properties":[
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":201,
                  "properties":[
                         {
                          "name":"collides",
@@ -540,15 +530,6 @@
                 }, 
                 {
                  "id":229,
-                 "properties":[
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":230,
                  "properties":[
                         {
                          "name":"collides",

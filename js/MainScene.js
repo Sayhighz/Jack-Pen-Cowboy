@@ -1,4 +1,6 @@
 import Player from "./Player.js";
+import Enemy from "./enemy.js";
+import Coins from "./coins.js";
 
 let playerHeart = 3;
 let heartGrp;
@@ -12,9 +14,12 @@ export default class MainScene extends Phaser.Scene {
     preload() {
         // Preload assets and player animations
         Player.preload(this);
+        Enemy.preload(this);
+        Coins.preload(this);
+
         this.load.image('heart', 'assets/images/heart.jpg');
-        this.load.image('tiles', 'assets/images/Dungeon_Tileset_at.png');
-        this.load.tilemapTiledJSON('map', 'assets/images/newmap.json');
+        this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
+        this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
     }
 
     create() {
@@ -31,15 +36,20 @@ export default class MainScene extends Phaser.Scene {
             layer1.setCollisionByProperty({ collides: true });
             this.matter.world.convertTilemapLayer(layer1);
 
-            const layer2 = map.createLayer('Tile Layer 2', tileset, 0, 0);
+            // const layer2 = map.createLayer('Tile Layer 2', tileset, 0, 0);
 
-            const layer3 = map.createLayer('Tile Layer 3', tileset, 0, 0);
+            // const layer3 = map.createLayer('coins', tileset, 0, 0);
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
 
         // Create player instance
-        this.player = new Player({ scene: this, x: 50, y: 50, texture: 'female', frame: 'townsfolk_f_idle_1' });
+        this.player = new Player({ scene: this, x: 110, y: 110, texture: 'female', frame: 'townsfolk_f_idle_1' });
+
+        // Create enemy instance
+        this.enemy = new Enemy({ scene: this, x: 210, y: 210, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
+
+        this.coins = new Coins({ scene: this, x: 300, y: 300, texture: 'coins', frame: 'coin_anim_f0' });
 
         // Listen for collision event
         this.matter.world.on('collisionstart', this.handleCollision, this);
@@ -60,17 +70,36 @@ export default class MainScene extends Phaser.Scene {
     update() {
         // Update game logic
         this.player.anims.play('female_idle', true);
+        this.enemy.anims.play('lizard_idle', true);
+
+        this.coins.anims.play('coins_idle', true);
+
         // Additional game logic updates can be added here
     }
 
     handleCollision(event) {
         event.pairs.forEach(pair => {
             const { bodyA, bodyB } = pair;
-
+    
+            // Check collision with static bodies (walls)
             if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
                 isRestarting = true; // Set restarting flag
                 playerHeart--;
-
+    
+                if (playerHeart <= 0) {
+                    playerHeart = 0;
+                    console.log("gameOver");
+                    this.showGameOverDialog();
+                }
+                this.updatePlayerHeart();
+                this.scene.restart();
+            }
+    
+            // Check collision with Enemy
+            if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
+                isRestarting = true; // Set restarting flag
+                playerHeart--;
+    
                 if (playerHeart <= 0) {
                     playerHeart = 0;
                     console.log("gameOver");
@@ -81,6 +110,7 @@ export default class MainScene extends Phaser.Scene {
             }
         });
     }
+    
 
     showGameOverDialog() {
         const dialog = document.getElementById('game-over-dialog');

@@ -1,0 +1,28 @@
+{
+    "anims": [
+        {
+            "key": "lizard_idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "lizard",
+                    "frame": "lizard_f_idle_anim_f0"
+                },
+                {
+                    "key": "lizard",
+                    "frame": "lizard_f_idle_anim_f1"
+                },
+                {
+                    "key": "lizard",
+                    "frame": "lizard_f_idle_anim_f2"
+                },
+                {
+                    "key": "lizard",
+                    "frame": "lizard_f_idle_anim_f3"
+                }
+            ]
+        }
+    ]
+}
