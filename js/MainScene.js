@@ -5,6 +5,8 @@ import Coins from "./coins.js";
 let playerHeart = 3;
 let heartGrp;
 let isRestarting = false;
+let scoreText
+let score = 0
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -35,6 +37,7 @@ export default class MainScene extends Phaser.Scene {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
             layer1.setCollisionByProperty({ collides: true });
             this.matter.world.convertTilemapLayer(layer1);
+            // this.world.convertTilemapLayer(layer1);
 
             // const layer2 = map.createLayer('Tile Layer 2', tileset, 0, 0);
 
@@ -56,6 +59,20 @@ export default class MainScene extends Phaser.Scene {
 
         // Setup input listener for command input and button
         this.setupCommandInput();
+
+        // this.physics.add.overlap(this.player,this.coins,this.onCollectCoins)
+        this.matter.world.on('collisionstart', (event) => {
+            event.pairs.forEach((pair) => {
+                const { bodyA, bodyB } = pair;
+                if ((bodyA.gameObject === this.player && bodyB.gameObject && bodyB.gameObject instanceof Coins) ||
+                    (bodyB.gameObject === this.player && bodyA.gameObject && bodyA.gameObject instanceof Coins)) {
+                    this.onCollectCoins(bodyA.gameObject, bodyB.gameObject); // A = player, B = coin
+                }
+            });
+        });
+
+        scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
+        scoreText.setOrigin(1, 0); // Set origin to the top-right corner
     }
 
     createPlayerHeart() {
@@ -72,7 +89,7 @@ export default class MainScene extends Phaser.Scene {
         this.player.anims.play('female_idle', true);
         this.enemy.anims.play('lizard_idle', true);
 
-        this.coins.anims.play('coins_idle', true);
+        // this.coins.anims.play('coins_idle', true);
 
         // Additional game logic updates can be added here
     }
@@ -136,6 +153,13 @@ export default class MainScene extends Phaser.Scene {
                 heartGrp.getChildren()[i].setVisible(true);
             }
         }
+    }
+
+    onCollectCoins(Player,Coins){
+            console.log("เก็บได้ละ")
+            Coins.destroy()
+            score += 10; // Increase score by 10
+            scoreText.setText('Score: ' + score); // Update score text
     }
 
     setupCommandInput() {
@@ -205,6 +229,9 @@ export default class MainScene extends Phaser.Scene {
                 break;
             case 'down':
                 this.player.moveDown();
+                break;
+            case 'attack':
+                this.player.playerAttack();
                 break;
             default:
                 console.log('Unknown action');
