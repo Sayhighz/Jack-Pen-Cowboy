@@ -20,15 +20,13 @@ export default class MainScene extends Phaser.Scene {
         Coins.preload(this);
 
         this.load.image('heart', 'assets/images/heart.jpg');
-
-        this.load.image('coin', 'assets/coins/coin.png')
-
+        this.load.image('coin', 'assets/coins/coin.png');
         this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
         this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
     }
 
     create() {
-        //heart
+        // Heart
         heartGrp = this.add.group();
         this.createPlayerHeart();
 
@@ -40,11 +38,6 @@ export default class MainScene extends Phaser.Scene {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
             layer1.setCollisionByProperty({ collides: true });
             this.matter.world.convertTilemapLayer(layer1);
-            // this.world.convertTilemapLayer(layer1);
-
-            // const layer2 = map.createLayer('Tile Layer 2', tileset, 0, 0);
-
-            // const layer3 = map.createLayer('coins', tileset, 0, 0);
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
@@ -55,8 +48,8 @@ export default class MainScene extends Phaser.Scene {
         // Create enemy instance
         this.enemy = new Enemy({ scene: this, x: 210, y: 210, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
 
+        // Create coins instance
         this.coins = new Coins({ scene: this, x: 150, y: 150, texture: 'coins', frame: 'coin_anim_f0' });
-        
 
         // Listen for collision event
         this.matter.world.on('collisionstart', this.handleCollision, this);
@@ -64,7 +57,6 @@ export default class MainScene extends Phaser.Scene {
         // Setup input listener for command input and button
         this.setupCommandInput();
 
-        // this.physics.add.overlap(this.player,this.coins,this.onCollectCoins)
         this.matter.world.on('collisionstart', (event) => {
             event.pairs.forEach((pair) => {
                 const { bodyA, bodyB } = pair;
@@ -90,11 +82,14 @@ export default class MainScene extends Phaser.Scene {
 
     update() {
         // Update game logic
-        this.player.anims.play('female_idle', true);//movement
+        this.player.anims.play('female_idle', true); // Player movement
 
-        this.enemy.anims.play('lizard_idle', true)
+        this.enemy.anims.play('lizard_idle', true); // Enemy movement
 
-        // this.coins.anims.play('coins_idle', true);
+        // Check if the coin exists before playing its animation
+        if (this.coins && this.coins.anims) {
+            this.coins.anims.play('coins_idle', true);
+        }
 
         // Additional game logic updates can be added here
     }
@@ -102,12 +97,12 @@ export default class MainScene extends Phaser.Scene {
     handleCollision(event) {
         event.pairs.forEach(pair => {
             const { bodyA, bodyB } = pair;
-    
+
             // Check collision with static bodies (walls)
             if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
                 isRestarting = true; // Set restarting flag
                 playerHeart--;
-    
+
                 if (playerHeart <= 0) {
                     playerHeart = 0;
                     console.log("gameOver");
@@ -116,12 +111,12 @@ export default class MainScene extends Phaser.Scene {
                 this.updatePlayerHeart();
                 this.scene.restart();
             }
-    
+
             // Check collision with Enemy
             if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
                 isRestarting = true; // Set restarting flag
                 playerHeart--;
-    
+
                 if (playerHeart <= 0) {
                     playerHeart = 0;
                     console.log("gameOver");
@@ -132,10 +127,12 @@ export default class MainScene extends Phaser.Scene {
             }
         });
     }
-    
 
     showGameOverDialog() {
         const dialog = document.getElementById('game-over-dialog');
+
+      
+
         const restartButton = document.getElementById('restart-button');
 
         dialog.style.display = 'block';
@@ -160,11 +157,12 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-    onCollectCoins(Player,Coins){
-            console.log("เก็บได้ละ")
-            Coins.destroy()
-            score += 10; // Increase score by 10
-            scoreText.setText('Score: ' + score); // Update score text
+    onCollectCoins(player, coin) {
+        console.log("เก็บได้ละ");
+        coin.destroy();
+        this.coins = null; // Set the coin reference to null after destroying
+        score += 10; // Increase score by 10
+        scoreText.setText('Score: ' + score); // Update score text
     }
 
     setupCommandInput() {

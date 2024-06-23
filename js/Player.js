@@ -4,8 +4,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         super(scene.matter.world, x, y, texture, frame);
         this.scene.add.existing(this);
 
-        this.tileSize = 32; // ขนาดของ tile
-        this.isMoving = false; // ตรวจสอบว่าตัวละครกำลังเคลื่อนที่อยู่หรือไม่
+        this.tileSize = 32; // Tile size
+        this.isMoving = false; // Check if the character is moving
 
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
@@ -17,6 +17,10 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         });
         this.setExistingBody(compoundBody);
         this.setFixedRotation();
+        
+        // Ensure debug drawing is disabled for this body
+        this.body.debugShowBody = false;
+        this.body.debugShowStaticBody = false;
     }
 
     static preload(scene) {
@@ -89,11 +93,11 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     playerAttack() {
-        console.log("attack")
+        console.log("attack");
     }
 
     stopAnimation() {
         this.anims.stop();
-        this.setFrame('townsfolk_f_idle_1'); // ตั้งกรอบไปที่ท่าทางยืนนิ่ง
+        this.setFrame('townsfolk_f_idle_1'); // Set frame to idle
     }
 }

@@ -4,7 +4,7 @@ import StartScene from "./StartScene.js";
 const config = {
     type: Phaser.AUTO,
     parent: 'survival-game',
-    scene: [StartScene, MainScene],  // เพิ่ม StartScene ก่อน MainScene
+    scene: [StartScene, MainScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -14,7 +14,10 @@ const config = {
     physics: {
         default: 'matter',
         matter: {
-            debug: true,
+            debug: {
+                showBody: true,  // Disable body debug drawing globally
+                showStaticBody: true,  // Disable static body debug drawing globally
+            },
             gravity: { y: 0 },
         }
     },
