@@ -1,10 +1,10 @@
-// survival-game.js
 import MainScene from "./MainScene.js";
+import StartScene from "./StartScene.js";
 
 const config = {
     type: Phaser.AUTO,
     parent: 'survival-game',
-    scene: [MainScene],
+    scene: [StartScene, MainScene],  // เพิ่ม StartScene ก่อน MainScene
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -18,13 +18,6 @@ const config = {
             gravity: { y: 0 },
         }
     },
-    // physics: {
-    //     default: "arcade",
-    //     arcade: {
-    //         gravity: { y: 0 },
-    //         debug: false
-    //     }
-    // },
     plugins: {
         scene: [
             {

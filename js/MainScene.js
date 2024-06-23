@@ -92,6 +92,8 @@ export default class MainScene extends Phaser.Scene {
         // Update game logic
         this.player.anims.play('female_idle', true);//movement
 
+        this.enemy.anims.play('lizard_idle', true)
+
         // this.coins.anims.play('coins_idle', true);
 
         // Additional game logic updates can be added here
