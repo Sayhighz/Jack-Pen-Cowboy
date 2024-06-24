@@ -22,6 +22,10 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         });
         this.setExistingBody(compoundBody);
         this.setFixedRotation();
+        
+        // Ensure debug drawing is disabled for this body
+        this.body.debugShowBody = false;
+        this.body.debugShowStaticBody = false;
     }
 
     static preload(scene) {
@@ -102,8 +106,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_R == Math.round(enemyGrp[i].x)) {
                         enemyGrp[i].destroy()
-                        this.scoreManager.updateScore(10); // เพิ่มคะแนน 10
-                        console.log(this.scoreManager.getScore())
                     }
                 }
             }
@@ -114,8 +116,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_L == Math.round(enemyGrp[i].x)) {
                         enemyGrp[i].destroy()
-                        this.scoreManager.updateScore(10); // เพิ่มคะแนน 10
-                        console.log(this.scoreManager.getScore())
                     }
                 }
             }
@@ -126,8 +126,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_U == Math.round(enemyGrp[i].y)) {
                         enemyGrp[i].destroy()
-                        this.scoreManager.updateScore(10); // เพิ่มคะแนน 10
-                        console.log(this.scoreManager.getScore())
                     }
                 }
             }
@@ -136,12 +134,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             let playerAttack_D = Number(Math.round(player.y)) + 32
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
-                    console.log(playerAttack_D)
-                    console.log(Math.round(enemyGrp[i].y))
                     if (playerAttack_D == Math.round(enemyGrp[i].y)) {
                         enemyGrp[i].destroy()
-                        this.scoreManager.updateScore(10); // เพิ่มคะแนน 10
-                        console.log(this.scoreManager.getScore())
                     }
                 }
             }
@@ -150,6 +144,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
     stopAnimation() {
         this.anims.stop();
-        this.setFrame('townsfolk_f_idle_1'); // ตั้งกรอบไปที่ท่าทางยืนนิ่ง
+        this.setFrame('townsfolk_f_idle_1'); // Set frame to idle
     }
 }

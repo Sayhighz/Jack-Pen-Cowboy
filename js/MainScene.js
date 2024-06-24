@@ -7,9 +7,10 @@ let playerHeart = 3;
 let heartGrp;
 let isRestarting = false;
 let scoreText
+let score = 0
 let lastActionMove = "right"
 let enemyGrp = []
-// let coinsGrp = []
+let coinsGrp = []
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -24,15 +25,13 @@ export default class MainScene extends Phaser.Scene {
         Coins.preload(this);
 
         this.load.image('heart', 'assets/images/heart.jpg');
-
-        this.load.image('coin', 'assets/coins/coin.png')
-
+        this.load.image('coin', 'assets/coins/coin.png');
         this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
         this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
     }
 
     create() {
-        //heart
+        // Heart
         heartGrp = this.add.group();
         this.createPlayerHeart();
 
@@ -44,11 +43,6 @@ export default class MainScene extends Phaser.Scene {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
             layer1.setCollisionByProperty({ collides: true });
             this.matter.world.convertTilemapLayer(layer1);
-            // this.world.convertTilemapLayer(layer1);
-
-            // const layer2 = map.createLayer('Tile Layer 2', tileset, 0, 0);
-
-            // const layer3 = map.createLayer('coins', tileset, 0, 0);
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
@@ -72,7 +66,6 @@ export default class MainScene extends Phaser.Scene {
         // Setup input listener for command input and button
         this.setupCommandInput();
 
-        // this.physics.add.overlap(this.player,this.coins,this.onCollectCoins)
         this.matter.world.on('collisionstart', (event) => {
             event.pairs.forEach((pair) => {
                 const { bodyA, bodyB } = pair;
@@ -104,19 +97,28 @@ export default class MainScene extends Phaser.Scene {
 
     createCoins(posX,posY) {
         this.coins = new Coins({ scene: this, x: posX, y: posY, texture: 'coins', frame: 'coin_anim_f0' });
+        let coins = this.coins
+        coinsGrp.push(coins)
     }
 
     update() {
         // Update game logic
-        this.player.anims.play('female_idle', true);    //movement
+        this.player.anims.play('female_idle', true); // Player movement
+
+        // this.enemy.anims.play('lizard_idle', true); // Enemy movement
+
+        // Check if the coin exists before playing its animation
+        if (this.coins && this.coins.anims) {
+            this.coins.anims.play('coins_idle', true);
+        }
+
+        if(this.enemy && this.enemy.anims) {
+            this.enemy.anims.play('lizard_idle', true);
+        }
 
         // Additional game logic updates can be added here
 
-        for(let i = 0 ; i < enemyGrp.length ; i++){
-            this.enemyGrp[i].anims.play('lizard_idle', true);
-        }
-
-        scoreText.setText('Score: ' + this.scoreManager.getScore());
+        scoreText.setText("SCORE : " + this.scoreManager.getScore())
     }
 
     handleCollision(event) {
@@ -155,9 +157,11 @@ export default class MainScene extends Phaser.Scene {
         });
     }
 
-
     showGameOverDialog() {
         const dialog = document.getElementById('game-over-dialog');
+
+      
+
         const restartButton = document.getElementById('restart-button');
 
         dialog.style.display = 'block';
@@ -282,12 +286,12 @@ export default class MainScene extends Phaser.Scene {
 
 
 //คำสั่ง
-//right()
-//left()
-//up()
-//down()
-//attack()
-//turn_right()  //หันขวา
-//turn_left()   //หันซ้าย
-//turn_toface() //หันหน้า
+//right()           //เดินขวา
+//left()            //เดินซ้าย
+//up()              //เดินขึ้น
+//down()            //เดินลง
+//attack()          //โจมตี
+//turn_right()      //หันขวา
+//turn_left()       //หันซ้าย
+//turn_toface()     //หันหน้า
 //turn_yourback()   //หันหลัง
