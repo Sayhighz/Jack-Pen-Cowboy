@@ -6,7 +6,7 @@ export default class Coins extends Phaser.Physics.Matter.Sprite {
 
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
-        const coinCollider = Bodies.circle(this.x, this.y, 12, { isSensor: false, label: 'coinCollider' });
+        const coinCollider = Bodies.circle(this.x, this.y, 6, { isSensor: false, label: 'coinCollider' });
         const compoundBody = Body.create({
             parts: [coinCollider],
             frictionAir: 0.35,

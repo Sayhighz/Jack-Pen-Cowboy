@@ -1,16 +1,20 @@
 import Player from "./Player.js";
 import Enemy from "./enemy.js";
 import Coins from "./coins.js";
+import ScoreManager from './ScoreManager.js'; // import ScoreManager
 
 let playerHeart = 3;
 let heartGrp;
 let isRestarting = false;
 let scoreText
-let score = 0
+let lastActionMove = "right"
+let enemyGrp = []
+// let coinsGrp = []
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
         super("MainScene");
+        this.scoreManager = new ScoreManager();
     }
 
     preload() {
@@ -53,10 +57,14 @@ export default class MainScene extends Phaser.Scene {
         this.player = new Player({ scene: this, x: 110, y: 110, texture: 'female', frame: 'townsfolk_f_idle_1' });
 
         // Create enemy instance
-        this.enemy = new Enemy({ scene: this, x: 210, y: 210, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
+        this.createEnemy(206, 206,2)
+        this.createEnemy(174, 238,3)
+        this.createEnemy(334, 142,2)
 
-        this.coins = new Coins({ scene: this, x: 150, y: 150, texture: 'coins', frame: 'coin_anim_f0' });
-        
+        this.createCoins(142,142)
+        this.createCoins(302,142)
+        this.createCoins(302,302)
+
 
         // Listen for collision event
         this.matter.world.on('collisionstart', this.handleCollision, this);
@@ -88,24 +96,38 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
+    createEnemy(posX, posY , health) {
+        this.enemy = new Enemy({ scene: this, x: posX, y: posY, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
+        let enemy = this.enemy
+        enemyGrp.push(enemy)
+    }
+
+    createCoins(posX,posY) {
+        this.coins = new Coins({ scene: this, x: posX, y: posY, texture: 'coins', frame: 'coin_anim_f0' });
+    }
+
     update() {
         // Update game logic
-        this.player.anims.play('female_idle', true);//movement
-
-        // this.coins.anims.play('coins_idle', true);
+        this.player.anims.play('female_idle', true);    //movement
 
         // Additional game logic updates can be added here
+
+        for(let i = 0 ; i < enemyGrp.length ; i++){
+            this.enemyGrp[i].anims.play('lizard_idle', true);
+        }
+
+        scoreText.setText('Score: ' + this.scoreManager.getScore());
     }
 
     handleCollision(event) {
         event.pairs.forEach(pair => {
             const { bodyA, bodyB } = pair;
-    
+
             // Check collision with static bodies (walls)
             if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
                 isRestarting = true; // Set restarting flag
                 playerHeart--;
-    
+
                 if (playerHeart <= 0) {
                     playerHeart = 0;
                     console.log("gameOver");
@@ -113,13 +135,14 @@ export default class MainScene extends Phaser.Scene {
                 }
                 this.updatePlayerHeart();
                 this.scene.restart();
+                this.scoreManager.resetScore()
             }
-    
+
             // Check collision with Enemy
             if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
                 isRestarting = true; // Set restarting flag
                 playerHeart--;
-    
+
                 if (playerHeart <= 0) {
                     playerHeart = 0;
                     console.log("gameOver");
@@ -127,10 +150,11 @@ export default class MainScene extends Phaser.Scene {
                 }
                 this.updatePlayerHeart();
                 this.scene.restart();
+                this.scoreManager.resetScore()
             }
         });
     }
-    
+
 
     showGameOverDialog() {
         const dialog = document.getElementById('game-over-dialog');
@@ -158,11 +182,9 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-    onCollectCoins(Player,Coins){
-            console.log("เก็บได้ละ")
-            Coins.destroy()
-            score += 10; // Increase score by 10
-            scoreText.setText('Score: ' + score); // Update score text
+    onCollectCoins(Player, Coins) {
+        Coins.destroy()         //แก้ให้ไม่หายทั้งหมด
+        this.scoreManager.updateScore(5)
     }
 
     setupCommandInput() {
@@ -223,21 +245,49 @@ export default class MainScene extends Phaser.Scene {
         switch (action) {
             case 'left':
                 this.player.moveLeft();
+                lastActionMove = "left"
                 break;
             case 'right':
                 this.player.moveRight();
+                lastActionMove = "right"
                 break;
             case 'up':
                 this.player.moveUp();
+                lastActionMove = "up"
                 break;
             case 'down':
                 this.player.moveDown();
+                lastActionMove = "down"
                 break;
             case 'attack':
-                this.player.playerAttack();
+                this.player.playerAttack(this.player, lastActionMove, enemyGrp);
+                break;
+            case 'turn_right':
+                lastActionMove = "right"
+                break;
+            case 'turn_left':
+                lastActionMove = "left"
+                break;
+            case 'turn_toface':
+                lastActionMove = "up"
+                break;
+            case 'turn_yourback':
+                lastActionMove = "down"
                 break;
             default:
                 console.log('Unknown action');
         }
     }
 }
+
+
+//คำสั่ง
+//right()
+//left()
+//up()
+//down()
+//attack()
+//turn_right()  //หันขวา
+//turn_left()   //หันซ้าย
+//turn_toface() //หันหน้า
+//turn_yourback()   //หันหลัง
