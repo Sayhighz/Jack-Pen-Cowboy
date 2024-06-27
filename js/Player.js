@@ -24,14 +24,14 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     static preload(scene) {
-        scene.load.atlas('female', 'assets/images/female.png', 'assets/images/female_atlas.json');
-        scene.load.animation('female_anim', 'assets/images/female_anim.json');
+        scene.load.atlas('knight', 'assets/testhero/knight.png', 'assets/testhero/knight_atlas.json');
+        scene.load.animation('knight_anim', 'assets/testhero/knight_anim.json');
     }
 
     moveLeft() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('walk_left');
+            this.play('run');
             this.scene.tweens.add({
                 targets: this,
                 x: this.x - this.tileSize,
@@ -43,11 +43,11 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
-
+    
     moveRight() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('walk_right');
+            this.play('run');
             this.scene.tweens.add({
                 targets: this,
                 x: this.x + this.tileSize,
@@ -59,11 +59,11 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
-
+    
     moveUp() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('walk_up');
+            this.play('run');
             this.scene.tweens.add({
                 targets: this,
                 y: this.y - this.tileSize,
@@ -75,11 +75,11 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
-
+    
     moveDown() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('walk_down');
+            this.play('run');
             this.scene.tweens.add({
                 targets: this,
                 y: this.y + this.tileSize,
@@ -91,54 +91,56 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
-
+    
     playerAttack(player, lastActionMove, enemyGrp) {
-        console.log("attack = ", lastActionMove)
-        console.log(player.x, player.y)
+        console.log("attack = ", lastActionMove);
+        console.log(player.x, player.y);
+        this.play('hit');
         if (lastActionMove == "right") {
-            let playerAttack_R = Number(Math.round(player.x)) + 32
+            let playerAttack_R = Number(Math.round(player.x)) + 32;
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_R == Math.round(enemyGrp[i].x)) {
-                        enemyGrp[i].destroy()
+                        enemyGrp[i].destroy();
                     }
                 }
             }
         }
         else if (lastActionMove == "left") {
-            let playerAttack_L = Number(Math.round(player.x)) - 32
+            let playerAttack_L = Number(Math.round(player.x)) - 32;
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_L == Math.round(enemyGrp[i].x)) {
-                        enemyGrp[i].destroy()
+                        enemyGrp[i].destroy();
                     }
                 }
             }
         }
         else if (lastActionMove == "up") {
-            let playerAttack_U = Number(Math.round(player.y)) - 32
+            let playerAttack_U = Number(Math.round(player.y)) - 32;
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_U == Math.round(enemyGrp[i].y)) {
-                        enemyGrp[i].destroy()
+                        enemyGrp[i].destroy();
                     }
                 }
             }
         }
         else if (lastActionMove == "down") {
-            let playerAttack_D = Number(Math.round(player.y)) + 32
+            let playerAttack_D = Number(Math.round(player.y)) + 32;
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_D == Math.round(enemyGrp[i].y)) {
-                        enemyGrp[i].destroy()
+                        enemyGrp[i].destroy();
                     }
                 }
             }
         }
     }
-
+    
     stopAnimation() {
         this.anims.stop();
-        this.setFrame('townsfolk_f_idle_1'); // Set frame to idle
+        this.play('idle')
+        this.setFrame('knight_m_idle_anim_f1'); // Set frame to idle
     }
 }

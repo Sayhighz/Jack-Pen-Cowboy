@@ -2,6 +2,8 @@ import Player from "./Player.js";
 import Enemy from "./enemy.js";
 import Coins from "./coins.js";
 
+
+
 let playerHeart = 3;
 let heartGrp;
 let isRestarting = false;
@@ -47,7 +49,8 @@ export default class MainScene extends Phaser.Scene {
         }
 
         // Create player instance
-        this.player = new Player({ scene: this, x: 110, y: 110, texture: 'female', frame: 'townsfolk_f_idle_1' });
+        this.player = new Player({ scene: this, x: 110, y: 110, texture: 'knight', frame: 'knight_m_idle_anim_f1' });
+        this.player.anims.play('idle', true); // Player movement
         this.crown = this.add.image(this.player.x, this.player.y - 10, 'crown');
         this.crown.setScale(0.05)
 
@@ -112,7 +115,7 @@ export default class MainScene extends Phaser.Scene {
 
     update() {
         // Update game logic
-        this.player.anims.play('female_idle', true); // Player movement
+        // this.player.anims.play('idle', true); // Player movement
 
         this.crown.x = this.player.x;
         this.crown.y = this.player.y - 10;
