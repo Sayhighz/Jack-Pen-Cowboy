@@ -38,7 +38,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.stopAnimation();
+                   this.play('idle')
                 }
             });
         }
@@ -54,7 +54,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.stopAnimation();
+                   this.play('idle')
                 }
             });
         }
@@ -70,7 +70,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.stopAnimation();
+                   this.play('idle')
                 }
             });
         }
@@ -86,7 +86,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.stopAnimation();
+                   this.play('idle')
                 }
             });
         }
@@ -95,23 +95,40 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     playerAttack(player, lastActionMove, enemyGrp) {
         console.log("attack = ", lastActionMove);
         console.log(player.x, player.y);
-        this.play('hit');
+
         if (lastActionMove == "right") {
             let playerAttack_R = Number(Math.round(player.x)) + 32;
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_R == Math.round(enemyGrp[i].x)) {
-                        enemyGrp[i].destroy();
+                        this.play('hit'); // เริ่มเล่น animation การโจมตี
+                        this.stopAnimation(); // หยุด animation เดิน
+                        enemyGrp[i].destroy(); // ทำลาย enemy
+
+                        // คืนสถานะเป็น animation idle หลังจาก animation การโจมตีเสร็จสิ้น
+                        this.scene.time.delayedCall(300, () => {
+                            this.play('idle');
+                        });
                     }
                 }
             }
         }
+        // เพิ่มเงื่อนไขสำหรับทิศทางอื่น ๆ ตามต้องการ
+        // }
+
         else if (lastActionMove == "left") {
             let playerAttack_L = Number(Math.round(player.x)) - 32;
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_L == Math.round(enemyGrp[i].x)) {
+                        this.play('hit');
+                        this.stopAnimation();
                         enemyGrp[i].destroy();
+
+                        // เพิ่มการเรียกใช้งาน animation idle หลังจาก animation การโจมตีเสร็จสิ้น
+                        this.scene.time.delayedCall(300, () => {
+                            this.play('idle');
+                        });
                     }
                 }
             }
@@ -121,7 +138,14 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_U == Math.round(enemyGrp[i].y)) {
+                        this.play('hit');
+                        this.stopAnimation();
                         enemyGrp[i].destroy();
+
+                        // เพิ่มการเรียกใช้งาน animation idle หลังจาก animation การโจมตีเสร็จสิ้น
+                        this.scene.time.delayedCall(300, () => {
+                            this.play('idle');
+                        });
                     }
                 }
             }
@@ -131,7 +155,14 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_D == Math.round(enemyGrp[i].y)) {
+                        this.play('hit');
+                        this.stopAnimation();
                         enemyGrp[i].destroy();
+
+                        // เพิ่มการเรียกใช้งาน animation idle หลังจาก animation การโจมตีเสร็จสิ้น
+                        this.scene.time.delayedCall(300, () => {
+                            this.play('idle');
+                        });
                     }
                 }
             }
@@ -140,7 +171,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
     stopAnimation() {
         this.anims.stop();
-        this.play('idle')
-        this.setFrame('knight_m_idle_anim_f1'); // Set frame to idle
+        // this.play('idle')
+        // this.setFrame('knight_m_idle_anim_f1'); // Set frame to idle
     }
 }
