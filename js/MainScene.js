@@ -114,6 +114,9 @@ export default class MainScene extends Phaser.Scene {
         // Update game logic
         this.player.anims.play('female_idle', true); // Player movement
 
+        this.crown.x = this.player.x;
+        this.crown.y = this.player.y - 10;
+
         // this.enemy.anims.play('lizard_idle', true); // Enemy movement
 
         // Check if the coin exists before playing its animation
