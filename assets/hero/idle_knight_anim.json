@@ -1,0 +1,28 @@
+{
+    "anims": [
+        {
+            "key": "idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "knight",
+                    "frame": "knight_f_idle_anim_f0"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_idle_anim_f1"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_idle_anim_f2"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_idle_anim_f3"
+                }
+            ]
+        }
+    ]
+}
