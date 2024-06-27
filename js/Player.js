@@ -95,6 +95,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     playerAttack(player, lastActionMove, enemyGrp) {
         console.log("attack = ", lastActionMove)
         console.log(player.x, player.y)
+        console.log(enemyGrp)
         if (lastActionMove == "right") {
             let playerAttack_R = Number(Math.round(player.x)) + 32
             for (let i = 0; i < enemyGrp.length; i++) {
