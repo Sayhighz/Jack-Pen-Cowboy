@@ -22,7 +22,7 @@ export default class MainScene extends Phaser.Scene {
         Enemy.preload(this);
         Coins.preload(this);
 
-        this.load.image('heart', 'assets/images/heart.jpg');
+        this.load.image('heart', 'assets/images/ui_heart_full.png');
         this.load.image('coin', 'assets/coins/coin.png');
         this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
         this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
@@ -90,7 +90,7 @@ export default class MainScene extends Phaser.Scene {
     createPlayerHeart() {
         for (let i = 0; i < playerHeart; i++) {
             let heart = this.add.sprite(40 + (i * 50), 20, "heart");
-            heart.setScale(0.05);
+            heart.setScale(2.5);
             heart.depth = 10;
             heartGrp.add(heart);
         }
