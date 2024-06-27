@@ -103,6 +103,7 @@ export default class MainScene extends Phaser.Scene {
         this.enemy = new Enemy({ scene: this, x: posX, y: posY, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
         let enemy = this.enemy
         enemy.anims.play('lizard_idle', true); // Ensure each enemy plays its animation
+        enemy.health = health
         enemyGrp.push(enemy)
     }
 
