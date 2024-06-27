@@ -92,12 +92,14 @@ export default class MainScene extends Phaser.Scene {
     createEnemy(posX, posY , health) {
         this.enemy = new Enemy({ scene: this, x: posX, y: posY, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
         let enemy = this.enemy
+        enemy.anims.play('lizard_idle', true); // Ensure each enemy plays its animation
         enemyGrp.push(enemy)
     }
 
     createCoins(posX,posY) {
         this.coins = new Coins({ scene: this, x: posX, y: posY, texture: 'coins', frame: 'coin_anim_f0' });
         let coins = this.coins
+        this.coins.anims.play('coins_idle', true);
         coinsGrp.push(coins)
     }
 
@@ -108,13 +110,6 @@ export default class MainScene extends Phaser.Scene {
         // this.enemy.anims.play('lizard_idle', true); // Enemy movement
 
         // Check if the coin exists before playing its animation
-        if (this.coins && this.coins.anims) {
-            this.coins.anims.play('coins_idle', true);
-        }
-
-        if(this.enemy && this.enemy.anims) {
-            this.enemy.anims.play('lizard_idle', true);
-        }
 
         // Additional game logic updates can be added here
 

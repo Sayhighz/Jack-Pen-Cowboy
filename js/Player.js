@@ -121,7 +121,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
         else if (lastActionMove == "up") {
-            let playerAttack_U = Number(Math.round(player.y)) + 32
+            let playerAttack_U = Number(Math.round(player.y)) - 32
             for (let i = 0; i < enemyGrp.length; i++) {
                 if (enemyGrp[i].active == true) {
                     if (playerAttack_U == Math.round(enemyGrp[i].y)) {
