@@ -17,7 +17,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         });
         this.setExistingBody(compoundBody);
         this.setFixedRotation();
-        
+
         // Ensure debug drawing is disabled for this body
         this.body.debugShowBody = false;
         this.body.debugShowStaticBody = false;
@@ -43,7 +43,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
-    
+
     moveRight() {
         if (!this.isMoving) {
             this.isMoving = true;
@@ -59,7 +59,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
-    
+
     moveUp() {
         if (!this.isMoving) {
             this.isMoving = true;
@@ -75,7 +75,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
-    
+
     moveDown() {
         if (!this.isMoving) {
             this.isMoving = true;
@@ -91,7 +91,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
-    
+
     playerAttack(player, lastActionMove, enemyGrp) {
         console.log("attack = ", lastActionMove);
         console.log(player.x, player.y);
@@ -137,7 +137,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
     }
-    
+
     stopAnimation() {
         this.anims.stop();
         this.play('idle')
