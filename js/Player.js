@@ -1,5 +1,3 @@
-import ScoreManager from './ScoreManager.js'; // import ScoreManager
-
 export default class Player extends Phaser.Physics.Matter.Sprite {
     constructor(data) {
         let { scene, x, y, texture, frame } = data;
@@ -8,9 +6,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         this.tileSize = 32; // ขนาดของ tile             //เดินไปเท่านี้
         this.isMoving = false; // ตรวจสอบว่าตัวละครกำลังเคลื่อนที่อยู่หรือไม่
-
-        // สร้าง ScoreManager
-        this.scoreManager = new ScoreManager();
 
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
