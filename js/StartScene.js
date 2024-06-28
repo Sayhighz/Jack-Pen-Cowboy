@@ -50,7 +50,7 @@ export default class StartScene extends Phaser.Scene {
 
         // เพิ่ม event เมื่อคลิกปุ่มเริ่มเกม
         startButton.on('pointerdown', () => {
-            this.scene.start('MainScene');  // เรียก MainScene เมื่อคลิกปุ่ม
+            this.scene.start('SelectScene');  // เรียก MainScene เมื่อคลิกปุ่ม
         });
 
         // เพิ่ม event เมื่อคลิกปุ่มตั้งค่า

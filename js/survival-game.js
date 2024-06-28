@@ -1,10 +1,11 @@
 import MainScene from "./MainScene.js";
 import StartScene from "./StartScene.js";
+import SelectScene  from "./SelectScene.js";
 
 const config = {
     type: Phaser.AUTO,
     parent: 'survival-game',
-    scene: [StartScene, MainScene],
+    scene: [StartScene, SelectScene, MainScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
