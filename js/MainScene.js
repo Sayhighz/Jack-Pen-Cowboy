@@ -19,6 +19,8 @@ export default class MainScene extends Phaser.Scene {
     }
 
     preload() {
+        
+        console.log('StartMain')
         // Preload assets and player animations
         Player.preload(this);
         Enemy.preload(this);
@@ -32,6 +34,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
+    
         // Heart
         heartGrp = this.add.group();
         this.createPlayerHeart();
@@ -49,8 +52,23 @@ export default class MainScene extends Phaser.Scene {
         }
 
         // Create player instance
-        this.player = new Player({ scene: this, x: 110, y: 110, texture: 'knight', frame: 'knight_m_idle_anim_f1' });
-        this.player.anims.play('idle', true); // Player movement
+        const selectedCharacter = this.scene.settings.data.character;
+
+        // กำหนด texture และ animations สำหรับตัวละครที่ถูกเลือก
+        let texture, animPrefix;
+        
+        if (selectedCharacter === 'knightt') {
+            texture = 'knight';
+            animPrefix = 'knightt';
+        } else if (selectedCharacter === 'wizzard') {
+            texture = 'wizard';
+            animPrefix = 'wizzard';
+        }
+    
+        // สร้าง player instance
+        this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
+        this.player.anims.play(`${animPrefix}_idle`, true);
+        
         this.crown = this.add.image(this.player.x, this.player.y - 10, 'crown');
         this.crown.setScale(0.05)
 

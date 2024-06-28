@@ -1,11 +1,13 @@
 export default class Player extends Phaser.Physics.Matter.Sprite {
     constructor(data) {
-        let { scene, x, y, texture, frame } = data;
+        let { scene, x, y, texture, frame, animPrefix } = data;
         super(scene.matter.world, x, y, texture, frame);
+        this.animPrefix = animPrefix; // เพิ่ม property นี้
+
         this.scene.add.existing(this);
 
-        this.tileSize = 32; // ขนาดของ tile             //เดินไปเท่านี้
-        this.isMoving = false; // ตรวจสอบว่าตัวละครกำลังเคลื่อนที่อยู่หรือไม่
+        this.tileSize = 32; // ขนาดของ tile
+        this.isMoving = false;
 
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
@@ -26,35 +28,41 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     static preload(scene) {
         scene.load.atlas('knight', 'assets/testhero/knight.png', 'assets/testhero/knight_atlas.json');
         scene.load.animation('knight_anim', 'assets/testhero/knight_anim.json');
+
+        scene.load.atlas('wizard', 'assets/testhero/wizard/wizard.png', 'assets/testhero/wizard/wizard_atlas.json');
+        scene.load.animation('wizard_anim', 'assets/testhero/wizard/wizard_anim.json');
     }
 
     moveLeft() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('run');
+            console.log('Playing run animation:', `${this.animPrefix}_run`);
+            this.play(`${this.animPrefix}_run`);
             this.scene.tweens.add({
                 targets: this,
                 x: this.x - this.tileSize,
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.play('idle')
+                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
+                    this.play(`${this.animPrefix}_idle`);
                 }
             });
         }
     }
+    
 
     moveRight() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('run');
+            this.play(`${this.animPrefix}_run`);
             this.scene.tweens.add({
                 targets: this,
                 x: this.x + this.tileSize,
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.play('idle')
+                    this.play(`${this.animPrefix}_idle`);
                 }
             });
         }
@@ -63,14 +71,14 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     moveUp() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('run');
+            this.play(`${this.animPrefix}_run`);
             this.scene.tweens.add({
                 targets: this,
                 y: this.y - this.tileSize,
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.play('idle')
+                    this.play(`${this.animPrefix}_idle`);
                 }
             });
         }
@@ -79,14 +87,14 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     moveDown() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('run');
+            this.play(`${this.animPrefix}_run`);
             this.scene.tweens.add({
                 targets: this,
                 y: this.y + this.tileSize,
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.play('idle')
+                    this.play(`${this.animPrefix}_idle`);
                 }
             });
         }
@@ -126,19 +134,15 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     playerAttackAni() {
-        this.play('hit'); // เริ่มเล่น animation การโจมตี
-        this.stopAnimation(); // หยุด animation เดิน
+        this.play(`${this.animPrefix}_hit`);
+        this.stopAnimation();
 
-
-        // เพิ่มการเรียกใช้งาน animation idle หลังจาก animation การโจมตีเสร็จสิ้น
         this.scene.time.delayedCall(300, () => {
-            this.play('idle');
+            this.play(`${this.animPrefix}_idle`);
         });
     }
 
     stopAnimation() {
         this.anims.stop();
-        // this.play('idle')
-        // this.setFrame('knight_m_idle_anim_f1'); // Set frame to idle
     }
 }

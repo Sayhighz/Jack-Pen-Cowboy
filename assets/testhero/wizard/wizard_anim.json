@@ -1,0 +1,64 @@
+{
+    "anims": [
+        {
+            "key": "wizzard_idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_idle_anim_f0"
+                },
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_idle_anim_f1"
+                },
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_idle_anim_f2"
+                },
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_idle_anim_f3"
+                }
+            ]
+        },
+        {
+            "key": "wizzard_run",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_run_anim_f0"
+                },
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_run_anim_f1"
+                },
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_run_anim_f2"
+                },
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_run_anim_f3"
+                }
+            ]
+        },
+        {
+            "key": "wizzard_hit",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "wizard",
+                    "frame": "wizzard_f_hit_anim_f0"
+                }
+            ]
+        }
+    ]
+}
