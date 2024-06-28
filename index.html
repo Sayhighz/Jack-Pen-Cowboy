@@ -7,17 +7,57 @@
     <title>Survival Game</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        #game-wrapper {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #command-label {
+            resize: none;
+            flex-grow: 1;
+        }
+
+        #tutorial-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            #tutorial-box {
+                flex-direction: row;
+                text-align: left;
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-center bg-cover h-screen" style="background-image: url('/assets/images/game_bg.jpg')">
     <div class="container mx-auto flex flex-col md:flex-row justify-center space-x-0 md:space-x-4 space-y-4 md:space-y-0 h-full p-4">
-        <div id="game-wrapper" class="w-full md:w-1/2 bg-base-100 bg-opacity-80 rounded-lg shadow-md p-4 flex flex-col">
-            <div id="survival-game" class="flex-grow border-2 border-base-300 rounded-lg shadow-md bg-base-200 mb-4"></div>
+        <div id="game-wrapper" class="w-full md:w-8/12 bg-base-100 bg-opacity-80 rounded-lg shadow-md p-4 flex flex-col">
+            <div id="survival-game" class="flex-grow border-2 border-base-300 rounded-lg shadow-md bg-base-200 mb-4">
+            </div>
         </div>
-        <div id="command-container" class="w-full md:w-1/2 bg-base-100 bg-opacity-80 rounded-lg shadow-md p-4 flex flex-col">
+        <div id="command-container" class="w-full md:w-4/12 bg-base-100 bg-opacity-80 rounded-lg shadow-md p-4 flex flex-col" style="display: none;">
             <h2 id="command-label1" class="text-lg font-bold text-base-content mb-2 text-center">CODE QUEST</h2>
-            <textarea id="command-label" placeholder="ใส่คำสั่ง..." class="textarea textarea-primary bg-neutral text-neutral-content border border-neutral-focus rounded-lg p-2 resize-none flex-grow"></textarea>
+            <textarea id="command-label" placeholder="ใส่คำสั่ง..." class="textarea textarea-primary w-full h-4/6 bg-neutral text-neutral-content border border-neutral-focus rounded-lg p-2 flex-grow"></textarea>
             <button id="command-button" class="btn btn-primary w-full mt-2">เริ่ม!</button>
+            <!-- Tutorial box -->
+            <div id="tutorial-box" class="tutorial-box bg-white shadow-lg p-4 border-2 border-black rounded-lg bottom-4 right-4 z-10 mt-4 md:mt-0 md:bottom-auto md:right-auto h-20vh md:h-1/5" style="display: none;">
+                <!-- <img src="assets/images/tutorial_character.png" alt="Tutorial Character" class="w-20 h-20 mr-4"> -->
+                <div class="flex-1">
+                    <!-- <h2 class="text-xl font-bold mb-1">คำสั่ง</h2> -->
+            <p class="text-black" style="white-space: pre-line;">
+                คำสั่ง สามารถใส่ตัวเลขจำนวนครั้งได้เช่น right(10)
+                right()           เดินขวา        attack()          โจมตี
+                left()            เดินซ้าย        turn_right()      หันขวา
+                up()              เดินขึ้น         turn_left()       หันซ้าย
+                down()            เดินลง         turn_toface()     หันหน้า
+                turn_yourback()   หันหลัง
+            </p>
+                </div>
+            </div>
         </div>
     </div>
     <div id="game-over-dialog" class="modal modal-open flex items-center justify-center" style="display:none;">

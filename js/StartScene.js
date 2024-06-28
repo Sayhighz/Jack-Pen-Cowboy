@@ -25,6 +25,11 @@ export default class StartScene extends Phaser.Scene {
     }
 
     create() {
+        // ซ่อน command-container
+        const commandContainer = document.getElementById('command-container');
+        const tutorial = document.getElementById('tutorial-box');
+        commandContainer.style.display = 'none';
+    
         // ตรวจสอบว่าภาพพื้นหลังถูกโหลดหรือไม่
         if (this.textures.exists('startBackground')) {
             // เพิ่มภาพพื้นหลัง
@@ -32,13 +37,16 @@ export default class StartScene extends Phaser.Scene {
         } else {
             console.error('Error: startBackground image not found');
         }
-
+    
         // เพิ่มปุ่มเริ่มเกม
         const startButton = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 100, 'startButton').setInteractive();
-
+    
         // เพิ่ม event เมื่อคลิกปุ่ม
         startButton.on('pointerdown', () => {
             this.scene.start('MainScene');  // เรียก MainScene เมื่อคลิกปุ่ม
+            commandContainer.style.display = 'block'
+            tutorial.style.display = 'block';
         });
     }
+    
 }
