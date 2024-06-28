@@ -1,16 +1,13 @@
-import ScoreManager from './ScoreManager.js'; // import ScoreManager
-
 export default class Player extends Phaser.Physics.Matter.Sprite {
     constructor(data) {
-        let { scene, x, y, texture, frame } = data;
+        let { scene, x, y, texture, frame, animPrefix } = data;
         super(scene.matter.world, x, y, texture, frame);
+        this.animPrefix = animPrefix; // เพิ่ม property นี้
+
         this.scene.add.existing(this);
 
-        this.tileSize = 32; // ขนาดของ tile             //เดินไปเท่านี้
-        this.isMoving = false; // ตรวจสอบว่าตัวละครกำลังเคลื่อนที่อยู่หรือไม่
-
-        // สร้าง ScoreManager
-        this.scoreManager = new ScoreManager();
+        this.tileSize = 32; // ขนาดของ tile
+        this.isMoving = false;
 
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
@@ -22,44 +19,50 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         });
         this.setExistingBody(compoundBody);
         this.setFixedRotation();
-        
+
         // Ensure debug drawing is disabled for this body
         this.body.debugShowBody = false;
         this.body.debugShowStaticBody = false;
     }
 
     static preload(scene) {
-        scene.load.atlas('female', 'assets/images/female.png', 'assets/images/female_atlas.json');
-        scene.load.animation('female_anim', 'assets/images/female_anim.json');
+        scene.load.atlas('knight', 'assets/testhero/knight.png', 'assets/testhero/knight_atlas.json');
+        scene.load.animation('knight_anim', 'assets/testhero/knight_anim.json');
+
+        scene.load.atlas('wizard', 'assets/testhero/wizard/wizard.png', 'assets/testhero/wizard/wizard_atlas.json');
+        scene.load.animation('wizard_anim', 'assets/testhero/wizard/wizard_anim.json');
     }
 
     moveLeft() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('walk_left');
+            console.log('Playing run animation:', `${this.animPrefix}_run`);
+            this.play(`${this.animPrefix}_run`);
             this.scene.tweens.add({
                 targets: this,
                 x: this.x - this.tileSize,
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.stopAnimation();
+                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
+                    this.play(`${this.animPrefix}_idle`);
                 }
             });
         }
     }
+    
 
     moveRight() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('walk_right');
+            this.play(`${this.animPrefix}_run`);
             this.scene.tweens.add({
                 targets: this,
                 x: this.x + this.tileSize,
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.stopAnimation();
+                    this.play(`${this.animPrefix}_idle`);
                 }
             });
         }
@@ -68,14 +71,14 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     moveUp() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('walk_up');
+            this.play(`${this.animPrefix}_run`);
             this.scene.tweens.add({
                 targets: this,
                 y: this.y - this.tileSize,
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.stopAnimation();
+                    this.play(`${this.animPrefix}_idle`);
                 }
             });
         }
@@ -84,66 +87,62 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     moveDown() {
         if (!this.isMoving) {
             this.isMoving = true;
-            this.play('walk_down');
+            this.play(`${this.animPrefix}_run`);
             this.scene.tweens.add({
                 targets: this,
                 y: this.y + this.tileSize,
                 duration: 300,
                 onComplete: () => {
                     this.isMoving = false;
-                    this.stopAnimation();
+                    this.play(`${this.animPrefix}_idle`);
                 }
             });
         }
     }
 
     playerAttack(player, lastActionMove, enemyGrp) {
-        console.log("attack = ", lastActionMove)
-        console.log(player.x, player.y)
-        if (lastActionMove == "right") {
-            let playerAttack_R = Number(Math.round(player.x)) + 32
-            for (let i = 0; i < enemyGrp.length; i++) {
-                if (enemyGrp[i].active == true) {
-                    if (playerAttack_R == Math.round(enemyGrp[i].x)) {
-                        enemyGrp[i].destroy()
-                    }
-                }
-            }
+        console.log("attack = ", lastActionMove);
+        console.log(player.x, player.y);
+        console.log(enemyGrp);
+    
+        let attackPosition = { x: player.x, y: player.y };
+    
+        switch (lastActionMove) {
+            case "right":
+                attackPosition.x += 32;
+                break;
+            case "left":
+                attackPosition.x -= 32;
+                break;
+            case "up":
+                attackPosition.y -= 32;
+                break;
+            case "down":
+                attackPosition.y += 32;
+                break;
         }
-        else if (lastActionMove == "left") {
-            let playerAttack_L = Number(Math.round(player.x)) - 32
-            for (let i = 0; i < enemyGrp.length; i++) {
-                if (enemyGrp[i].active == true) {
-                    if (playerAttack_L == Math.round(enemyGrp[i].x)) {
-                        enemyGrp[i].destroy()
-                    }
-                }
-            }
-        }
-        else if (lastActionMove == "up") {
-            let playerAttack_U = Number(Math.round(player.y)) + 32
-            for (let i = 0; i < enemyGrp.length; i++) {
-                if (enemyGrp[i].active == true) {
-                    if (playerAttack_U == Math.round(enemyGrp[i].y)) {
-                        enemyGrp[i].destroy()
-                    }
-                }
-            }
-        }
-        else if (lastActionMove == "down") {
-            let playerAttack_D = Number(Math.round(player.y)) + 32
-            for (let i = 0; i < enemyGrp.length; i++) {
-                if (enemyGrp[i].active == true) {
-                    if (playerAttack_D == Math.round(enemyGrp[i].y)) {
-                        enemyGrp[i].destroy()
-                    }
+    
+        for (let i = 0; i < enemyGrp.length; i++) {
+            if (enemyGrp[i].active == true) {
+                if (Math.round(attackPosition.x) == Math.round(enemyGrp[i].x) && 
+                    Math.round(attackPosition.y) == Math.round(enemyGrp[i].y)) {
+                    this.playerAttackAni();
+                    enemyGrp[i].destroy();
                 }
             }
         }
     }
 
+    playerAttackAni() {
+        this.play(`${this.animPrefix}_hit`);
+        this.stopAnimation();
+
+        this.scene.time.delayedCall(300, () => {
+            this.play(`${this.animPrefix}_idle`);
+        });
+    }
+
     stopAnimation() {
         this.anims.stop();
-        this.setFrame('townsfolk_f_idle_1'); // Set frame to idle
     }
 }

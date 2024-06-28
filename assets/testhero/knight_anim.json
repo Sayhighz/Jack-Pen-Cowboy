@@ -1,0 +1,64 @@
+{
+    "anims": [
+        {
+            "key": "knightt_hit",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "knight",
+                    "frame": "knight_f_hit_anim_f0"
+                }
+            ]
+        },
+        {
+            "key": "knightt_run",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "knight",
+                    "frame": "knight_f_run_anim_f0"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_run_anim_f1"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_run_anim_f2"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_run_anim_f3"
+                }
+            ]
+        },
+        {
+            "key": "knightt_idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "knight",
+                    "frame": "knight_f_idle_anim_f0"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_idle_anim_f1"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_idle_anim_f2"
+                },
+                {
+                    "key": "knight",
+                    "frame": "knight_f_idle_anim_f3"
+                }
+            ]
+        }
+    ]
+}

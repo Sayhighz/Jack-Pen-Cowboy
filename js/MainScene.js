@@ -1,36 +1,40 @@
 import Player from "./Player.js";
 import Enemy from "./enemy.js";
 import Coins from "./coins.js";
-import ScoreManager from './ScoreManager.js'; // import ScoreManager
+
+
 
 let playerHeart = 3;
 let heartGrp;
 let isRestarting = false;
+let lastActionMove = "right"
 let scoreText
 let score = 0
-let lastActionMove = "right"
 let enemyGrp = []
 let coinsGrp = []
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
         super("MainScene");
-        this.scoreManager = new ScoreManager();
     }
 
     preload() {
+        
+        console.log('StartMain')
         // Preload assets and player animations
         Player.preload(this);
         Enemy.preload(this);
         Coins.preload(this);
 
-        this.load.image('heart', 'assets/images/heart.jpg');
+        this.load.image('heart', 'assets/images/ui_heart_full.png');
         this.load.image('coin', 'assets/coins/coin.png');
         this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
         this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
+        this.load.image('crown', 'assets/images/crown_NBG.png')
     }
 
     create() {
+    
         // Heart
         heartGrp = this.add.group();
         this.createPlayerHeart();
@@ -48,17 +52,41 @@ export default class MainScene extends Phaser.Scene {
         }
 
         // Create player instance
-        this.player = new Player({ scene: this, x: 110, y: 110, texture: 'female', frame: 'townsfolk_f_idle_1' });
+        const selectedCharacter = this.scene.settings.data.character;
 
-        // Create enemy instance
-        this.createEnemy(206, 206,2)
-        this.createEnemy(174, 238,3)
-        this.createEnemy(334, 142,2)
+        // กำหนด texture และ animations สำหรับตัวละครที่ถูกเลือก
+        let texture, animPrefix;
+        
+        if (selectedCharacter === 'knightt') {
+            texture = 'knight';
+            animPrefix = 'knightt';
+        } else if (selectedCharacter === 'wizzard') {
+            texture = 'wizard';
+            animPrefix = 'wizzard';
+        }
+    
+        // สร้าง player instance
+        this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
+        this.player.anims.play(`${animPrefix}_idle`, true);
+        
+        this.crown = this.add.image(this.player.x, this.player.y - 10, 'crown');
+        this.crown.setScale(0.05)
 
-        this.createCoins(142,142)
-        this.createCoins(302,142)
-        this.createCoins(302,302)
+        this.tweens.add({
+            targets: this.crown,
+            alpha: { from: 1, to: 0 },
+            duration: 800, // duration of one blink cycle
+            yoyo: true,
+            repeat: -1 // repeat forever
+        });
 
+        this.createEnemy(206, 206, 2)
+        this.createEnemy(174, 238, 3)
+        this.createEnemy(334, 142, 2)
+
+        this.createCoins(142, 142)
+        this.createCoins(302, 142)
+        this.createCoins(302, 302)
 
         // Listen for collision event
         this.matter.world.on('collisionstart', this.handleCollision, this);
@@ -83,42 +111,41 @@ export default class MainScene extends Phaser.Scene {
     createPlayerHeart() {
         for (let i = 0; i < playerHeart; i++) {
             let heart = this.add.sprite(40 + (i * 50), 20, "heart");
-            heart.setScale(0.05);
+            heart.setScale(2.5);
             heart.depth = 10;
             heartGrp.add(heart);
         }
     }
 
-    createEnemy(posX, posY , health) {
+    createEnemy(posX, posY, health) {
         this.enemy = new Enemy({ scene: this, x: posX, y: posY, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
         let enemy = this.enemy
+        enemy.anims.play('lizard_idle', true); // Ensure each enemy plays its animation
+        enemy.health = health
         enemyGrp.push(enemy)
     }
 
-    createCoins(posX,posY) {
+    createCoins(posX, posY) {
         this.coins = new Coins({ scene: this, x: posX, y: posY, texture: 'coins', frame: 'coin_anim_f0' });
         let coins = this.coins
+        this.coins.anims.play('coins_idle', true);
         coinsGrp.push(coins)
     }
 
     update() {
         // Update game logic
-        this.player.anims.play('female_idle', true); // Player movement
+        // this.player.anims.play('idle', true); // Player movement
+
+        this.crown.x = this.player.x;
+        this.crown.y = this.player.y - 10;
 
         // this.enemy.anims.play('lizard_idle', true); // Enemy movement
 
         // Check if the coin exists before playing its animation
-        if (this.coins && this.coins.anims) {
-            this.coins.anims.play('coins_idle', true);
-        }
-
-        if(this.enemy && this.enemy.anims) {
-            this.enemy.anims.play('lizard_idle', true);
-        }
 
         // Additional game logic updates can be added here
 
-        scoreText.setText("SCORE : " + this.scoreManager.getScore())
+        scoreText.setText("SCORE : " + score)
     }
 
     handleCollision(event) {
@@ -137,7 +164,7 @@ export default class MainScene extends Phaser.Scene {
                 }
                 this.updatePlayerHeart();
                 this.scene.restart();
-                this.scoreManager.resetScore()
+                score = 0
             }
 
             // Check collision with Enemy
@@ -152,15 +179,13 @@ export default class MainScene extends Phaser.Scene {
                 }
                 this.updatePlayerHeart();
                 this.scene.restart();
-                this.scoreManager.resetScore()
+                score = 0
             }
         });
     }
 
     showGameOverDialog() {
         const dialog = document.getElementById('game-over-dialog');
-
-      
 
         const restartButton = document.getElementById('restart-button');
 
@@ -188,7 +213,7 @@ export default class MainScene extends Phaser.Scene {
 
     onCollectCoins(Player, Coins) {
         Coins.destroy()         //แก้ให้ไม่หายทั้งหมด
-        this.scoreManager.updateScore(5)
+        score += 5
     }
 
     setupCommandInput() {
@@ -215,6 +240,7 @@ export default class MainScene extends Phaser.Scene {
         // Button click event listener
         commandButton.addEventListener('click', () => {
             executeCommands();
+            score = 0
         });
 
         // Also handle Enter key press in textarea
@@ -272,10 +298,10 @@ export default class MainScene extends Phaser.Scene {
             case 'turn_left':
                 lastActionMove = "left"
                 break;
-            case 'turn_toface':
+            case 'turn_up':
                 lastActionMove = "up"
                 break;
-            case 'turn_yourback':
+            case 'turn_down':
                 lastActionMove = "down"
                 break;
             default:
@@ -293,5 +319,5 @@ export default class MainScene extends Phaser.Scene {
 //attack()          //โจมตี
 //turn_right()      //หันขวา
 //turn_left()       //หันซ้าย
-//turn_toface()     //หันหน้า
-//turn_yourback()   //หันหลัง
+//turn_up()         //หันหน้า
+//turn_down()       //หันหลัง
