@@ -103,10 +103,9 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     playerAttack(player, lastActionMove, enemyGrp) {
         console.log("attack = ", lastActionMove);
         console.log(player.x, player.y);
-        console.log(enemyGrp);
-    
+
         let attackPosition = { x: player.x, y: player.y };
-    
+
         switch (lastActionMove) {
             case "right":
                 attackPosition.x += 32;
@@ -121,13 +120,17 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 attackPosition.y += 32;
                 break;
         }
-    
+
         for (let i = 0; i < enemyGrp.length; i++) {
             if (enemyGrp[i].active == true) {
-                if (Math.round(attackPosition.x) == Math.round(enemyGrp[i].x) && 
+                if (Math.round(attackPosition.x) == Math.round(enemyGrp[i].x) &&
                     Math.round(attackPosition.y) == Math.round(enemyGrp[i].y)) {
+                    enemyGrp[i].health -= 1
+                    console.log(enemyGrp[i].health)
                     this.playerAttackAni();
-                    enemyGrp[i].destroy();
+                    if(enemyGrp[i].health <= 0) {
+                        enemyGrp[i].destroy()
+                    }
                 }
             }
         }
