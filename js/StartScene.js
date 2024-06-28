@@ -29,6 +29,7 @@ export default class StartScene extends Phaser.Scene {
         const commandContainer = document.getElementById('command-container');
         const tutorial = document.getElementById('tutorial-box');
         commandContainer.style.display = 'none';
+        tutorial.style.display = 'none';
     
         // ตรวจสอบว่าภาพพื้นหลังถูกโหลดหรือไม่
         if (this.textures.exists('startBackground')) {
