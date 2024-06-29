@@ -12,6 +12,7 @@ let scoreText
 let score = 0
 let enemyGrp = []
 let coinsGrp = []
+let timesOfCommand = 0                      //เอาไว้นับจำนวนคำสั่ง สามารถใช้ได้แล้ว 
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -158,7 +159,6 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-
     createCoins(posX, posY) {
         this.coins = new Coins({ scene: this, x: posX, y: posY, texture: 'coins', frame: 'coin_anim_f0' });
         let coins = this.coins
@@ -276,7 +276,9 @@ export default class MainScene extends Phaser.Scene {
                 isRestarting = false; // Clear restarting flag
                 const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
                 for (const command of commands) {
-                    if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restarting
+                    if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restartingฃ
+                        timesOfCommand ++
+                        console.log(timesOfCommand)
                         await this.executeCommand(command.trim());
                     }
                 }
