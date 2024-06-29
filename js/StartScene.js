@@ -26,6 +26,12 @@ export default class StartScene extends Phaser.Scene {
     }
 
     create() {
+        // ซ่อน command-container
+        const commandContainer = document.getElementById('command-container');
+        const tutorial = document.getElementById('tutorial-box');
+        commandContainer.style.display = 'none';
+        tutorial.style.display = 'none';
+    
         // ตรวจสอบว่าภาพพื้นหลังถูกโหลดหรือไม่
         if (this.textures.exists('startBackground')) {
             // เพิ่มภาพพื้นหลัง
@@ -33,7 +39,7 @@ export default class StartScene extends Phaser.Scene {
         } else {
             console.error('Error: startBackground image not found');
         }
-
+    
         // เพิ่มปุ่มเริ่มเกม
         const startButton = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 100, 'startButton').setInteractive();
         this.tweens.add({
@@ -50,7 +56,9 @@ export default class StartScene extends Phaser.Scene {
 
         // เพิ่ม event เมื่อคลิกปุ่มเริ่มเกม
         startButton.on('pointerdown', () => {
-            this.scene.start('SelectScene');  // เรียก MainScene เมื่อคลิกปุ่ม
+            this.scene.start('MainScene');  // เรียก MainScene เมื่อคลิกปุ่ม
+            commandContainer.style.display = 'block'
+            tutorial.style.display = 'block';
         });
 
         // เพิ่ม event เมื่อคลิกปุ่มตั้งค่า
@@ -58,4 +66,5 @@ export default class StartScene extends Phaser.Scene {
             this.scene.start('Settings');
         });
     }
+    
 }
