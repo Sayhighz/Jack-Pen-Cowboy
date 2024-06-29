@@ -42,6 +42,7 @@ export default class SelectScene extends Phaser.Scene {
     
         // Handle hover animation for knightButton
         knightButton.on('pointerover', () => {
+            knightButton.setTint(0xff0000); // เปลี่ยนสีพื้นหลังเป็นสีแดง
             this.tweens.add({
                 targets: knightButton,
                 scaleX: 2.8,
@@ -52,9 +53,14 @@ export default class SelectScene extends Phaser.Scene {
                 repeat: 0
             });
         });
+        
+        knightButton.on('pointerout', () => {
+            knightButton.clearTint(); // กลับไปที่สีเดิมเมื่อไม่ได้วางเมาส์เหนือปุ่ม
+        });
     
         // Handle hover animation for wizardButton
         wizardButton.on('pointerover', () => {
+            wizardButton.setTint(0xff0000);
             this.tweens.add({
                 targets: wizardButton,
                 scaleX: 2.8,
@@ -64,6 +70,10 @@ export default class SelectScene extends Phaser.Scene {
                 yoyo: true,
                 repeat: 0
             });
+        });
+
+        wizardButton.on('pointerout', () => {
+            wizardButton.clearTint(); // กลับไปที่สีเดิมเมื่อไม่ได้วางเมาส์เหนือปุ่ม
         });
     
         // Handle character button click
@@ -77,13 +87,13 @@ export default class SelectScene extends Phaser.Scene {
             this.startGame();
         });
     
-        // Add start game button
-        const startButton = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 100, 'startButton').setInteractive();
+        // // Add start game button
+        // const startButton = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 100, 'startButton').setInteractive();
     
         // Add event when start button is clicked
-        startButton.on('pointerdown', () => {
-            this.startGame();  // Call startGame when button is clicked
-        });
+        // startButton.on('pointerdown', () => {
+        //     this.startGame();  // Call startGame when button is clicked
+        // });
     }
     
 
