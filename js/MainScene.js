@@ -19,7 +19,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     preload() {
-        
+
         console.log('StartMain')
         // Preload assets and player animations
         Player.preload(this);
@@ -34,7 +34,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-    
+
         // Heart
         heartGrp = this.add.group();
         this.createPlayerHeart();
@@ -56,7 +56,7 @@ export default class MainScene extends Phaser.Scene {
 
         // กำหนด texture และ animations สำหรับตัวละครที่ถูกเลือก
         let texture, animPrefix;
-        
+
         if (selectedCharacter === 'knightt') {
             texture = 'knight';
             animPrefix = 'knightt';
@@ -64,11 +64,11 @@ export default class MainScene extends Phaser.Scene {
             texture = 'wizard';
             animPrefix = 'wizzard';
         }
-    
+
         // สร้าง player instance
         this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
-        
+
         this.crown = this.add.image(this.player.x, this.player.y - 10, 'crown');
         this.crown.setScale(0.05)
 
@@ -83,7 +83,7 @@ export default class MainScene extends Phaser.Scene {
 
         // Create Enemy and Coins
         this.createEnemy(206, 206, 3)
-        this.createEnemy(174, 238, 3)
+        this.createEnemy(174, 238, 4)
         this.createEnemy(334, 142, 2)
 
         this.createCoins(142, 142)
@@ -123,20 +123,41 @@ export default class MainScene extends Phaser.Scene {
     createEnemy(posX, posY, health) {
         // สร้างศัตรู
         this.enemy = new Enemy({ scene: this, x: posX, y: posY, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
-        let enemy = this.enemy
+        let enemy = this.enemy;
         enemy.anims.play('lizard_idle', true);
-        enemy.health = health
-        enemy.maxHealth = health // เก็บค่าสุขภาพสูงสุด
+        enemy.health = health;
+        enemy.maxHealth = health; // ต้องกำหนดค่า maxHealth ด้วย
 
-        // สร้างกราฟิกหลอดเลือด
-        enemy.healthBar = this.add.graphics();
-        enemy.healthBar.fillStyle(0x00ff00, 1); // สีเขียว
-        enemy.healthBar.fillRect(enemy.x - 20, enemy.y - 10, 40, 5); // ขนาดและตำแหน่งของหลอดเลือด
+        this.updateHealthBar(enemy);
 
         // เพิ่มศัตรูลงในกลุ่ม
-        enemyGrp.push(enemy)
-
+        enemyGrp.push(enemy);
     }
+
+    updateHealthBar(enemy) {
+        // สร้างกราฟิกหลอดเลือด
+        let barWidth = 5; // ความกว้างของช่องหลอดเลือด
+        let barHeight = 3; // ความสูงของช่องหลอดเลือด
+        let barSpacing = 2; // ช่องว่างระหว่างหลอดเลือด
+        let totalWidth = enemy.maxHealth * (barWidth + barSpacing) - barSpacing; // ความกว้างรวมของหลอดเลือดทั้งหมด
+        enemy.healthBars = [];
+
+        for (let i = 0; i < enemy.maxHealth; i++) {
+            const healthBar = this.add.graphics();
+            if (i < enemy.health) {
+                healthBar.fillStyle(0x00ff00, 1); // สีเขียวถ้ายังมีสุขภาพ
+            } else {
+                healthBar.fillStyle(0xff0000, 1); // สีแดงถ้าสุขภาพลด
+            }
+            healthBar.fillRect(enemy.x - totalWidth / 2 + i * (barWidth + barSpacing), enemy.y - 10, barWidth, barHeight); // ขนาดและตำแหน่งของหลอดเลือด
+            enemy.healthBars.push(healthBar);
+        }
+
+        if (enemy.health === 0) {
+            console.log("เลือดไม่เหลือ");
+        }
+    }
+
 
     createCoins(posX, posY) {
         this.coins = new Coins({ scene: this, x: posX, y: posY, texture: 'coins', frame: 'coin_anim_f0' });
@@ -199,12 +220,13 @@ export default class MainScene extends Phaser.Scene {
         });
     }
 
-    // enemyReset() {
-    //     enemyGrp.forEach(enemy => {
-    //         enemy.health = enemy.maxHealth; // Reset each enemy's health
-    //         console.log(enemy.health , enemy.maxHealth)
-    //     });
-    // }
+    enemyReset() {
+        if(enemyGrp.active === true){
+            for(let i = 0 ;i < enemyGrp.length ; i++){
+                enemyGrp[i].health = enemyGrp[i].maxHealth
+            }
+        }
+    }
 
     showGameOverDialog() {
         const dialog = document.getElementById('game-over-dialog');
@@ -246,9 +268,11 @@ export default class MainScene extends Phaser.Scene {
         const executeCommands = async () => {
             isRestarting = true; // Set restarting flag
             this.scene.restart(); // Restart the scene
+            score = 0
 
             // Wait for the scene to restart
             this.events.once('create', async () => {
+                this.enemyReset()
                 isRestarting = false; // Clear restarting flag
                 const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
                 for (const command of commands) {
@@ -262,13 +286,11 @@ export default class MainScene extends Phaser.Scene {
         // Button click event listener
         commandButton.addEventListener('click', () => {
             executeCommands();
-            score = 0
         });
 
         // Also handle Enter key press in textarea
         commandLabel.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
-                score = 0
                 e.preventDefault(); // Prevent default Enter key behavior (submitting form)
                 await executeCommands(); // Execute commands when Enter is pressed
             }
@@ -313,7 +335,7 @@ export default class MainScene extends Phaser.Scene {
                 lastActionMove = "down"
                 break;
             case 'attack':
-                this.player.playerAttack(this.player, lastActionMove, enemyGrp);
+                this.playerAttack(this.player, lastActionMove, enemyGrp);
                 break;
             case 'turn_right':
                 lastActionMove = "right"
@@ -330,6 +352,56 @@ export default class MainScene extends Phaser.Scene {
             default:
                 console.log('Unknown action');
         }
+    }
+
+    playerAttack(player, lastActionMove, enemyGrp) {
+        console.log("attack = ", lastActionMove);
+        console.log(player.x, player.y);
+
+        let attackPosition = { x: player.x, y: player.y };
+
+        switch (lastActionMove) {
+            case "right":
+                attackPosition.x += 32;
+                break;
+            case "left":
+                attackPosition.x -= 32;
+                break;
+            case "up":
+                attackPosition.y -= 32;
+                break;
+            case "down":
+                attackPosition.y += 32;
+                break;
+        }
+
+        for (let i = 0; i < enemyGrp.length; i++) {
+            if (enemyGrp[i].active == true) {
+                if (Math.round(attackPosition.x) == Math.round(enemyGrp[i].x) &&
+                    Math.round(attackPosition.y) == Math.round(enemyGrp[i].y)) {
+                    enemyGrp[i].health--
+                    console.log(enemyGrp[i].health)
+                    this.playerAttackAni();
+                    this.updateHealthBar(enemyGrp[i])
+                    if (enemyGrp[i].health <= 0) {
+                        enemyGrp[i].destroy()
+                    }
+                }
+            }
+        }
+    }
+
+    playerAttackAni() {
+        this.player.anims.play(`${this.player.animPrefix}_hit`);
+        this.stopAnimation();
+
+        setTimeout(() => {
+            this.player.anims.play(`${this.player.animPrefix}_idle`);
+        }, 300);
+    }
+
+    stopAnimation() {
+        this.player.anims.stop();
     }
 }
 
