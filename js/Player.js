@@ -31,6 +31,9 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         scene.load.atlas('wizard', 'assets/testhero/wizard/wizard.png', 'assets/testhero/wizard/wizard_atlas.json');
         scene.load.animation('wizard_anim', 'assets/testhero/wizard/wizard_anim.json');
+
+        scene.load.atlas('elf', 'assets/testhero/elf/elf.png', 'assets/testhero/elf/elf_atlas.json');
+        scene.load.animation('elf_anim', 'assets/testhero/elf/elf_anim.json');
     }
 
     moveLeft() {

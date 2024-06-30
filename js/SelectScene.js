@@ -6,12 +6,13 @@ export default class SelectScene extends Phaser.Scene {
 
     preload() {
         // Load background and buttons
-        this.load.image('ss', 'assets/images/game_bg.jpg');
+        this.load.image('ss', 'assets/images/ง่วง (1).jpg');
         this.load.spritesheet('startButton', 'assets/images/play_button.png', { frameWidth: 190, frameHeight: 49 });
 
         // Load character images
         this.load.image('knightt', 'assets/hero/knight.png');
         this.load.image('wizzard', 'assets/hero/wizard.png');
+        this.load.image('elff', 'assets/hero/elf.png');
 
         // Check file loading status
         this.load.on('filecomplete', (fileKey) => {
@@ -29,16 +30,26 @@ export default class SelectScene extends Phaser.Scene {
 
     create() {
         // Add background image
-        this.add.image(this.scale.width / 2, this.scale.height / 2, 'ss');
+        const background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'ss');
+        background.setDisplaySize(this.scale.width, this.scale.height);
     
         // Add character buttons with initial scale
-        const knightButton = this.add.sprite(this.scale.width / 2 - 100, this.scale.height / 2, 'knightt').setInteractive();
-        const wizardButton = this.add.sprite(this.scale.width / 2 + 100, this.scale.height / 2, 'wizzard').setInteractive();
+        const knightButton = this.add.sprite(this.scale.width / 2 - 100, this.scale.height / 2 + 90, 'knightt').setInteractive();
+        const wizardButton = this.add.sprite(this.scale.width / 2 + 100, this.scale.height / 2 + 90, 'wizzard').setInteractive();
+        const elfButton = this.add.sprite(this.scale.width / 2 , this.scale.height / 2 + 90, 'elff').setInteractive();
 
         knightButton.setScale(2); // Adjust the scale factor as needed
+     
+        elfButton.setScale(2); // Adjust the scale factor as needed
 
         // Scale up the wizard button
         wizardButton.setScale(2); // Adjust the scale factor as needed
+
+        const WordTop = this.add.text(this.scale.width / 2, 200, 'Select Character', { font: '20px Anton', fill: '#ffffff' }).setOrigin(0.5);
+
+        const knightName = this.add.text(knightButton.x, knightButton.y - 30, 'Knight', { font: '20px Anton', fill: '#ffffff' }).setOrigin(0.5);
+        const wizardName = this.add.text(wizardButton.x, wizardButton.y - 30, 'Wizard', { font: '20px Anton', fill: '#ffffff' }).setOrigin(0.5);
+        const elfName = this.add.text(elfButton.x, elfButton.y - 30, 'Elf', { font: '20px Anton', fill: '#ffffff' }).setOrigin(0.5);
     
         // Handle hover animation for knightButton
         knightButton.on('pointerover', () => {
@@ -74,6 +85,28 @@ export default class SelectScene extends Phaser.Scene {
 
         wizardButton.on('pointerout', () => {
             wizardButton.clearTint(); // กลับไปที่สีเดิมเมื่อไม่ได้วางเมาส์เหนือปุ่ม
+        });
+
+        elfButton.on('pointerover', () => {
+            elfButton.setTint(0xff0000);
+            this.tweens.add({
+                targets: elfButton,
+                scaleX: 2.8,
+                scaleY: 2.8,
+                duration: 200,
+                ease: 'Linear',
+                yoyo: true,
+                repeat: 0
+            });
+        });
+
+        elfButton.on('pointerout', () => {
+            elfButton.clearTint(); // กลับไปที่สีเดิมเมื่อไม่ได้วางเมาส์เหนือปุ่ม
+        });
+        
+        elfButton.on('pointerdown', () => {
+            this.selectedCharacter = 'elff';
+            this.startGame();
         });
     
         // Handle character button click

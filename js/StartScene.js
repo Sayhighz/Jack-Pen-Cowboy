@@ -7,9 +7,9 @@ export default class StartScene extends Phaser.Scene {
 
     preload() {
         // โหลดภาพพื้นหลังและปุ่ม
-        this.load.image('startBackground', 'assets/images/title_bg.jpg');
+        this.load.image('startBackground', 'assets/images/ง่วง.jpg');
         this.load.spritesheet('startButton', 'assets/images/play_button.png', { frameWidth: 190, frameHeight: 49 });
-        this.load.image('settingsButton', 'assets/images/setting_btn.png', { frameWidth: 190, frameHeight: 49 }); // โหลดภาพปุ่มใหม่
+        this.load.image('settingsButton', 'assets/images/options_button.png', { frameWidth: 190, frameHeight: 49 }); // โหลดภาพปุ่มใหม่
 
         // ตรวจสอบการโหลดไฟล์ภาพ
         this.load.on('filecomplete', (fileKey, type, data) => {
@@ -35,7 +35,9 @@ export default class StartScene extends Phaser.Scene {
         // ตรวจสอบว่าภาพพื้นหลังถูกโหลดหรือไม่
         if (this.textures.exists('startBackground')) {
             // เพิ่มภาพพื้นหลัง
-            this.add.image(this.scale.width / 2, this.scale.height / 2, 'startBackground');
+            const background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'startBackground');
+            background.setDisplaySize(this.scale.width, this.scale.height);
+            
         } else {
             console.error('Error: startBackground image not found');
         }
@@ -49,10 +51,19 @@ export default class StartScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1 // repeat forever
         });
+
+        const settingsButton = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 170, 'settingsButton').setInteractive();
+        this.tweens.add({
+            targets: settingsButton,
+            alpha: { from: 1, to: 0.5 },
+            duration: 1000, // duration of one blink cycle
+            yoyo: true,
+            repeat: -1 // repeat forever
+        });
         
         // เพิ่มปุ่มตั้งค่า
-        const settingsButton = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 225, 'settingsButton').setInteractive();
-        settingsButton.setScale(0.1)
+        // const settingsButton = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 150, 'settingsButton').setInteractive();
+        // settingsButton.setScale(1)
 
         // เพิ่ม event เมื่อคลิกปุ่มเริ่มเกม
         startButton.on('pointerdown', () => {
