@@ -221,11 +221,12 @@ export default class MainScene extends Phaser.Scene {
     }
 
     enemyReset() {
-        if(enemyGrp.active === true){
-            for(let i = 0 ;i < enemyGrp.length ; i++){
-                enemyGrp[i].health = enemyGrp[i].maxHealth
-            }
+        console.log(enemyGrp)
+        for (let i = 0; i < enemyGrp.length; i++) {
+            enemyGrp[i].health = enemyGrp[i].maxHealth
+            console.log(enemyGrp[i].health, enemyGrp[i].maxHealth, "ตัวที่ ", i)
         }
+
     }
 
     showGameOverDialog() {
@@ -268,16 +269,16 @@ export default class MainScene extends Phaser.Scene {
         const executeCommands = async () => {
             isRestarting = true; // Set restarting flag
             this.scene.restart(); // Restart the scene
+            this.enemyReset()
             score = 0
 
             // Wait for the scene to restart
             this.events.once('create', async () => {
-                this.enemyReset()
                 isRestarting = false; // Clear restarting flag
                 const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
                 for (const command of commands) {
                     if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restartingฃ
-                        timesOfCommand ++
+                        timesOfCommand++
                         console.log(timesOfCommand)
                         await this.executeCommand(command.trim());
                     }
@@ -381,16 +382,27 @@ export default class MainScene extends Phaser.Scene {
             if (enemyGrp[i].active == true) {
                 if (Math.round(attackPosition.x) == Math.round(enemyGrp[i].x) &&
                     Math.round(attackPosition.y) == Math.round(enemyGrp[i].y)) {
-                    enemyGrp[i].health--
-                    console.log(enemyGrp[i].health)
-                    this.playerAttackAni();
-                    this.updateHealthBar(enemyGrp[i])
-                    if (enemyGrp[i].health <= 0) {
-                        enemyGrp[i].destroy()
-                    }
+                    this.onPlayerAttack(enemyGrp[i])
                 }
             }
         }
+    }
+
+    onPlayerAttack(enemy) {
+        enemy.health--
+        console.log(enemy.health, enemy.maxHealth)
+        this.playerAttackAni();
+        this.updateHealthBar(enemy)
+        if (enemy.health <= 0) {
+            enemy.destroy()
+            score += 10
+        }
+        // this.input.keyboard.on('keydown', (event) => {
+        //     if (event.key === 'Enter') {
+        //         this.enemyReset();
+        //         this.executeCommand();
+        //     }
+        // });
     }
 
     playerAttackAni() {
