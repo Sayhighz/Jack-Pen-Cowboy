@@ -176,6 +176,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.crown.x = this.player.x;
         this.crown.y = this.player.y - 10;
+        
 
         // this.enemy.anims.play('lizard_idle', true); // Enemy movement
 

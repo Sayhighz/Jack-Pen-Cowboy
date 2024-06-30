@@ -36,11 +36,14 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         scene.load.animation('elf_anim', 'assets/testhero/elf/elf_anim.json');
     }
 
+    
+
     moveLeft() {
         if (!this.isMoving) {
             this.isMoving = true;
             console.log('Playing run animation:', `${this.animPrefix}_run`);
             this.play(`${this.animPrefix}_run`);
+            this.flipX = true; // Flip the sprite to face left
             this.scene.tweens.add({
                 targets: this,
                 x: this.x - this.tileSize,
@@ -59,6 +62,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         if (!this.isMoving) {
             this.isMoving = true;
             this.play(`${this.animPrefix}_run`);
+            this.flipX = false; // Ensure the sprite is not flipped to face right
             this.scene.tweens.add({
                 targets: this,
                 x: this.x + this.tileSize,
@@ -70,6 +74,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
+    
 
     moveUp() {
         if (!this.isMoving) {
