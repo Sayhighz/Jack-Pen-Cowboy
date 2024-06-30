@@ -39,21 +39,21 @@
             padding-right: 10px;
             box-sizing: border-box;
             font-family: 'Courier New', Courier, monospace;
-            line-height: 20px; /* Adjust line-height to match command-label */
-            font-size: 14px; /* Ensure same font-size as command-label */
+            line-height: 20px;
+            font-size: 14px;
             color: #999;
             overflow: hidden;
         }
 
         .line-number {
             display: block;
-            height: 20px; /* Adjust height to match line-height of command-label */
+            height: 20px;
         }
 
         #command-label-container {
             margin-left: 40px;
             flex-grow: 1;
-            height: 100%; /* Fill the height of the parent container */
+            height: 100%;
             display: flex;
             flex-direction: column;
         }
@@ -64,14 +64,37 @@
             overflow-wrap: break-word;
             padding: 10px;
             margin: 0;
-            line-height: 20px; /* Adjust line-height to match line-numbers */
-            font-size: 14px; /* Ensure same font-size as line-numbers */
+            line-height: 20px;
+            font-size: 14px;
             font-family: 'Courier New', Courier, monospace;
             outline: none;
             box-sizing: border-box;
-            resize: vertical; /* Allow vertical resizing */
-            min-height: 100%; /* Ensure it fills the container */
+            resize: vertical;
+            min-height: 100%;
         }
+
+        #tutor{
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s forwards;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 
     </style>
 </head>
@@ -84,16 +107,13 @@
         </div>
         <div id="command-container" class="w-full md:w-4/12 bg-base-100 bg-opacity-80 rounded-lg shadow-md p-4 flex flex-col" style="display: none;">
             <h2 id="command-label1" class="text-lg font-bold text-base-content mb-2 text-center">CODE QUEST</h2>
-            <div id="tutorial-box" class="tutorial-box bg-white shadow-lg p-4 border-2 border-black rounded-lg bottom-4 right-4 z-10 mt-4 md:mt-0 md:bottom-auto md:right-auto h-20vh md:h-1/5" style="display: none;">
-                <img src="assets/images/tutorial_character.png" alt="Tutorial Character">
+            <div id="tutorial-box" class="tutorial-box flex bg-neutral shadow-lg p-4 border-2 border-black rounded-lg bottom-4 right-4 z-10 mt-4 md:mt-0 md:bottom-auto md:right-auto h-20vh md:h-1/5" style="display: none;">
+                <div c>
+                    <img src="assets/images/tutorial_character.png" alt="Tutorial Character" style="width: 20%;">
+                </div>
                 <div class="flex-1">
-                    <p class="text-black">
-                        คำสั่ง สามารถใส่ตัวเลขจำนวนครั้งได้เช่น right(10)
-                        right()           เดินขวา        attack()          โจมตี
-                        left()            เดินซ้าย        turn_right()      หันขวา
-                        up()              เดินขึ้น         turn_left()       หันซ้าย
-                        down()            เดินลง         turn_up()         หันหน้า
-                        turn_down()       หันหลัง
+                    <p class="tutor text-neutral-content">
+                        สวัสดีผู้กล้า คุณต้องการความช่วยเหลือหรอ? ลองจิ้มดูสิ
                     </p>
                 </div>
             </div>
@@ -104,7 +124,6 @@
                 </div>
             </div>
             <button id="command-button" class="btn btn-primary w-full mt-2">เริ่ม!</button>
-            <!-- Tutorial box -->
         </div>
     </div>
     <div id="game-over-dialog" class="modal modal-open flex items-center justify-center" style="display:none;">
@@ -138,6 +157,36 @@
         });
 
         updateLineNumbers();
+
+        let messages = [];
+        let currentMessageIndex = 0;
+
+        const tutorialBox = document.getElementById('tutorial-box');
+        const tutorialText = tutorialBox.querySelector('p');
+
+        fetch('messages.json')
+            .then(response => response.json())
+            .then(data => {
+                messages = data;
+                tutorialBox.style.display = 'block'; // แสดง tutorial box หลังจากโหลดข้อความเสร็จแล้ว
+            })
+            .catch(error => console.error('Error loading messages:', error));
+
+        tutorialBox.addEventListener('click', () => {
+            if (messages.length > 0) {
+                tutorialText.classList.remove('fade-in');
+                tutorialText.classList.add('fade-out');
+                tutorialText.addEventListener('animationend', () => {
+                    tutorialText.classList.remove('fade-out');
+                    currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+                    tutorialText.textContent = messages[currentMessageIndex];
+                    tutorialText.classList.add('fade-in');
+                    tutorialText.addEventListener('animationend', () => {
+                        tutorialText.classList.remove('fade-in');
+                    }, { once: true });
+                }, { once: true });
+            }
+        });
     </script>
 </body>
 
