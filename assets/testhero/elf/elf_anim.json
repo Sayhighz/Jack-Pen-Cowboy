@@ -1,0 +1,64 @@
+{
+    "anims": [
+        {
+            "key": "elff_run",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "elf",
+                    "frame": "elf_f_run_anim_f0"
+                },
+                {
+                    "key": "elf",
+                    "frame": "elf_f_run_anim_f1"
+                },
+                {
+                    "key": "elf",
+                    "frame": "elf_f_run_anim_f2"
+                },
+                {
+                    "key": "elf",
+                    "frame": "elf_f_run_anim_f3"
+                }
+            ]
+        },
+        {
+            "key": "elff_idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "elf",
+                    "frame": "elf_f_idle_anim_f0"
+                },
+                {
+                    "key": "elf",
+                    "frame": "elf_f_idle_anim_f1"
+                },
+                {
+                    "key": "elf",
+                    "frame": "elf_f_idle_anim_f2"
+                },
+                {
+                    "key": "elf",
+                    "frame": "elf_f_idle_anim_f3"
+                }
+            ]
+        },
+        {
+            "key": "elff_hit",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "elf",
+                    "frame": "elf_f_hit_anim_f0"
+                }
+            ]
+        }
+    ]
+}

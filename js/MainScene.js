@@ -65,6 +65,10 @@ export default class MainScene extends Phaser.Scene {
             texture = 'wizard';
             animPrefix = 'wizzard';
         }
+        else if (selectedCharacter === 'elff') {
+            texture = 'elf';
+            animPrefix = 'elff';
+        }
 
         // สร้าง player instance
         this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
