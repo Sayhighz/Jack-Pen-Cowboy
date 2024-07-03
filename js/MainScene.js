@@ -36,6 +36,14 @@ export default class MainScene extends Phaser.Scene {
 
     create() {
 
+        if (!this.eventListenersAdded) {
+            this.setupCommandInput();
+            this.eventListenersAdded = true; // ใช้ flag เพื่อหลีกเลี่ยงการเพิ่ม event listener ซ้ำ
+        }
+
+        enemyGrp = [];
+        coinsGrp = [];
+
         // Heart
         heartGrp = this.add.group();
         this.createPlayerHeart();
@@ -176,7 +184,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.crown.x = this.player.x;
         this.crown.y = this.player.y - 10;
-        
+
 
         // this.enemy.anims.play('lizard_idle', true); // Enemy movement
 
@@ -269,20 +277,19 @@ export default class MainScene extends Phaser.Scene {
     setupCommandInput() {
         const commandLabel = document.getElementById('command-label'); // textarea
         const commandButton = document.getElementById('command-button');
-
-        // Function to handle button click
+    
         const executeCommands = async () => {
             isRestarting = true; // Set restarting flag
             this.scene.restart(); // Restart the scene
             this.enemyReset()
             score = 0
-
+    
             // Wait for the scene to restart
             this.events.once('create', async () => {
                 isRestarting = false; // Clear restarting flag
                 const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
                 for (const command of commands) {
-                    if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restartingฃ
+                    if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restarting
                         timesOfCommand++
                         console.log(timesOfCommand)
                         await this.executeCommand(command.trim());
@@ -290,20 +297,23 @@ export default class MainScene extends Phaser.Scene {
                 }
             });
         };
-
-        // Button click event listener
-        commandButton.addEventListener('click', () => {
-            executeCommands();
-        });
-
-        // Also handle Enter key press in textarea
-        commandLabel.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Prevent default Enter key behavior (submitting form)
-                await executeCommands(); // Execute commands when Enter is pressed
-            }
-        });
+    
+        if (!this.commandEventListenerAdded) {
+            // Button click event listener
+            commandButton.addEventListener('click', executeCommands);
+    
+            // Also handle Enter key press in textarea
+            commandLabel.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault(); // Prevent default Enter key behavior (submitting form)
+                    await executeCommands(); // Execute commands when Enter is pressed
+                }
+            });
+    
+            this.commandEventListenerAdded = true; // Use flag to ensure event listener is added only once
+        }
     }
+    
 
     async executeCommand(command) {
         const match = command.match(/(\w+)\((\d*)\)/);
