@@ -13,6 +13,7 @@ let score = 0
 let enemyGrp = []
 let coinsGrp = []
 let timesOfCommand = 0                      //เอาไว้นับจำนวนคำสั่ง สามารถใช้ได้แล้ว 
+let isExecuting = false; // Flag to prevent multiple command executions
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -279,24 +280,32 @@ export default class MainScene extends Phaser.Scene {
         const commandButton = document.getElementById('command-button');
     
         const executeCommands = async () => {
+            if (isExecuting) {
+                console.log('คำสั่งกำลังทำงาน');
+                return; // Check if already executing commands
+            }
+            isExecuting = true; // Set executing flag
+        
             isRestarting = true; // Set restarting flag
             this.scene.restart(); // Restart the scene
-            this.enemyReset()
-            score = 0
-    
+            this.enemyReset();
+            score = 0;
+        
             // Wait for the scene to restart
             this.events.once('create', async () => {
                 isRestarting = false; // Clear restarting flag
                 const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
                 for (const command of commands) {
                     if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restarting
-                        timesOfCommand++
-                        console.log(timesOfCommand)
+                        timesOfCommand++;
+                        console.log(timesOfCommand);
                         await this.executeCommand(command.trim());
                     }
                 }
+                isExecuting = false; // Clear executing flag when done
             });
         };
+        
     
         if (!this.commandEventListenerAdded) {
             // Button click event listener
@@ -313,6 +322,8 @@ export default class MainScene extends Phaser.Scene {
             this.commandEventListenerAdded = true; // Use flag to ensure event listener is added only once
         }
     }
+    
+    
     
 
     async executeCommand(command) {
@@ -333,7 +344,7 @@ export default class MainScene extends Phaser.Scene {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
-
+    
     async performAction(action) {
         switch (action) {
             case 'left':
@@ -371,6 +382,7 @@ export default class MainScene extends Phaser.Scene {
                 console.log('Unknown action');
         }
     }
+    
 
     playerAttack(player, lastActionMove, enemyGrp) {
         console.log("attack = ", lastActionMove);
