@@ -21,7 +21,10 @@ export default class SelectScene extends Phaser.Scene {
     create() {
         // เพิ่มภาพพื้นหลัง
         const background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'ss');
-        background.setDisplaySize(this.scale.width, this.scale.height);
+        const scaleX = this.scale.width / background.width;
+        const scaleY = this.scale.height / background.height;
+        const scale = Math.max(scaleX, scaleY);
+        background.setScale(scale).setScrollFactor(0);
 
         // เพิ่มปุ่มตัวละครพร้อมขนาดเริ่มต้น
         this.characterButtons.knightt = this.add.sprite(this.scale.width / 2 - 100, this.scale.height / 2 + 90, 'knightt').setInteractive();

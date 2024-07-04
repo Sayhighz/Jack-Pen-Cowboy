@@ -12,12 +12,12 @@
         #game-wrapper {
             transition: transform 0.3s ease-in-out;
         }
-
+    
         #command-container {
             display: flex;
             flex-direction: column;
         }
-
+    
         #command-wrapper {
             position: relative;
             display: flex;
@@ -25,7 +25,7 @@
             flex-grow: 1;
             overflow: hidden;
         }
-
+    
         #line-numbers {
             position: absolute;
             left: 0;
@@ -44,12 +44,12 @@
             color: #999;
             overflow: hidden;
         }
-
+    
         .line-number {
             display: block;
             height: 20px;
         }
-
+    
         #command-label-container {
             margin-left: 40px;
             flex-grow: 1;
@@ -57,7 +57,7 @@
             display: flex;
             flex-direction: column;
         }
-
+    
         #command-label {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -71,25 +71,27 @@
             box-sizing: border-box;
             resize: vertical;
             min-height: 100%;
+            background-color: #d6c8bd !important; /* เพิ่มสีพื้นหลังเป็นสีเขียว */
+            color: white; /* ปรับสีข้อความเป็นสีขาวเพื่อให้ดูชัดเจน */
         }
-
-        #tutor{
+    
+        #tutor {
             font-family: 'Courier New', Courier, monospace;
         }
-
+    
         .fade-out {
             animation: fadeOut 0.5s forwards;
         }
-
+    
         .fade-in {
             animation: fadeIn 0.5s forwards;
         }
-
+    
         @keyframes fadeOut {
             from { opacity: 1; }
             to { opacity: 0; }
         }
-
+    
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -102,10 +104,14 @@
     }
 
     .ui{
-        background-color: #d6c8bd;
+        background-color: #8a8178;
     }
-    </style>
 
+
+    #tutorial-box {
+        background-color: #d6c8bd !important; /* เพิ่มสีพื้นหลังเป็นสีเขียว */
+        color: white; /* ปรับสีข้อความเป็นสีขาวเพื่อให้ดูชัดเจน */
+    }
     </style>
 </head>
 
@@ -130,7 +136,7 @@
             <div id="command-wrapper" class="mt-5 mb-4">
                 <div id="line-numbers"></div>
                 <div id="command-label-container" class="h-48">
-                    <textarea id="command-label" class="w-full h-full bg-neutral text-neutral-content p-2" placeholder="// ใส่คำสั่งตรงนี้ได้เลย" rows="33"></textarea>
+                    <textarea id="command-label" class="w-full h-full bg-base text-neutral-content p-2" placeholder="// ใส่คำสั่งตรงนี้ได้เลย" rows="33"></textarea>
                    
                 </div>
             </div>
