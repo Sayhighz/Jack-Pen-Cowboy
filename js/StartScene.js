@@ -74,7 +74,7 @@ export default class StartScene extends Phaser.Scene {
 
         // เพิ่ม event เมื่อคลิกปุ่มตั้งค่า
         settingsButton.on('pointerdown', () => {
-            this.scene.start('Settings');
+            this.scene.start('RankingScene');
         });
     }
     

@@ -1,8 +1,9 @@
+// MainScene.js
+
 import Player from "./Player.js";
 import Enemy from "./enemy.js";
 import Coins from "./coins.js";
-
-
+import RankingScene from "./RankingScene.js";
 
 let playerHeart = 3;
 let heartGrp;
@@ -12,8 +13,8 @@ let scoreText
 let score = 0
 let enemyGrp = []
 let coinsGrp = []
-let timesOfCommand = 0                      //เอาไว้นับจำนวนคำสั่ง สามารถใช้ได้แล้ว 
-let isExecuting = false; // Flag to prevent multiple command executions
+let timesOfCommand = 0
+let isExecuting = false;
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -21,9 +22,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     preload() {
-
         console.log('StartMain')
-        // Preload assets and player animations
         Player.preload(this);
         Enemy.preload(this);
         Coins.preload(this);
@@ -36,20 +35,17 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-
         if (!this.eventListenersAdded) {
             this.setupCommandInput();
-            this.eventListenersAdded = true; // ใช้ flag เพื่อหลีกเลี่ยงการเพิ่ม event listener ซ้ำ
+            this.eventListenersAdded = true;
         }
 
         enemyGrp = [];
         coinsGrp = [];
 
-        // Heart
         heartGrp = this.add.group();
         this.createPlayerHeart();
 
-        // Create tilemap and layers
         const map = this.make.tilemap({ key: 'map' });
         const tileset = map.addTilesetImage('Dungeon_Tileset_at', 'tiles', 32, 32, 0, 0);
 
@@ -61,10 +57,9 @@ export default class MainScene extends Phaser.Scene {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
 
-        // Create player instance
         const selectedCharacter = this.scene.settings.data.character;
+        const playerName = this.scene.settings.data.playerName;
 
-        // กำหนด texture และ animations สำหรับตัวละครที่ถูกเลือก
         let texture, animPrefix;
 
         if (selectedCharacter === 'knightt') {
@@ -79,7 +74,6 @@ export default class MainScene extends Phaser.Scene {
             animPrefix = 'elff';
         }
 
-        // สร้าง player instance
         this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
 
@@ -89,40 +83,35 @@ export default class MainScene extends Phaser.Scene {
         this.tweens.add({
             targets: this.crown,
             alpha: { from: 1, to: 0.3 },
-            duration: 800, // duration of one blink cycle
+            duration: 800,
             yoyo: true,
-            repeat: -1 // repeat forever
+            repeat: -1
         });
 
+        this.createEnemy(206, 206, 3);
+        this.createEnemy(174, 238, 4);
+        this.createEnemy(334, 142, 2);
 
-        // Create Enemy and Coins
-        this.createEnemy(206, 206, 3)
-        this.createEnemy(174, 238, 4)
-        this.createEnemy(334, 142, 2)
+        this.createCoins(142, 142);
+        this.createCoins(302, 142);
+        this.createCoins(302, 302);
 
-        this.createCoins(142, 142)
-        this.createCoins(302, 142)
-        this.createCoins(302, 302)
-
-        // Listen for collision event
         this.matter.world.on('collisionstart', this.handleCollision, this);
-
-        // Setup input listener for command input and button
         this.setupCommandInput();
-
         this.matter.world.on('collisionstart', (event) => {
             event.pairs.forEach((pair) => {
                 const { bodyA, bodyB } = pair;
                 if ((bodyA.gameObject === this.player && bodyB.gameObject && bodyB.gameObject instanceof Coins) ||
                     (bodyB.gameObject === this.player && bodyA.gameObject && bodyA.gameObject instanceof Coins)) {
-                    this.onCollectCoins(bodyA.gameObject, bodyB.gameObject); // A = player, B = coin
+                    this.onCollectCoins(bodyA.gameObject, bodyB.gameObject);
                 }
             });
         });
 
-        // Score
         scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
-        scoreText.setOrigin(1, 0); // Set origin to the top-right corner
+        scoreText.setOrigin(1, 0);
+
+        this.playerName = playerName;
     }
 
     createPlayerHeart() {
@@ -135,35 +124,31 @@ export default class MainScene extends Phaser.Scene {
     }
 
     createEnemy(posX, posY, health) {
-        // สร้างศัตรู
         this.enemy = new Enemy({ scene: this, x: posX, y: posY, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
         let enemy = this.enemy;
         enemy.anims.play('lizard_idle', true);
         enemy.health = health;
-        enemy.maxHealth = health; // ต้องกำหนดค่า maxHealth ด้วย
+        enemy.maxHealth = health;
 
         this.updateHealthBar(enemy);
-
-        // เพิ่มศัตรูลงในกลุ่ม
         enemyGrp.push(enemy);
     }
 
     updateHealthBar(enemy) {
-        // สร้างกราฟิกหลอดเลือด
-        let barWidth = 5; // ความกว้างของช่องหลอดเลือด
-        let barHeight = 3; // ความสูงของช่องหลอดเลือด
-        let barSpacing = 2; // ช่องว่างระหว่างหลอดเลือด
-        let totalWidth = enemy.maxHealth * (barWidth + barSpacing) - barSpacing; // ความกว้างรวมของหลอดเลือดทั้งหมด
+        let barWidth = 5;
+        let barHeight = 3;
+        let barSpacing = 2;
+        let totalWidth = enemy.maxHealth * (barWidth + barSpacing) - barSpacing;
         enemy.healthBars = [];
 
         for (let i = 0; i < enemy.maxHealth; i++) {
             const healthBar = this.add.graphics();
             if (i < enemy.health) {
-                healthBar.fillStyle(0x00ff00, 1); // สีเขียวถ้ายังมีสุขภาพ
+                healthBar.fillStyle(0x00ff00, 1);
             } else {
-                healthBar.fillStyle(0xff0000, 1); // สีแดงถ้าสุขภาพลด
+                healthBar.fillStyle(0xff0000, 1);
             }
-            healthBar.fillRect(enemy.x - totalWidth / 2 + i * (barWidth + barSpacing), enemy.y - 10, barWidth, barHeight); // ขนาดและตำแหน่งของหลอดเลือด
+            healthBar.fillRect(enemy.x - totalWidth / 2 + i * (barWidth + barSpacing), enemy.y - 10, barWidth, barHeight);
             enemy.healthBars.push(healthBar);
         }
 
@@ -180,18 +165,8 @@ export default class MainScene extends Phaser.Scene {
     }
 
     update() {
-        // Update game logic
-        // this.player.anims.play('idle', true); // Player movement
-
         this.crown.x = this.player.x;
         this.crown.y = this.player.y - 10;
-
-
-        // this.enemy.anims.play('lizard_idle', true); // Enemy movement
-
-        // Check if the coin exists before playing its animation
-
-        // Additional game logic updates can be added here
 
         scoreText.setText("SCORE : " + score)
     }
@@ -200,9 +175,8 @@ export default class MainScene extends Phaser.Scene {
         event.pairs.forEach(pair => {
             const { bodyA, bodyB } = pair;
 
-            // Check collision with static bodies (walls)
             if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
-                isRestarting = true; // Set restarting flag
+                isRestarting = true;
                 playerHeart--;
 
                 if (playerHeart <= 0) {
@@ -212,13 +186,11 @@ export default class MainScene extends Phaser.Scene {
                 }
                 this.updatePlayerHeart();
                 this.scene.restart();
-                score = 0
-                // this.enemyReset()
+                score = 0;
             }
 
-            // Check collision with Enemy
             if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
-                isRestarting = true; // Set restarting flag
+                isRestarting = true;
                 playerHeart--;
 
                 if (playerHeart <= 0) {
@@ -228,8 +200,7 @@ export default class MainScene extends Phaser.Scene {
                 }
                 this.updatePlayerHeart();
                 this.scene.restart();
-                score = 0
-                // this.enemyReset()
+                score = 0;
             }
         });
     }
@@ -240,25 +211,42 @@ export default class MainScene extends Phaser.Scene {
             enemyGrp[i].health = enemyGrp[i].maxHealth
             console.log(enemyGrp[i].health, enemyGrp[i].maxHealth, "ตัวที่ ", i)
         }
-
     }
 
     showGameOverDialog() {
         const dialog = document.getElementById('game-over-dialog');
-
         const restartButton = document.getElementById('restart-button');
-
+        const backButton = document.getElementById('back-button');  // เพิ่มการเลือก element สำหรับปุ่มย้อนกลับ
+        const scoreText = document.getElementById('game-over-score');  // เพิ่มการเลือก element สำหรับคะแนน
+    
+        const playerName = this.playerName;  // เพิ่มการเลือกชื่อผู้เล่น
+    
+        scoreText.textContent = `แพ้แล้ว! ${playerName}, คะแนนของคุณคือ: ${score}`;  // แสดงคะแนนและชื่อผู้เล่นในข้อความ
+    
         dialog.style.display = 'block';
-
+    
         const handleRestart = () => {
             dialog.style.display = 'none';
-            playerHeart = 3; // Reset hearts to initial value
-            this.scene.restart(); // Restart the game
+            playerHeart = 3;
+            this.scene.restart();
             restartButton.removeEventListener('click', handleRestart);
         };
-
+    
+        const handleBack = () => {
+            dialog.style.display = 'none';
+            this.scene.start('StartScene'); // กลับไปที่ StartScene
+            backButton.removeEventListener('click', handleBack);
+        };
+    
         restartButton.addEventListener('click', handleRestart);
+        backButton.addEventListener('click', handleBack);
+    
+        this.savePlayerScore();
+        this.scene.start('RankingScene'); // เปลี่ยนฉากเป็น RankingScene
     }
+    
+    
+    
 
     updatePlayerHeart() {
         for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
@@ -271,66 +259,58 @@ export default class MainScene extends Phaser.Scene {
     }
 
     onCollectCoins(Player, Coins) {
-        Coins.destroy()         //แก้ให้ไม่หายทั้งหมด
+        Coins.destroy()
         score += 5
     }
 
     setupCommandInput() {
-        const commandLabel = document.getElementById('command-label'); // textarea
+        const commandLabel = document.getElementById('command-label');
         const commandButton = document.getElementById('command-button');
-    
+
         const executeCommands = async () => {
             if (isExecuting) {
                 console.log('คำสั่งกำลังทำงาน');
-                return; // Check if already executing commands
+                return;
             }
-            isExecuting = true; // Set executing flag
-        
-            isRestarting = true; // Set restarting flag
-            this.scene.restart(); // Restart the scene
+            isExecuting = true;
+
+            isRestarting = true;
+            this.scene.restart();
             this.enemyReset();
             score = 0;
-        
-            // Wait for the scene to restart
+
             this.events.once('create', async () => {
-                isRestarting = false; // Clear restarting flag
-                const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
+                isRestarting = false;
+                const commands = commandLabel.value.toLowerCase().split('\n');
                 for (const command of commands) {
-                    if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restarting
+                    if (command.trim() !== '' && !isRestarting) {
                         timesOfCommand++;
                         console.log(timesOfCommand);
                         await this.executeCommand(command.trim());
                     }
                 }
-                isExecuting = false; // Clear executing flag when done
+                isExecuting = false;
             });
         };
-        
-    
+
         if (!this.commandEventListenerAdded) {
-            // Button click event listener
             commandButton.addEventListener('click', executeCommands);
-    
-            // Also handle Enter key press in textarea
             commandLabel.addEventListener('keypress', async (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault(); // Prevent default Enter key behavior (submitting form)
-                    await executeCommands(); // Execute commands when Enter is pressed
+                    e.preventDefault();
+                    await executeCommands();
                 }
             });
-    
-            this.commandEventListenerAdded = true; // Use flag to ensure event listener is added only once
+
+            this.commandEventListenerAdded = true;
         }
     }
-    
-    
-    
 
     async executeCommand(command) {
         const match = command.match(/(\w+)\((\d*)\)/);
         if (match) {
             const action = match[1];
-            const repetitions = match[2] ? parseInt(match[2], 10) : 1; // Default to 1 if no repetitions provided
+            const repetitions = match[2] ? parseInt(match[2], 10) : 1;
             await this.performActionWithDelay(action, repetitions);
         } else {
             console.log('Invalid command');
@@ -339,50 +319,49 @@ export default class MainScene extends Phaser.Scene {
 
     async performActionWithDelay(action, repetitions) {
         for (let i = 0; i < repetitions; i++) {
-            if (isRestarting) break; // Stop executing if restarting
+            if (isRestarting) break;
             await this.performAction(action);
             await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
-    
+
     async performAction(action) {
         switch (action) {
             case 'left':
                 this.player.moveLeft();
-                lastActionMove = "left"
+                lastActionMove = "left";
                 break;
             case 'right':
                 this.player.moveRight();
-                lastActionMove = "right"
+                lastActionMove = "right";
                 break;
             case 'up':
                 this.player.moveUp();
-                lastActionMove = "up"
+                lastActionMove = "up";
                 break;
             case 'down':
                 this.player.moveDown();
-                lastActionMove = "down"
+                lastActionMove = "down";
                 break;
             case 'attack':
                 this.playerAttack(this.player, lastActionMove, enemyGrp);
                 break;
             case 'turn_right':
-                lastActionMove = "right"
+                lastActionMove = "right";
                 break;
             case 'turn_left':
-                lastActionMove = "left"
+                lastActionMove = "left";
                 break;
             case 'turn_up':
-                lastActionMove = "up"
+                lastActionMove = "up";
                 break;
             case 'turn_down':
-                lastActionMove = "down"
+                lastActionMove = "down";
                 break;
             default:
                 console.log('Unknown action');
         }
     }
-    
 
     playerAttack(player, lastActionMove, enemyGrp) {
         console.log("attack = ", lastActionMove);
@@ -424,12 +403,6 @@ export default class MainScene extends Phaser.Scene {
             enemy.destroy()
             score += 10
         }
-        // this.input.keyboard.on('keydown', (event) => {
-        //     if (event.key === 'Enter') {
-        //         this.enemyReset();
-        //         this.executeCommand();
-        //     }
-        // });
     }
 
     playerAttackAni() {
@@ -444,16 +417,10 @@ export default class MainScene extends Phaser.Scene {
     stopAnimation() {
         this.player.anims.stop();
     }
+
+    savePlayerScore() {
+        let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
+        scores.push({ name: this.playerName, score: score });
+        localStorage.setItem('playerScores', JSON.stringify(scores));
+    }
 }
-
-
-//คำสั่ง
-//right()           //เดินขวา
-//left()            //เดินซ้าย
-//up()              //เดินขึ้น
-//down()            //เดินลง
-//attack()          //โจมตี
-//turn_right()      //หันขวา
-//turn_left()       //หันซ้าย
-//turn_up()         //หันหน้า
-//turn_down()       //หันหลัง

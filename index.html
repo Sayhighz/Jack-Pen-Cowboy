@@ -129,15 +129,18 @@
     </div>
     <div id="game-over-dialog" class="modal modal-open flex items-center justify-center" style="display:none;">
         <div class="modal-box w-1/2 h-1/5">
-            <p class="text-base-content mb-4">แพ้แล้ว! เกมจะเริ่มใหม่</p>
+            <p id="game-over-score" class="text-base-content mb-4"></p> <!-- เพิ่มบรรทัดนี้ -->
             <div class="modal-action mb-5">
-                <button class="btn">ย้อนกลับ</button>
+                <button id="back-button" class="btn">ย้อนกลับ</button> <!-- แก้ไขบรรทัดนี้ -->
             </div>
             <div class="modal-action mt-5">
                 <button id="restart-button" class="btn btn-primary">เริ่มใหม่</button>
             </div>
         </div>
     </div>
+    
+    
+    
 
     <!-- Phaser and custom game scripts -->
     <script src="//cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.js"></script>
