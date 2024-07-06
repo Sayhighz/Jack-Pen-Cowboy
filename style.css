@@ -1,0 +1,262 @@
+body {
+    background-image: url('assets/images/ui_bg.jpg');
+    background-repeat: repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Ensure container takes the full height of the viewport */
+    width: 100%;
+    max-width: 1550px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+.btn-contanier{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-wrapper, .command-container {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Ensure these containers can grow to fill the height */
+}
+
+.game-wrapper {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+    .game-wrapper {
+        width: 66.666%;
+        margin-bottom: 0;
+        margin-right: 16px;
+    }
+}
+
+.command-container {
+    width: 100%;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .command-container {
+        width: 33.333%;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.command-container h2 {
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.tutorial-box {
+    background-color: #d6c8bd;
+    color: black;
+    display: flex;
+    padding: 16px;
+
+    border-radius: 8px;
+    margin-top: 16px;
+    display: none;
+}
+
+.tutorial-box img {
+    width: 20%;
+    margin-right: 16px;
+}
+
+.command-wrapper {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    border-right: 1px solid #ccc;
+    background: #f7f7f7;
+    text-align: right;
+    padding-top: 0.7rem;
+    padding-right: 10px;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 20px;
+    font-size: 14px;
+    color: #999;
+    overflow: hidden;
+}
+
+/* Default for small devices */
+#command-label-container {
+    margin-left: 40px;
+    flex-grow: 1;
+    height: 65vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* For medium devices and up */
+@media (min-width: 768px) {
+    #command-label-container {
+        height: 65vh; /* Adjust the height as needed */
+    }
+}
+
+/* For large devices and up */
+@media (min-width: 1024px) {
+    #command-label-container {
+        height: 62vh; /* Adjust the height as needed */
+    }
+}
+
+#command-label {
+    padding: 10px;
+    margin: 0;
+    line-height: 20px;
+    font-size: 14px;
+    font-family: 'Courier New', Courier, monospace;
+    outline: none;
+    box-sizing: border-box;
+    background-color: #d6c8bd !important;
+    color: black;
+    flex-grow: 1;
+    resize: none;
+    height: 100%; /* Make sure textarea fills the height */
+}
+
+.btn {
+    position: relative;
+    top: 0;
+    cursor: pointer;
+    text-decoration: none !important;
+    outline: none !important;
+    font-family: 'Carter One', sans-serif;
+    font-size: 20px;
+    line-height: 1.5em;
+    width: 100%;
+    letter-spacing: .1em;
+    text-shadow: 2px 2px 1px #b5651d, -2px 2px 1px #b5651d, 2px -2px 1px #b5651d, -2px -2px 1px #b5651d, 0px 2px 1px #b5651d, 0px -2px 1px #b5651d, 0px 4px 1px #8c4313, 2px 4px 1px #8c4313, -2px 4px 1px #8c4313;
+    border: none;
+    margin: 15px 15px 30px;
+    background: repeating-linear-gradient(45deg, #d2691e, #d2691e 5px, #b5651d 5px, #b5651d 10px);
+    border-bottom: 3px solid rgba(139, 69, 19, 0.5);
+    border-top: 3px solid rgba(255, 255, 255, .3);
+    color: #fff !important;
+    border-radius: 8px;
+    padding: 8px 15px 10px;
+    box-shadow: 0 6px 0 #8c4313, 0 8px 1px 1px rgba(0, 0, 0, .3), 0 10px 0 5px #6e2c00, 0 12px 0 5px #8c4313, 0 15px 0 5px #6e2c00, 0 15px 1px 6px rgba(0, 0, 0, .3);
+    background-color: #d6c8bd; /* เปลี่ยนสีพื้นหลังของปุ่มเป็น theme ของสี #d6c8bd */
+}
+
+.btn:hover {
+    top: 2px;
+    box-shadow: 0 4px 0 #8c4313, 0 6px 1px 1px rgba(0, 0, 0, .3), 0 8px 0 5px #6e2c00, 0 10px 0 5px #8c4313, 0 13px 0 5px #6e2c00, 0 13px 1px 6px rgba(0, 0, 0, .3);
+}
+
+.btn::before {
+    content: '';
+    height: 10%;
+    position: absolute;
+    width: 40%;
+    background: #fff;
+    right: 13%;
+    top: -3%;
+    border-radius: 99px;
+}
+
+.btn::after {
+    content: '';
+    height: 10%;
+    position: absolute;
+    width: 5%;
+    background: #fff;
+    right: 5%;
+    top: -3%;
+    border-radius: 99px;
+}
+
+.modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-box {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.modal-action {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
