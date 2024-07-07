@@ -69,9 +69,10 @@ export default class SelectScene extends Phaser.Scene {
         }
     
         // เพิ่มปุ่ม Start Game ที่ล่างขวาสุดของหน้าจอเกม
-        this.startButton = this.add.text(this.scale.width - 20, this.scale.height - 20, 'Start Game', { font: '20px Anton', fill: '#ffffff', backgroundColor: '#000' })
-            .setInteractive()
-            .setOrigin(1, 1);
+        this.startButton = this.add.text(this.scale.width / 2, this.scale.height, 'Start Game', { font: '20px Anton', fill: '#ffffff' })
+        .setInteractive()
+        .setOrigin(0.5, 3);
+    
     
         this.startButton.on('pointerdown', () => {
             if (this.selectedCharacter) {

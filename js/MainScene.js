@@ -88,12 +88,12 @@ export default class MainScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.createEnemy(206, 206, 3);
-        this.createEnemy(174, 238, 4);
-        this.createEnemy(334, 142, 2);
+        this.enemyPos()
 
         // Create Enemy and Coins
-        this.enemyPos()
+        this.createCoins(142, 142);
+        this.createCoins(302, 142);
+        this.createCoins(302, 302);
 
         this.matter.world.on('collisionstart', this.handleCollision, this);
         this.setupCommandInput();
@@ -144,12 +144,15 @@ export default class MainScene extends Phaser.Scene {
     }
 
     updateHealthBar(enemy) {
+        if (enemy.healthBars) {
+            enemy.healthBars.forEach(healthBar => healthBar.destroy());
+        }
         let barWidth = 5;
         let barHeight = 3;
         let barSpacing = 2;
         let totalWidth = enemy.maxHealth * (barWidth + barSpacing) - barSpacing;
         enemy.healthBars = [];
-
+    
         for (let i = 0; i < enemy.maxHealth; i++) {
             const healthBar = this.add.graphics();
             if (i < enemy.health) {
@@ -160,11 +163,12 @@ export default class MainScene extends Phaser.Scene {
             healthBar.fillRect(enemy.x - totalWidth / 2 + i * (barWidth + barSpacing), enemy.y - 10, barWidth, barHeight);
             enemy.healthBars.push(healthBar);
         }
-
+    
         if (enemy.health === 0) {
             console.log("เลือดไม่เหลือ");
         }
     }
+    
 
     createCoins(posX, posY) {
         this.coins = new Coins({ scene: this, x: posX, y: posY, texture: 'coins', frame: 'coin_anim_f0' });
@@ -404,15 +408,24 @@ export default class MainScene extends Phaser.Scene {
     }
 
     onPlayerAttack(enemy) {
-        enemy.health--
-        console.log(enemy.health, enemy.maxHealth)
+        enemy.health--;
+        console.log(enemy.health, enemy.maxHealth);
         this.playerAttackAni();
-        this.updateHealthBar(enemy)
+        this.updateHealthBar(enemy);
         if (enemy.health <= 0) {
-            enemy.destroy()
-            score += 10
+            this.clearHealthBars(enemy);  // เพิ่มการลบหลอดเลือดของศัตรู
+            enemy.destroy();
+            score += 10;
         }
     }
+
+    clearHealthBars(enemy) {
+        if (enemy.healthBars) {
+            enemy.healthBars.forEach(healthBar => healthBar.destroy());
+            enemy.healthBars = [];
+        }
+    }    
+    
 
     playerAttackAni() {
         this.player.anims.play(`${this.player.animPrefix}_hit`);
