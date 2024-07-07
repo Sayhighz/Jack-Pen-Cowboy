@@ -1,30 +1,32 @@
-// MainScene.js
+// Scene2.js
 
 import Player from "./Player.js";
 import Enemy from "./enemy.js";
 import Coins from "./coins.js";
 import RankingScene from "./RankingScene.js";
 
-let playerHeart = 3;
 let heartGrp;
 let isRestarting = false;
 let lastActionMove = "right";
 let scoreText;
-let score = 0;
 let enemyGrp = [];
 let coinsGrp = [];
 let timesOfCommand = 0;
 let isExecuting = false;
-let mapSclect = 1
 
-export default class MainScene extends Phaser.Scene {
+export default class Scene2 extends Phaser.Scene {
     constructor() {
-        super("MainScene");
-        let isScoreSaved = false;
+        super("Scene2");
+        this.character = null;
+        this.playerName = null;
+        this.playerHeart = 3;
+        this.score = 0;
+        this.initialScore = 0;
+        this.isScoreSaved = false;
     }
 
     preload() {
-        console.log('StartMain');
+        console.log('StartMain2');
         
         if (!this.textures.exists('heart')) {
             this.load.image('heart', 'assets/images/ui_heart_full.png');
@@ -35,8 +37,8 @@ export default class MainScene extends Phaser.Scene {
         if (!this.textures.exists('tiles')) {
             this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
         }
-        if (!this.cache.tilemap.exists('map')) {
-            this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
+        if (!this.cache.tilemap.exists('map2')) {
+            this.load.tilemapTiledJSON('map2', 'assets/map/map2.json');
         }
         if (!this.textures.exists('crown')) {
             this.load.image('crown', 'assets/images/crown_NBG.png');
@@ -53,16 +55,34 @@ export default class MainScene extends Phaser.Scene {
             this.setupCommandInput();
             this.eventListenersAdded = true;
         }
-
+    
+        const data = this.scene.settings.data || {};
+        if (data.character) this.character = data.character;
+        if (data.playerName) this.playerName = data.playerName;
+        if (data.playerX) this.playerX = data.playerX;
+        if (data.playerY) this.playerY = data.playerY;
+        if (data.playerHeart) this.playerHeart = data.playerHeart;
+        if (data.score) {
+            this.initialScore = data.score;
+            this.score = data.score;
+        }
+    
+        console.log("Character:", this.character);
+        console.log("Player Name:", this.playerName);
+        console.log("Player X:", this.playerX);
+        console.log("Player Y:", this.playerY);
+        console.log("Player Heart:", this.playerHeart);
+        console.log("Score:", this.score);
+    
         enemyGrp = [];
         coinsGrp = [];
-
+    
         heartGrp = this.add.group();
         this.createPlayerHeart();
-
-        const map = this.make.tilemap({ key: 'map' });
+    
+        const map = this.make.tilemap({ key: 'map2' });
         const tileset = map.addTilesetImage('Dungeon_Tileset_at', 'tiles', 32, 32, 0, 0);
-
+    
         if (tileset) {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
             layer1.setCollisionByProperty({ collides: true });
@@ -70,39 +90,33 @@ export default class MainScene extends Phaser.Scene {
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
-
-        if (tileset) {
-            const doorLayer = map.createLayer('Door Layer', tileset, 0, 0);
-            doorLayer.setCollisionByProperty({ isDoor: true });
-            this.matter.world.convertTilemapLayer(doorLayer);
-        } else {
-            console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
-        }
-
+    
         this.matter.world.on('collisionstart', this.handleCollision, this);
-
-        const selectedCharacter = this.scene.settings.data.character;
-        const playerName = this.scene.settings.data.playerName;
-
+    
         let texture, animPrefix;
-
-        if (selectedCharacter === 'knightt') {
+    
+        if (this.character === 'knightt') {
             texture = 'knight';
             animPrefix = 'knightt';
-        } else if (selectedCharacter === 'wizzard') {
+        } else if (this.character === 'wizzard') {
             texture = 'wizard';
             animPrefix = 'wizzard';
-        } else if (selectedCharacter === 'elff') {
+        } else if (this.character === 'elff') {
             texture = 'elf';
             animPrefix = 'elff';
+        } else {
+            console.error('Character not found');
+            return;
         }
-
-        this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
+    
+        this.player = new Player({ scene: this, x:  110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
-
+    
+        this.score = this.initialScore;
+    
         this.crown = this.add.image(this.player.x, this.player.y - 10, 'crown');
         this.crown.setScale(0.05);
-
+    
         this.tweens.add({
             targets: this.crown,
             alpha: { from: 1, to: 0.3 },
@@ -110,9 +124,13 @@ export default class MainScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1
         });
-
-        this.enemyAndCoinsPos()
-
+    
+        this.enemyPos();
+    
+        this.createCoins(142, 142);
+        this.createCoins(302, 142);
+        this.createCoins(302, 302);
+    
         this.matter.world.on('collisionstart', this.handleCollision, this);
         this.setupCommandInput();
         this.matter.world.on('collisionstart', (event) => {
@@ -124,21 +142,14 @@ export default class MainScene extends Phaser.Scene {
                 }
             });
         });
-
-        scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: 0', { fontSize: '28px', fill: '#fff' });
+    
+        scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: ' + this.score, { fontSize: '32px', fill: '#fff' });
         scoreText.setOrigin(1, 0);
-
-        this.playerName = playerName;
-
-        const playerNameLabel = this.add.text(16, 16, `Player: ${this.playerName}`, {
-            fontSize: '20px',
-            fill: '#fff'
-        });
-        playerNameLabel.setOrigin(0, -1.3);
     }
+    
 
     createPlayerHeart() {
-        for (let i = 0; i < playerHeart; i++) {
+        for (let i = 0; i < this.playerHeart; i++) {
             let heart = this.add.sprite(40 + (i * 50), 20, "heart");
             heart.setScale(2.5);
             heart.depth = 10;
@@ -146,25 +157,12 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-    enemyAndCoinsPos() {
-        enemyGrp = []
+    enemyPos() {
+        enemyGrp = [];
 
-        if(mapSclect === 1) {
-            this.createEnemy(206, 206, 3)
-            this.createEnemy(174, 238, 4)
-            this.createEnemy(334, 142, 2)
-        
-            this.createCoins(142, 142);
-            this.createCoins(302, 142);
-            this.createCoins(302, 302);
-        }
-        else if (mapSclect === 2) {
-            this.createEnemy(206, 206, 3)
-            this.createEnemy(174, 238, 4)
-            this.createEnemy(334, 142, 2)
-        
-            this.createCoins(142, 142);
-        }
+        this.createEnemy(206, 206, 3);
+        this.createEnemy(174, 238, 4);
+        this.createEnemy(334, 142, 2);
     }
 
     createEnemy(posX, posY, health) {
@@ -215,92 +213,58 @@ export default class MainScene extends Phaser.Scene {
         this.crown.x = this.player.x;
         this.crown.y = this.player.y - 10;
 
-        scoreText.setText("SCORE : " + score)
-
-        //เมื่อจบเกม
-        if(this.player.x === 494 && this.player.y === 334){
-            this.scene.restart();
-            mapSclect++
-            if(mapSclect === 3){
-                this.savePlayerScore();
-                this.scene.start('RankingScene'); // เปลี่ยนฉากเป็น RankingScene
-            }
-        }
+        scoreText.setText("SCORE : " + this.score.toString());
     }
 
     handleCollision(event) {
         event.pairs.forEach(pair => {
             const { bodyA, bodyB } = pair;
-
-            if ((bodyA.gameObject === this.player && bodyB.gameObject && bodyB.gameObject.tile && bodyB.gameObject.tile.properties.isDoor) ||
-                (bodyB.gameObject === this.player && bodyA.gameObject && bodyA.gameObject.tile && bodyA.gameObject.tile.properties.isDoor)) {
-                console.log("แมพใหม่");
-                this.player.stopMovement();
-
-                console.log("Sending character data:", this.scene.settings.data.character);
-                console.log("Sending playerName:", this.scene.settings.data.playerName);
-                console.log("Sending playerX:", this.player.x);
-                console.log("Sending playerY:", this.player.y);
-                console.log("Sending playerHeart:", playerHeart);
-                console.log("Sending score:", score);
-
-                this.scene.start('Scene2', {
-                    character: this.scene.settings.data.character,
-                    playerName: this.scene.settings.data.playerName,
-                    playerX: this.player.x,
-                    playerY: this.player.y,
-                    playerHeart: playerHeart,
-                    score: score
-                });
-                return;
-            }
-
+    
             if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
                 if (!isRestarting) {
                     isRestarting = true;
-                    playerHeart--;
-                    console.log("เลือดลด");
+                    this.playerHeart--;
     
-                    if (playerHeart <= 0) {
-                        playerHeart = 0;
-                        console.log("gameOver");
+                    if (this.playerHeart <= 0) {
+                        this.playerHeart = 0;
                         this.showGameOverDialog();
                     } else {
                         this.updatePlayerHeart();
-                        this.scene.restart({
-                            character: this.scene.settings.data.character,
-                            playerName: this.scene.settings.data.playerName,
-                            playerHeart: playerHeart,
-                            score: score
+                        this.score = this.initialScore; // รีเซ็ตคะแนนกลับไปยังคะแนนเริ่มต้น
+                        this.scene.restart('Scene2', {
+                            character: this.character,
+                            playerName: this.playerName,
+                            playerHeart: this.playerHeart,
+                            score: this.score
                         });
                     }
                 }
             }
     
-            // ตรวจสอบการชนกับศัตรู
             if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
                 if (!isRestarting) {
                     isRestarting = true;
-                    playerHeart--;
-                    console.log("เลือดลด");
+                    this.playerHeart--;
     
-                    if (playerHeart <= 0) {
-                        playerHeart = 0;
-                        console.log("gameOver");
+                    if (this.playerHeart <= 0) {
+                        this.playerHeart = 0;
                         this.showGameOverDialog();
                     } else {
                         this.updatePlayerHeart();
-                        this.scene.restart({
-                            character: this.scene.settings.data.character,
-                            playerName: this.scene.settings.data.playerName,
-                            playerHeart: playerHeart,
-                            score: score
+                        this.score = this.initialScore; // รีเซ็ตคะแนนกลับไปยังคะแนนเริ่มต้น
+                        this.scene.restart('Scene2', {
+                            character: this.character,
+                            playerName: this.playerName,
+                            playerHeart: this.playerHeart,
+                            score: this.score
                         });
                     }
                 }
             }
         });
     }
+    
+
     enemyReset() {
         console.log(enemyGrp);
         for (let i = 0; i < enemyGrp.length; i++) {
@@ -317,37 +281,55 @@ export default class MainScene extends Phaser.Scene {
 
         const playerName = this.playerName;
 
-        scoreText.textContent = `แพ้แล้ว! ${playerName}, คะแนนของคุณคือ: ${score}`;
+        const finalScore = this.score;
+        scoreText.textContent = `แพ้แล้ว! ${playerName}, คะแนนรวมของคุณคือ: ${finalScore}`;
 
         dialog.style.display = 'block';
 
         const handleRestart = () => {
             dialog.style.display = 'none';
-            playerHeart = 3;
-            this.scene.restart();
+            this.playerHeart = 3;
+            this.scene.restart({
+                character: this.character,
+                playerName: this.playerName,
+                playerHeart: this.playerHeart,
+                score: this.score
+            });
             restartButton.removeEventListener('click', handleRestart);
         };
 
         const handleBack = () => {
             dialog.style.display = 'none';
-            this.scene.start('StartScene');
+            // this.scene.start('StartScene');
+            // console.log("ไปหน้าหลัก")
             backButton.removeEventListener('click', handleBack);
+            this.scene.start('RankingScene');
+            console.log("ไปหาคะแนน")
         };
 
         restartButton.addEventListener('click', handleRestart);
         backButton.addEventListener('click', handleBack);
 
-        if (!this.isScoreSaved) { // เช็คว่าคะแนนถูกบันทึกหรือยัง
-            this.savePlayerScore();
-            this.isScoreSaved = true; // เปลี่ยนสถานะการบันทึกคะแนน
+        if (!this.isScoreSaved) { 
+            this.savePlayerScore(finalScore);
+            this.isScoreSaved = true; 
         }
-        this.scene.start('RankingScene');
     }
+
+    savePlayerScore(finalScore) {
+        let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
+        const newScore = { name: this.playerName, score: finalScore, character: this.character };
     
+        if (!scores.some(score => score.name === newScore.name && score.score === newScore.score && score.character === newScore.character)) {
+            scores.push(newScore);
+            console.log("Scene2");
+            localStorage.setItem('playerScores', JSON.stringify(scores));
+        }
+    }
 
     updatePlayerHeart() {
         for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
-            if (playerHeart < i + 1) {
+            if (this.playerHeart < i + 1) {
                 heartGrp.getChildren()[i].setVisible(false);
             } else {
                 heartGrp.getChildren()[i].setVisible(true);
@@ -357,7 +339,8 @@ export default class MainScene extends Phaser.Scene {
 
     onCollectCoins(Player, Coins) {
         Coins.destroy();
-        score += 5;
+        this.score += 5;
+        scoreText.setText("SCORE : " + this.score);
     }
 
     setupCommandInput() {
@@ -374,7 +357,7 @@ export default class MainScene extends Phaser.Scene {
             isRestarting = true;
             this.scene.restart();
             this.enemyReset();
-            score = 0;
+            this.score = 0;
 
             this.events.once('create', async () => {
                 isRestarting = false;
@@ -499,7 +482,8 @@ export default class MainScene extends Phaser.Scene {
         if (enemy.health <= 0) {
             this.clearHealthBars(enemy);
             enemy.destroy();
-            score += 10;
+            this.score += 10;
+            scoreText.setText("SCORE : " + this.score);
         }
     }
 
@@ -522,19 +506,4 @@ export default class MainScene extends Phaser.Scene {
     stopAnimation() {
         this.player.anims.stop();
     }
-
-    savePlayerScore() {
-        let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
-        const selectedCharacter = this.scene.settings.data.character;
-        const newScore = { name: this.playerName, score: score, character: selectedCharacter };
-        
-        // ตรวจสอบว่ามีข้อมูลซ้ำหรือไม่
-        if (!scores.some(score => score.name === newScore.name && score.score === newScore.score && score.character === newScore.character)) {
-            scores.push(newScore);
-            console.log("Scene1");
-            console.log(scores);
-            localStorage.setItem('playerScores', JSON.stringify(scores));
-        }
-    }
-    
 }
