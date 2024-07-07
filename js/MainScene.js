@@ -35,20 +35,24 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
+        // แสดง command-container
+        const commandContainer = document.getElementById('command-container');
+        commandContainer.style.display = 'flex';
+    
         if (!this.eventListenersAdded) {
             this.setupCommandInput();
             this.eventListenersAdded = true;
         }
-
+    
         enemyGrp = [];
         coinsGrp = [];
-
+    
         heartGrp = this.add.group();
         this.createPlayerHeart();
-
+    
         const map = this.make.tilemap({ key: 'map' });
         const tileset = map.addTilesetImage('Dungeon_Tileset_at', 'tiles', 32, 32, 0, 0);
-
+    
         if (tileset) {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
             layer1.setCollisionByProperty({ collides: true });
@@ -56,12 +60,12 @@ export default class MainScene extends Phaser.Scene {
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
-
+    
         const selectedCharacter = this.scene.settings.data.character;
         const playerName = this.scene.settings.data.playerName;
-
+    
         let texture, animPrefix;
-
+    
         if (selectedCharacter === 'knightt') {
             texture = 'knight';
             animPrefix = 'knightt';
@@ -73,13 +77,13 @@ export default class MainScene extends Phaser.Scene {
             texture = 'elf';
             animPrefix = 'elff';
         }
-
+    
         this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
-
+    
         this.crown = this.add.image(this.player.x, this.player.y - 10, 'crown');
         this.crown.setScale(0.05)
-
+    
         this.tweens.add({
             targets: this.crown,
             alpha: { from: 1, to: 0.3 },
@@ -87,14 +91,14 @@ export default class MainScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1
         });
-
+    
         this.enemyPos()
-
+    
         // Create Enemy and Coins
         this.createCoins(142, 142);
         this.createCoins(302, 142);
         this.createCoins(302, 302);
-
+    
         this.matter.world.on('collisionstart', this.handleCollision, this);
         this.setupCommandInput();
         this.matter.world.on('collisionstart', (event) => {
@@ -106,18 +110,20 @@ export default class MainScene extends Phaser.Scene {
                 }
             });
         });
-
+    
         scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: 0', { fontSize: '28px', fill: '#fff' });
         scoreText.setOrigin(1, 0);
-
+    
         this.playerName = playerName;
-
+    
         const playerNameLabel = this.add.text(16, 16, `Player: ${this.playerName}`, {
             fontSize: '20px',
             fill: '#fff'
         });
         playerNameLabel.setOrigin(0, -1.3);
     }
+    
+    
 
     createPlayerHeart() {
         for (let i = 0; i < playerHeart; i++) {

@@ -158,6 +158,12 @@ body {
     height: 100%; /* Make sure textarea fills the height */
 }
 
+#command-container {
+    width: 100%;
+    display: none;
+}
+
+
 .btn {
     position: relative;
     top: 0;
@@ -234,6 +240,43 @@ body {
     justify-content: flex-end;
     margin-top: 16px;
 }
+
+.autocomplete-suggestions {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 10px;
+    position: absolute;
+    width: calc(100% - 20px);
+    z-index: 1000;
+    display: none;
+    margin-top: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    left: 0;  /* เพิ่มตำแหน่งการจัดเรียงของกล่องแสดงตัวอย่าง */
+}
+
+.suggestion {
+    padding: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+.suggestion.selected {
+    background-color: #ddd;
+}
+
+.command {
+    color: black;
+}
+
+.press-tab {
+    color: #999;
+}
+
+
 
 .fade-out {
     animation: fadeOut 0.5s forwards;

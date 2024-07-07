@@ -12,7 +12,7 @@
 <body>
     <div class="container">
         <div id="game-wrapper" class="game-wrapper">
-            <div id="survival-game" class="flex-grow border-2 border-base-300 rounded-lg shadow-md bg-base-200 mb-4">
+            <div id="survival-game">
             </div>
         </div>
         <div id="command-container" class="command-container">
@@ -27,6 +27,7 @@
                 <div id="line-numbers"></div>
                 <div id="command-label-container">
                     <textarea id="command-label" placeholder="// ใส่คำสั่งตรงนี้ได้เลย"></textarea>
+                    <div id="autocomplete-suggestions" class="autocomplete-suggestions"></div>
                 </div>
             </div>
             <div class="btn-contanier">
@@ -46,52 +47,126 @@
     <script>
         const textarea = document.getElementById('command-label');
         const lineNumbers = document.getElementById('line-numbers');
-        
+        const suggestionsBox = document.getElementById('autocomplete-suggestions');
+
         const updateLineNumbers = () => {
             const lines = textarea.value.split('\n').length;
             lineNumbers.innerHTML = Array(lines).fill().map((_, i) => i + 1).join('<br>');
         };
-        
+
         textarea.addEventListener('input', updateLineNumbers);
         textarea.addEventListener('scroll', () => {
             lineNumbers.scrollTop = textarea.scrollTop;
         });
 
         updateLineNumbers();
-        
+
         let messages = [];
         let currentMessageIndex = 0;
-        
+
         const tutorialBox = document.getElementById('tutorial-box');
         const tutorialText = tutorialBox.querySelector('p');
-        
+
         fetch('messages.json')
-        .then(response => response.json())
-        .then(data => {
+            .then(response => response.json())
+            .then(data => {
                 messages = data;
                 tutorialBox.style.display = 'block';
             })
             .catch(error => console.error('Error loading messages:', error));
-            
-            tutorialBox.addEventListener('click', () => {
-                if (messages.length > 0) {
-                    tutorialText.classList.remove('fade-in');
-                    tutorialText.classList.add('fade-out');
+
+        tutorialBox.addEventListener('click', () => {
+            if (messages.length > 0) {
+                tutorialText.classList.remove('fade-in');
+                tutorialText.classList.add('fade-out');
+                tutorialText.addEventListener('animationend', () => {
+                    tutorialText.classList.remove('fade-out');
+                    currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+                    tutorialText.textContent = messages[currentMessageIndex];
+                    tutorialText.classList.add('fade-in');
                     tutorialText.addEventListener('animationend', () => {
-                        tutorialText.classList.remove('fade-out');
-                        currentMessageIndex = (currentMessageIndex + 1) % messages.length;
-                        tutorialText.textContent = messages[currentMessageIndex];
-                        tutorialText.classList.add('fade-in');
-                        tutorialText.addEventListener('animationend', () => {
                         tutorialText.classList.remove('fade-in');
                     }, { once: true });
                 }, { once: true });
             }
         });
-        </script>
-        <script src="//cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.js"></script>
-        <script src="//cdn.jsdelivr.net/npm/phaser-matter-collision-plugin"></script>
-        <script type="module" src="js/survival-game.js"></script>
+
+        const commands = ["down()", "up()", "left()", "right()", "attack()", "turn_right()", "turn_left()", "turn_up()", "turn_down()"];
+        let currentInput = '';
+        let suggestionIndex = 0; // Default to the first suggestion
+
+        const updateSuggestions = (lastWord) => {
+            const matchedCommands = commands.filter(cmd => cmd.startsWith(lastWord));
+            suggestionsBox.innerHTML = matchedCommands.map((cmd, index) => 
+                `<div class="suggestion ${index === suggestionIndex ? 'selected' : ''}">
+                    <span class="command">${cmd}</span> 
+                    <span class="press-tab">press tab</span>
+                </div>`).join('');
+            suggestionsBox.style.display = matchedCommands.length ? 'block' : 'none';
+        };
+
+        const positionSuggestionsBox = () => {
+            const textareaLineHeight = parseInt(window.getComputedStyle(textarea).lineHeight);
+            const cursorPosition = textarea.selectionStart;
+            const textareaValue = textarea.value.substring(0, cursorPosition);
+            const lineNumber = textareaValue.split('\n').length - 1;
+            const topPosition = textarea.offsetTop + (lineNumber + 1) * textareaLineHeight - textarea.scrollTop;
+            suggestionsBox.style.top = `${topPosition}px`;
+        };
+
+        textarea.addEventListener('input', function(event) {
+            const cursorPos = textarea.selectionStart;
+            const textBeforeCursor = textarea.value.substring(0, cursorPos);
+            const lastWordMatch = textBeforeCursor.match(/(\w+)$/);
+            if (lastWordMatch) {
+                const lastWord = lastWordMatch[1];
+                suggestionIndex = 0; // Reset to the first suggestion
+                updateSuggestions(lastWord);
+                positionSuggestionsBox();
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        textarea.addEventListener('keydown', function(event) {
+            const suggestions = suggestionsBox.querySelectorAll('.suggestion');
+            if (event.key === 'Tab' && suggestions.length > 0) {
+                event.preventDefault();
+                const cursorPos = textarea.selectionStart;
+                const textBeforeCursor = textarea.value.substring(0, cursorPos);
+                const lastWordMatch = textBeforeCursor.match(/(\w+)$/);
+                if (lastWordMatch && suggestionIndex >= 0) {
+                    const lastWord = lastWordMatch[1];
+                    const matchedCommand = suggestions[suggestionIndex].querySelector('.command').textContent;
+                    const newText = textBeforeCursor.replace(/(\w+)$/, matchedCommand + '\n') + textarea.value.substring(cursorPos);
+                    textarea.value = newText;
+                    textarea.setSelectionRange(cursorPos + (matchedCommand.length - lastWord.length) + 1, cursorPos + (matchedCommand.length - lastWord.length) + 1);
+                    updateLineNumbers();
+                    suggestionsBox.style.display = 'none';
+                    suggestionIndex = 0; // Reset to the first suggestion
+                }
+            } else if (event.key === 'ArrowDown' && suggestions.length > 0) {
+                event.preventDefault();
+                suggestionIndex = (suggestionIndex + 1) % suggestions.length;
+                updateSuggestions(textarea.value.substring(0, textarea.selectionStart).match(/(\w+)$/)[1]);
+            } else if (event.key === 'ArrowUp' && suggestions.length > 0) {
+                event.preventDefault();
+                suggestionIndex = (suggestionIndex - 1 + suggestions.length) % suggestions.length;
+                updateSuggestions(textarea.value.substring(0, textarea.selectionStart).match(/(\w+)$/)[1]);
+            } else if (event.key === 'Enter') {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        document.getElementById('start-button').addEventListener('click', function() {
+            document.getElementById('command-container').style.display = 'flex';
+            document.getElementById('tutorial-box').style.display = 'block';
+            this.style.display = 'none';
+        });
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser-matter-collision-plugin"></script>
+    <script type="module" src="js/survival-game.js"></script>
 </body>
 
 </html>

@@ -19,33 +19,37 @@ export default class SelectScene extends Phaser.Scene {
     }
 
     create() {
+        // ซ่อน command-container
+        const commandContainer = document.getElementById('command-container');
+        commandContainer.style.display = 'none';
+    
         // เพิ่มภาพพื้นหลัง
         const background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'ss');
         const scaleX = this.scale.width / background.width;
         const scaleY = this.scale.height / background.height;
         const scale = Math.max(scaleX, scaleY);
         background.setScale(scale).setScrollFactor(0);
-
+    
         // เพิ่มปุ่มตัวละครพร้อมขนาดเริ่มต้น
         this.characterButtons.knightt = this.add.sprite(this.scale.width / 2 - 100, this.scale.height / 2 + 90, 'knightt').setInteractive();
         this.characterButtons.wizzard = this.add.sprite(this.scale.width / 2 + 100, this.scale.height / 2 + 90, 'wizzard').setInteractive();
         this.characterButtons.elff = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 90, 'elff').setInteractive();
-
+    
         this.characterButtons.knightt.setScale(2);
         this.characterButtons.wizzard.setScale(2);
         this.characterButtons.elff.setScale(2);
-
+    
         // เพิ่มป้ายชื่อ
         this.add.text(this.scale.width / 2, 200, 'Select Character', { font: '20px Anton', fill: '#ffffff' }).setOrigin(0.5);
         this.add.text(this.characterButtons.knightt.x, this.characterButtons.knightt.y - 30, 'Knight', { font: '20px Anton', fill: '#ffffff' }).setOrigin(0.5);
         this.add.text(this.characterButtons.wizzard.x, this.characterButtons.wizzard.y - 30, 'Wizard', { font: '20px Anton', fill: '#ffffff' }).setOrigin(0.5);
         this.add.text(this.characterButtons.elff.x, this.characterButtons.elff.y - 30, 'Elf', { font: '20px Anton', fill: '#ffffff' }).setOrigin(0.5);
-
+    
         // เพิ่มเอฟเฟกต์เมื่อวางเมาส์และคลิก
         this.addHoverEffect(this.characterButtons.knightt, 'knightt');
         this.addHoverEffect(this.characterButtons.wizzard, 'wizzard');
         this.addHoverEffect(this.characterButtons.elff, 'elff');
-
+    
         this.characterButtons.knightt.on('pointerdown', () => {
             this.selectCharacter('knightt');
         });
@@ -53,14 +57,15 @@ export default class SelectScene extends Phaser.Scene {
         this.characterButtons.wizzard.on('pointerdown', () => {
             this.selectCharacter('wizzard');
         });
-
+    
         this.characterButtons.elff.on('pointerdown', () => {
             this.selectCharacter('elff');
         });
-
+    
         // สร้างปุ่ม Start Game ในตำแหน่งที่กำหนดในหน้าจอเกม
         this.createStartButton();
     }
+    
 
     createStartButton() {
         // ลบปุ่ม Start Game ถ้ามีอยู่ก่อนหน้า
