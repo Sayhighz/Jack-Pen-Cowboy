@@ -87,9 +87,7 @@ export default class MainScene extends Phaser.Scene {
 
 
         // Create Enemy and Coins
-        this.createEnemy(206, 206, 3)
-        this.createEnemy(174, 238, 4)
-        this.createEnemy(334, 142, 2)
+        this.enemyPos()
 
         this.createCoins(142, 142)
         this.createCoins(302, 142)
@@ -125,6 +123,16 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
+    enemyPos() {
+        enemyGrp = []
+
+        this.createEnemy(206, 206, 3)
+        this.createEnemy(174, 238, 4)
+        this.createEnemy(334, 142, 2)
+    
+
+    }
+
     createEnemy(posX, posY, health) {
         // สร้างศัตรู
         this.enemy = new Enemy({ scene: this, x: posX, y: posY, texture: 'lizard', frame: 'lizard_f_idle_anim_f0' });
@@ -136,7 +144,10 @@ export default class MainScene extends Phaser.Scene {
         this.updateHealthBar(enemy);
 
         // เพิ่มศัตรูลงในกลุ่ม
-        enemyGrp.push(enemy);
+        if (enemy.active === true) {
+            enemyGrp.push(enemy);
+            console.log(enemyGrp)
+        }
     }
 
     updateHealthBar(enemy) {
@@ -176,7 +187,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.crown.x = this.player.x;
         this.crown.y = this.player.y - 10;
-        
+
 
         // this.enemy.anims.play('lizard_idle', true); // Enemy movement
 
@@ -204,7 +215,6 @@ export default class MainScene extends Phaser.Scene {
                 this.updatePlayerHeart();
                 this.scene.restart();
                 score = 0
-                // this.enemyReset()
             }
 
             // Check collision with Enemy
@@ -220,18 +230,31 @@ export default class MainScene extends Phaser.Scene {
                 this.updatePlayerHeart();
                 this.scene.restart();
                 score = 0
-                // this.enemyReset()
             }
         });
     }
 
     enemyReset() {
-        console.log(enemyGrp)
-        for (let i = 0; i < enemyGrp.length; i++) {
-            enemyGrp[i].health = enemyGrp[i].maxHealth
-            console.log(enemyGrp[i].health, enemyGrp[i].maxHealth, "ตัวที่ ", i)
-        }
+        // Clear existing enemy health bars
+        // enemyGrp.forEach(enemy => {
+        //     if (enemy.healthBars) {
+        //         enemy.healthBars.forEach(bar => bar.destroy());
+        //     }
+        // });
 
+        // Clear the enemy group and create new enemies
+        this.enemyPos();
+        console.log(enemyGrp);
+
+        for (let i = 0; i < enemyGrp.length; i++) {
+            console.log(enemyGrp[i])
+            enemyGrp[i].active = true
+            if (enemyGrp[i].active === true) {
+                enemyGrp[i].health = enemyGrp[i].maxHealth;
+                this.updateHealthBar(enemyGrp[i]); // Recreate the health bars for each enemy
+                console.log(enemyGrp[i].health, enemyGrp[i].maxHealth, "ตัวที่ ", i);
+            }
+        }
     }
 
     showGameOverDialog() {
@@ -274,7 +297,6 @@ export default class MainScene extends Phaser.Scene {
         const executeCommands = async () => {
             isRestarting = true; // Set restarting flag
             this.scene.restart(); // Restart the scene
-            this.enemyReset()
             score = 0
 
             // Wait for the scene to restart
@@ -283,8 +305,8 @@ export default class MainScene extends Phaser.Scene {
                 const commands = commandLabel.value.toLowerCase().split('\n'); // Split by newline to read line by line
                 for (const command of commands) {
                     if (command.trim() !== '' && !isRestarting) { // Skip empty lines and check if restartingฃ
-                        timesOfCommand++
-                        console.log(timesOfCommand)
+                        // timesOfCommand++
+                        // console.log(timesOfCommand)
                         await this.executeCommand(command.trim());
                     }
                 }
@@ -293,12 +315,14 @@ export default class MainScene extends Phaser.Scene {
 
         // Button click event listener
         commandButton.addEventListener('click', () => {
+            this.enemyReset()
             executeCommands();
         });
 
         // Also handle Enter key press in textarea
         commandLabel.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
+                this.enemyReset()
                 e.preventDefault(); // Prevent default Enter key behavior (submitting form)
                 await executeCommands(); // Execute commands when Enter is pressed
             }
@@ -402,12 +426,6 @@ export default class MainScene extends Phaser.Scene {
             enemy.destroy()
             score += 10
         }
-        // this.input.keyboard.on('keydown', (event) => {
-        //     if (event.key === 'Enter') {
-        //         this.enemyReset();
-        //         this.executeCommand();
-        //     }
-        // });
     }
 
     playerAttackAni() {
