@@ -107,10 +107,16 @@ export default class MainScene extends Phaser.Scene {
             });
         });
 
-        scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
+        scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: 0', { fontSize: '28px', fill: '#fff' });
         scoreText.setOrigin(1, 0);
 
         this.playerName = playerName;
+
+        const playerNameLabel = this.add.text(16, 16, `Player: ${this.playerName}`, {
+            fontSize: '20px',
+            fill: '#fff'
+        });
+        playerNameLabel.setOrigin(0, -1.3);
     }
 
     createPlayerHeart() {

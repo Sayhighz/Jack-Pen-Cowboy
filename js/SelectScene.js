@@ -60,6 +60,26 @@ export default class SelectScene extends Phaser.Scene {
 
         // สร้างปุ่ม Start Game ในตำแหน่งที่กำหนดในหน้าจอเกม
         this.createStartButton();
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // ป้องกันการ submit form ซึ่งเป็น default behavior ของ input
+                if (this.selectedCharacter) {
+                    if (this.profileInput) {
+                        const playerName = this.profileInput.value.trim();
+                        if (playerName) {
+                            this.profileInput.remove();
+                            this.startButton.destroy();
+                            this.startGame(playerName);
+                        } else {
+                            alert('Please enter your name');
+                        }
+                    }
+                } else {
+                    alert('Choose character first');
+                }
+            }
+        });
     }
 
     createStartButton() {
@@ -69,10 +89,15 @@ export default class SelectScene extends Phaser.Scene {
         }
     
         // เพิ่มปุ่ม Start Game ที่ล่างขวาสุดของหน้าจอเกม
-        this.startButton = this.add.text(this.scale.width / 2, this.scale.height, 'Start Game', { font: '20px Anton', fill: '#ffffff' })
+        this.startButton = this.add.text(this.scale.width / 2, this.scale.height, 'Start Game', {
+            font: '20px Anton',
+            fill: '#ffffff',
+            backgroundColor: '#000',
+            padding: { left: 10, right: 10, top: 10, bottom: 10 },
+            align: 'center',
+        })
         .setInteractive()
-        .setOrigin(0.5, 3);
-    
+        .setOrigin(0.5, 1.5);
     
         this.startButton.on('pointerdown', () => {
             if (this.selectedCharacter) {
