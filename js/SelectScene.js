@@ -60,26 +60,6 @@ export default class SelectScene extends Phaser.Scene {
 
         // สร้างปุ่ม Start Game ในตำแหน่งที่กำหนดในหน้าจอเกม
         this.createStartButton();
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // ป้องกันการ submit form ซึ่งเป็น default behavior ของ input
-                if (this.selectedCharacter) {
-                    if (this.profileInput) {
-                        const playerName = this.profileInput.value.trim();
-                        if (playerName) {
-                            this.profileInput.remove();
-                            this.startButton.destroy();
-                            this.startGame(playerName);
-                        } else {
-                            alert('Please enter your name');
-                        }
-                    }
-                } else {
-                    alert('Choose character first');
-                }
-            }
-        });
     }
 
     createStartButton() {

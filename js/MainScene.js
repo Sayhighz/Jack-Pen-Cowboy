@@ -449,6 +449,7 @@ export default class MainScene extends Phaser.Scene {
     savePlayerScore() {
         let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
         scores.push({ name: this.playerName, score: score });
+        console.log(scores)
         localStorage.setItem('playerScores', JSON.stringify(scores));
     }
 }
