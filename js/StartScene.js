@@ -36,7 +36,10 @@ export default class StartScene extends Phaser.Scene {
         if (this.textures.exists('startBackground')) {
             // เพิ่มภาพพื้นหลัง
             const background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'startBackground');
-            background.setDisplaySize(this.scale.width, this.scale.height);
+            const scaleX = this.scale.width / background.width;
+            const scaleY = this.scale.height / background.height;
+            const scale = Math.max(scaleX, scaleY);
+            background.setScale(scale).setScrollFactor(0);
             
         } else {
             console.error('Error: startBackground image not found');
@@ -74,7 +77,7 @@ export default class StartScene extends Phaser.Scene {
 
         // เพิ่ม event เมื่อคลิกปุ่มตั้งค่า
         settingsButton.on('pointerdown', () => {
-            this.scene.start('Settings');
+            this.scene.start('RankingScene');
         });
     }
     
