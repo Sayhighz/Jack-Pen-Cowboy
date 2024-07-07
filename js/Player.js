@@ -107,4 +107,10 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             });
         }
     }
+
+    stopMovement() {
+        this.setVelocity(0);
+        this.anims.stop();
+    }
+    
 }
