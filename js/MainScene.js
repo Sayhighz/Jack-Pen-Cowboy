@@ -15,6 +15,7 @@ let enemyGrp = []
 let coinsGrp = []
 let timesOfCommand = 0
 let isExecuting = false;
+let mapSclect = 1
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -88,12 +89,7 @@ export default class MainScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.enemyPos()
-
-        // Create Enemy and Coins
-        this.createCoins(142, 142);
-        this.createCoins(302, 142);
-        this.createCoins(302, 302);
+        this.enemyAndCoinsPos()
 
         this.matter.world.on('collisionstart', this.handleCollision, this);
         this.setupCommandInput();
@@ -128,14 +124,25 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-    enemyPos() {
+    enemyAndCoinsPos() {
         enemyGrp = []
 
-        this.createEnemy(206, 206, 3)
-        this.createEnemy(174, 238, 4)
-        this.createEnemy(334, 142, 2)
-    
-
+        if(mapSclect === 1) {
+            this.createEnemy(206, 206, 3)
+            this.createEnemy(174, 238, 4)
+            this.createEnemy(334, 142, 2)
+        
+            this.createCoins(142, 142);
+            this.createCoins(302, 142);
+            this.createCoins(302, 302);
+        }
+        else if (mapSclect === 2) {
+            this.createEnemy(206, 206, 3)
+            this.createEnemy(174, 238, 4)
+            this.createEnemy(334, 142, 2)
+        
+            this.createCoins(142, 142);
+        }
     }
 
     createEnemy(posX, posY, health) {
@@ -190,8 +197,12 @@ export default class MainScene extends Phaser.Scene {
 
         //เมื่อจบเกม
         if(this.player.x === 494 && this.player.y === 334){
-            this.savePlayerScore();
-            this.scene.start('RankingScene'); // เปลี่ยนฉากเป็น RankingScene
+            this.scene.restart();
+            mapSclect++
+            if(mapSclect === 3){
+                this.savePlayerScore();
+                this.scene.start('RankingScene'); // เปลี่ยนฉากเป็น RankingScene
+            }
         }
     }
 
