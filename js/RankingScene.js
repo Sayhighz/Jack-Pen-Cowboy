@@ -30,15 +30,16 @@ export default class RankingScene extends Phaser.Scene {
 
         // Display scores
         const scores = JSON.parse(localStorage.getItem('playerScores')) || [];
+        console.log(scores)
         scores.sort((a, b) => b.score - a.score);
 
         this.add.text(this.scale.width / 2, 50, 'Ranking', { fontSize: '40px', fill: '#ffcc00' }).setOrigin(0.5);
 
         scores.slice(0, 10).forEach((score, index) => {
-            this.add.text(this.scale.width / 2, 100 + index * 40, `${index + 1}. ${score.name} - ${score.score}`, { fontSize: '32px', fill: '#00ff00' }).setOrigin(0.5);
+            this.add.text(this.scale.width / 2, 100 + index * 40, `${index + 1}. ${score.name} - ${score.score} ( ${score.character} )`, { fontSize: '26px', fill: '#000000' }).setOrigin(0.5);
         });
 
-        const backButton = this.add.text(this.scale.width / 2, this.scale.height - 50, 'Back To Menu', { fontSize: '32px', fill: '#ff0000' }).setOrigin(0.5).setInteractive();
+        const backButton = this.add.text(this.scale.width / 2, this.scale.height - 15, 'Back To Menu', { fontSize: '32px', fill: '#ff0000' }).setOrigin(0.5).setInteractive();
         backButton.on('pointerdown', () => {
             this.scene.start('StartScene');
         });

@@ -175,7 +175,6 @@ export default class MainScene extends Phaser.Scene {
         }
     }
     
-
     createCoins(posX, posY) {
         this.coins = new Coins({ scene: this, x: posX, y: posY, texture: 'coins', frame: 'coin_anim_f0' });
         let coins = this.coins
@@ -188,6 +187,12 @@ export default class MainScene extends Phaser.Scene {
         this.crown.y = this.player.y - 10;
 
         scoreText.setText("SCORE : " + score)
+
+        //เมื่อจบเกม
+        if(this.player.x === 494 && this.player.y === 334){
+            this.savePlayerScore();
+            this.scene.start('RankingScene'); // เปลี่ยนฉากเป็น RankingScene
+        }
     }
 
     handleCollision(event) {
@@ -259,14 +264,9 @@ export default class MainScene extends Phaser.Scene {
     
         restartButton.addEventListener('click', handleRestart);
         backButton.addEventListener('click', handleBack);
-    
-        this.savePlayerScore();
-        this.scene.start('RankingScene'); // เปลี่ยนฉากเป็น RankingScene
+
     }
     
-    
-    
-
     updatePlayerHeart() {
         for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
             if (playerHeart < i + 1) {
@@ -432,7 +432,6 @@ export default class MainScene extends Phaser.Scene {
         }
     }    
     
-
     playerAttackAni() {
         this.player.anims.play(`${this.player.animPrefix}_hit`);
         this.stopAnimation();
@@ -448,7 +447,8 @@ export default class MainScene extends Phaser.Scene {
 
     savePlayerScore() {
         let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
-        scores.push({ name: this.playerName, score: score });
+        const selectedCharacter = this.scene.settings.data.character;
+        scores.push({ name: this.playerName, score: score , character: selectedCharacter});
         console.log(scores)
         localStorage.setItem('playerScores', JSON.stringify(scores));
     }
