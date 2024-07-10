@@ -19,6 +19,7 @@ export default class SelectScene extends Phaser.Scene {
     }
 
     create() {
+        
         // ซ่อน command-container
         const commandContainer = document.getElementById('command-container');
         commandContainer.style.display = 'none';
@@ -137,15 +138,15 @@ export default class SelectScene extends Phaser.Scene {
             this.updateCharacterSelection();
         }
     }
-
+    
     showProfileInput(character) {
         if (this.profileInput) {
             this.profileInput.remove();
         }
-
+    
         let characterButton = this.characterButtons[character];
         let inputY = characterButton.y - characterButton.displayHeight / 2 - 20;
-
+    
         this.profileInput = document.createElement('input');
         this.profileInput.type = 'text';
         this.profileInput.placeholder = 'Enter your name';
@@ -154,7 +155,7 @@ export default class SelectScene extends Phaser.Scene {
         this.profileInput.style.left = `${this.scale.canvas.offsetLeft + characterButton.x - characterButton.displayWidth / 2}px`;
         document.body.appendChild(this.profileInput);
     }
-
+    
     updateCharacterSelection() {
         // เคลียร์เอฟเฟกต์เรืองแสงทั้งหมด
         Object.keys(this.characterButtons).forEach(character => {
@@ -162,13 +163,13 @@ export default class SelectScene extends Phaser.Scene {
                 this.characterButtons[character].clearTint();
             }
         });
-
+    
         // เพิ่มเอฟเฟกต์เรืองแสงให้กับตัวละครที่เลือก
         if (this.selectedCharacter) {
             this.characterButtons[this.selectedCharacter].setTint(0x00ff00);  // สีเขียวบอกว่าถูกเลือก
         }
     }
-
+    
     startGame(playerName) {
         if (this.selectedCharacter) {
             this.scene.start('MainScene', { character: this.selectedCharacter, playerName });

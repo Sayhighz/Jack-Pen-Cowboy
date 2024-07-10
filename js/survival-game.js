@@ -7,7 +7,7 @@ import Scene2 from "./Scene2.js";
 const config = {
     type: Phaser.AUTO,
     parent: 'survival-game',
-    scene: [StartScene, SelectScene, RankingScene, MainScene, Scene2],
+    scene: [StartScene, SelectScene, MainScene, Scene2, RankingScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,

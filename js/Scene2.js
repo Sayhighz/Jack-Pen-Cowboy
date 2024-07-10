@@ -90,6 +90,8 @@ export default class Scene2 extends Phaser.Scene {
     
         enemyGrp = [];
         coinsGrp = [];
+
+        this.isScoreSaved = false;
     
         heartGrp = this.add.group();
         this.createPlayerHeart();
@@ -292,44 +294,38 @@ export default class Scene2 extends Phaser.Scene {
         const restartButton = document.getElementById('restart-button');
         const backButton = document.getElementById('back-button');
         const scoreText = document.getElementById('game-over-score');
-
+    
         const playerName = this.playerName;
-
         const finalScore = this.score;
-        scoreText.textContent = `แพ้แล้ว! ${playerName}, คะแนนรวมของคุณคือ: ${finalScore}`;
-
+    
+        scoreText.textContent = `แพ้แล้ว! ${playerName}, คะแนนของคุณคือ: ${finalScore}`;
+    
         dialog.style.display = 'block';
-
+    
         const handleRestart = () => {
             dialog.style.display = 'none';
             this.playerHeart = 3;
-            this.scene.restart({
-                character: this.character,
-                playerName: this.playerName,
-                playerHeart: this.playerHeart,
-                score: this.score
-            });
+            this.score = 0;
+            this.scene.start('SelectScene');  // Go back to the character selection scene
             restartButton.removeEventListener('click', handleRestart);
         };
-
+    
         const handleBack = () => {
             dialog.style.display = 'none';
-            // this.scene.start('StartScene');
-            // console.log("ไปหน้าหลัก")
+            this.scene.start('StartScene');  // Ensure 'StartScene' is the correct scene name
             backButton.removeEventListener('click', handleBack);
-            this.scene.start('RankingScene');
-            console.log("ไปหาคะแนน")
         };
-
+    
         restartButton.addEventListener('click', handleRestart);
         backButton.addEventListener('click', handleBack);
-
-        if (!this.isScoreSaved) { 
+    
+        if (!this.isScoreSaved) { // เช็คว่าคะแนนถูกบันทึกหรือยัง
             this.savePlayerScore(finalScore);
-            this.isScoreSaved = true; 
+            this.isScoreSaved = true; // เปลี่ยนสถานะการบันทึกคะแนน
         }
     }
-
+    
+    
     savePlayerScore(finalScore) {
         let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
         const newScore = { name: this.playerName, score: finalScore, character: this.character };
@@ -374,7 +370,7 @@ export default class Scene2 extends Phaser.Scene {
                     isRestarting = true;
                     this.scene.restart();
                     this.enemyReset();
-                    this.score = 0;
+                    // this.score = 0;
         
                     this.events.once('create', async () => {
                         isRestarting = false;

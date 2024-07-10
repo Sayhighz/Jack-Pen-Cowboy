@@ -21,7 +21,7 @@ let scenetwo = false
 export default class MainScene extends Phaser.Scene {
     constructor() {
         super("MainScene");
-        let isScoreSaved = false;
+        this.isScoreSaved = false;
     }
 
     preload() {
@@ -66,6 +66,8 @@ export default class MainScene extends Phaser.Scene {
             this.setupCommandInput();
             this.eventListenersAdded = true;
         }
+
+        this.isScoreSaved = false;
 
         enemyGrp = [];
         coinsGrp = [];
@@ -250,19 +252,12 @@ export default class MainScene extends Phaser.Scene {
     handleCollision(event) {
         event.pairs.forEach(pair => {
             const { bodyA, bodyB } = pair;
-
+    
             if ((bodyA.gameObject === this.player && bodyB.gameObject && bodyB.gameObject.tile && bodyB.gameObject.tile.properties.isDoor) ||
                 (bodyB.gameObject === this.player && bodyA.gameObject && bodyA.gameObject.tile && bodyA.gameObject.tile.properties.isDoor)) {
                 console.log("แมพใหม่");
                 this.player.stopMovement();
-
-                // console.log("Sending character data:", this.scene.settings.data.character);
-                // console.log("Sending playerName:", this.scene.settings.data.playerName);
-                // console.log("Sending playerX:", this.player.x);
-                // console.log("Sending playerY:", this.player.y);
-                // console.log("Sending playerHeart:", playerHeart);
-                // console.log("Sending score:", score);
-
+    
                 this.scene.start('Scene2', {
                     character: this.scene.settings.data.character,
                     playerName: this.scene.settings.data.playerName,
@@ -273,12 +268,12 @@ export default class MainScene extends Phaser.Scene {
                 });
                 return;
             }
-
+    
             if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
                 if (!isRestarting) {
                     isRestarting = true;
                     playerHeart--;
-
+    
                     if (playerHeart <= 0) {
                         playerHeart = 0;
                         console.log("gameOver");
@@ -294,13 +289,13 @@ export default class MainScene extends Phaser.Scene {
                     }
                 }
             }
-
+    
             // ตรวจสอบการชนกับศัตรู
             if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
                 if (!isRestarting) {
                     isRestarting = true;
                     playerHeart--;
-
+    
                     if (playerHeart <= 0) {
                         playerHeart = 0;
                         console.log("gameOver");
@@ -318,6 +313,7 @@ export default class MainScene extends Phaser.Scene {
             }
         });
     }
+    
     enemyReset() {
         for (let i = 0; i < enemyGrp.length; i++) {
             enemyGrp[i].health = enemyGrp[i].maxHealth;
@@ -330,35 +326,36 @@ export default class MainScene extends Phaser.Scene {
         const restartButton = document.getElementById('restart-button');
         const backButton = document.getElementById('back-button');
         const scoreText = document.getElementById('game-over-score');
-
+   
         const playerName = this.playerName;
-
+   
         scoreText.textContent = `แพ้แล้ว! ${playerName}, คะแนนของคุณคือ: ${score}`;
-
+   
         dialog.style.display = 'block';
-
+   
         const handleRestart = () => {
             dialog.style.display = 'none';
             playerHeart = 3;
-            this.scene.restart();
+            score = 0;
+            this.scene.start('SelectScene');  // Go back to the character selection scene
             restartButton.removeEventListener('click', handleRestart);
         };
-
+   
         const handleBack = () => {
             dialog.style.display = 'none';
             this.scene.start('StartScene');
             backButton.removeEventListener('click', handleBack);
         };
-
+   
         restartButton.addEventListener('click', handleRestart);
         backButton.addEventListener('click', handleBack);
-
+   
         if (!this.isScoreSaved) { // เช็คว่าคะแนนถูกบันทึกหรือยัง
             this.savePlayerScore();
             this.isScoreSaved = true; // เปลี่ยนสถานะการบันทึกคะแนน
         }
-        this.scene.start('RankingScene');
     }
+    
 
 
     updatePlayerHeart() {
@@ -549,7 +546,7 @@ export default class MainScene extends Phaser.Scene {
         let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
         const selectedCharacter = this.scene.settings.data.character;
         const newScore = { name: this.playerName, score: score, character: selectedCharacter };
-
+   
         // ตรวจสอบว่ามีข้อมูลซ้ำหรือไม่
         if (!scores.some(score => score.name === newScore.name && score.score === newScore.score && score.character === newScore.character)) {
             scores.push(newScore);
@@ -558,5 +555,6 @@ export default class MainScene extends Phaser.Scene {
             localStorage.setItem('playerScores', JSON.stringify(scores));
         }
     }
+   
 
 }
