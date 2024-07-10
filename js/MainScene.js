@@ -15,7 +15,8 @@ let enemyGrp = [];
 let coinsGrp = [];
 let timesOfCommand = 0;
 let isExecuting = false;
-let mapSclect = 1
+let sceneone = true
+let scenetwo = false
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -24,49 +25,57 @@ export default class MainScene extends Phaser.Scene {
     }
 
     preload() {
-        console.log('StartMain');
-        
-        if (!this.textures.exists('heart')) {
-            this.load.image('heart', 'assets/images/ui_heart_full.png');
+        if (sceneone === true) {
+            console.log('StartMain');
+
+            if (!this.textures.exists('heart')) {
+                this.load.image('heart', 'assets/images/ui_heart_full.png');
+            }
+            if (!this.textures.exists('coin')) {
+                this.load.image('coin', 'assets/coins/coin.png');
+            }
+            if (!this.textures.exists('tiles')) {
+                this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
+            }
+            if (!this.cache.tilemap.exists('map')) {
+                this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
+            }
+            if (!this.textures.exists('crown')) {
+                this.load.image('crown', 'assets/images/crown_NBG.png');
+            }
+
+            Player.preload(this);
+            Enemy.preload(this);
+            Coins.preload(this);
         }
-        if (!this.textures.exists('coin')) {
-            this.load.image('coin', 'assets/coins/coin.png');
-        }
-        if (!this.textures.exists('tiles')) {
-            this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
-        }
-        if (!this.cache.tilemap.exists('map')) {
-            this.load.tilemapTiledJSON('map', 'assets/map/newmap.json');
-        }
-        if (!this.textures.exists('crown')) {
-            this.load.image('crown', 'assets/images/crown_NBG.png');
-        }
-        
-        Player.preload(this);
-        Enemy.preload(this);
-        Coins.preload(this);
     }
-    
+
+    receiveSceneOneData(sceneoneData) {
+        // นำ sceneoneData ไปใช้งานตามที่ต้องการใน mainscene
+        console.log('Received sceneone data:', sceneoneData);
+        // ตัวอย่างเช่นการเซ็ตค่าใน mainscene จาก sceneoneData
+        sceneone = sceneoneData;
+    }
 
     create() {
         // แสดง command-container
         const commandContainer = document.getElementById('command-container');
         commandContainer.style.display = 'flex';
-    
+
         if (!this.eventListenersAdded) {
             this.setupCommandInput();
             this.eventListenersAdded = true;
         }
-    
+
         enemyGrp = [];
         coinsGrp = [];
-    
+
         heartGrp = this.add.group();
         this.createPlayerHeart();
-    
+
         const map = this.make.tilemap({ key: 'map' });
         const tileset = map.addTilesetImage('Dungeon_Tileset_at', 'tiles', 32, 32, 0, 0);
-    
+
         if (tileset) {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
             layer1.setCollisionByProperty({ collides: true });
@@ -87,9 +96,9 @@ export default class MainScene extends Phaser.Scene {
 
         const selectedCharacter = this.scene.settings.data.character;
         const playerName = this.scene.settings.data.playerName;
-    
+
         let texture, animPrefix;
-    
+
         if (selectedCharacter === 'knightt') {
             texture = 'knight';
             animPrefix = 'knightt';
@@ -100,10 +109,10 @@ export default class MainScene extends Phaser.Scene {
             texture = 'elf';
             animPrefix = 'elff';
         }
-    
+
         this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
-    
+
         this.crown = this.add.image(this.player.x, this.player.y - 10, 'crown');
         this.crown.setScale(0.05);
 
@@ -128,20 +137,20 @@ export default class MainScene extends Phaser.Scene {
                 }
             });
         });
-    
+
         scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: 0', { fontSize: '28px', fill: '#fff' });
         scoreText.setOrigin(1, 0);
-    
+
         this.playerName = playerName;
-    
+
         const playerNameLabel = this.add.text(16, 16, `Player: ${this.playerName}`, {
             fontSize: '20px',
             fill: '#fff'
         });
         playerNameLabel.setOrigin(0, -1.3);
     }
-    
-    
+
+
 
     createPlayerHeart() {
         for (let i = 0; i < playerHeart; i++) {
@@ -155,22 +164,13 @@ export default class MainScene extends Phaser.Scene {
     enemyAndCoinsPos() {
         enemyGrp = []
 
-        if(mapSclect === 1) {
-            this.createEnemy(206, 206, 3)
-            this.createEnemy(174, 238, 4)
-            this.createEnemy(334, 142, 2)
-        
-            this.createCoins(142, 142);
-            this.createCoins(302, 142);
-            this.createCoins(302, 302);
-        }
-        else if (mapSclect === 2) {
-            this.createEnemy(206, 206, 3)
-            this.createEnemy(174, 238, 4)
-            this.createEnemy(334, 142, 2)
-        
-            this.createCoins(142, 142);
-        }
+        this.createEnemy(206, 206, 3)
+        this.createEnemy(174, 238, 4)
+        this.createEnemy(334, 142, 2)
+
+        this.createCoins(142, 142);
+        this.createCoins(302, 142);
+        this.createCoins(302, 302);
     }
 
     createEnemy(posX, posY, health) {
@@ -223,14 +223,27 @@ export default class MainScene extends Phaser.Scene {
 
         scoreText.setText("SCORE : " + score)
 
-        //เมื่อจบเกม
-        if(this.player.x === 494 && this.player.y === 334){
-            this.scene.restart();
-            mapSclect++
-            if(mapSclect === 3){
-                this.savePlayerScore();
-                this.scene.start('RankingScene'); // เปลี่ยนฉากเป็น RankingScene
-            }
+        if (this.player.x === 462 && this.player.y === 334) {
+            this.receiveSceneOneData()
+            console.log("แมพใหม่");
+            this.player.stopMovement();
+
+            console.log("Sending character data:", this.scene.settings.data.character);
+            console.log("Sending playerName:", this.scene.settings.data.playerName);
+            console.log("Sending playerX:", this.player.x);
+            console.log("Sending playerY:", this.player.y);
+            console.log("Sending playerHeart:", playerHeart);
+            console.log("Sending score:", score);
+
+            this.scene.start('Scene2', {
+                character: this.scene.settings.data.character,
+                playerName: this.scene.settings.data.playerName,
+                playerX: this.player.x,
+                playerY: this.player.y,
+                playerHeart: playerHeart,
+                score: score
+            });
+            return;
         }
     }
 
@@ -243,12 +256,12 @@ export default class MainScene extends Phaser.Scene {
                 console.log("แมพใหม่");
                 this.player.stopMovement();
 
-                console.log("Sending character data:", this.scene.settings.data.character);
-                console.log("Sending playerName:", this.scene.settings.data.playerName);
-                console.log("Sending playerX:", this.player.x);
-                console.log("Sending playerY:", this.player.y);
-                console.log("Sending playerHeart:", playerHeart);
-                console.log("Sending score:", score);
+                // console.log("Sending character data:", this.scene.settings.data.character);
+                // console.log("Sending playerName:", this.scene.settings.data.playerName);
+                // console.log("Sending playerX:", this.player.x);
+                // console.log("Sending playerY:", this.player.y);
+                // console.log("Sending playerHeart:", playerHeart);
+                // console.log("Sending score:", score);
 
                 this.scene.start('Scene2', {
                     character: this.scene.settings.data.character,
@@ -265,8 +278,7 @@ export default class MainScene extends Phaser.Scene {
                 if (!isRestarting) {
                     isRestarting = true;
                     playerHeart--;
-                    console.log("เลือดลด");
-    
+
                     if (playerHeart <= 0) {
                         playerHeart = 0;
                         console.log("gameOver");
@@ -282,14 +294,13 @@ export default class MainScene extends Phaser.Scene {
                     }
                 }
             }
-    
+
             // ตรวจสอบการชนกับศัตรู
             if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
                 if (!isRestarting) {
                     isRestarting = true;
                     playerHeart--;
-                    console.log("เลือดลด");
-    
+
                     if (playerHeart <= 0) {
                         playerHeart = 0;
                         console.log("gameOver");
@@ -308,10 +319,9 @@ export default class MainScene extends Phaser.Scene {
         });
     }
     enemyReset() {
-        console.log(enemyGrp);
         for (let i = 0; i < enemyGrp.length; i++) {
             enemyGrp[i].health = enemyGrp[i].maxHealth;
-            console.log(enemyGrp[i].health, enemyGrp[i].maxHealth, "ตัวที่ ", i);
+            // console.log(enemyGrp[i].health, enemyGrp[i].maxHealth, "ตัวที่ ", i);
         }
     }
 
@@ -349,7 +359,7 @@ export default class MainScene extends Phaser.Scene {
         }
         this.scene.start('RankingScene');
     }
-    
+
 
     updatePlayerHeart() {
         for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
@@ -370,43 +380,49 @@ export default class MainScene extends Phaser.Scene {
         const commandLabel = document.getElementById('command-label');
         const commandButton = document.getElementById('command-button');
 
-        const executeCommands = async () => {
-            if (isExecuting) {
-                console.log('คำสั่งกำลังทำงาน');
-                return;
-            }
-            isExecuting = true;
-
-            isRestarting = true;
-            this.scene.restart();
-            this.enemyReset();
-            score = 0;
-
-            this.events.once('create', async () => {
-                isRestarting = false;
-                const commands = commandLabel.value.toLowerCase().split('\n');
-                for (const command of commands) {
-                    if (command.trim() !== '' && !isRestarting) {
-                        timesOfCommand++;
-                        console.log(timesOfCommand);
-                        await this.executeCommand(command.trim());
+        if (sceneone === true) {
+            console.log("scene 1 กำลังทำงาน")
+            if (scenetwo === false) {
+                const executeCommands = async () => {
+                    if (isExecuting) {
+                        console.log('คำสั่งกำลังทำงาน');
+                        return;
                     }
-                }
-                isExecuting = false;
-            });
-        };
+                    isExecuting = true;
 
-        if (!this.commandEventListenerAdded) {
-            commandButton.addEventListener('click', executeCommands);
-            commandLabel.addEventListener('keypress', async (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    await executeCommands();
-                }
-            });
+                    isRestarting = true;
+                    this.scene.restart();
+                    this.enemyReset();
+                    score = 0;
 
-            this.commandEventListenerAdded = true;
+                    this.events.once('create', async () => {
+                        isRestarting = false;
+                        const commands = commandLabel.value.toLowerCase().split('\n');
+                        for (const command of commands) {
+                            if (command.trim() !== '' && !isRestarting) {
+                                timesOfCommand++;
+                                // console.log(timesOfCommand);
+                                await this.executeCommand(command.trim());
+                            }
+                        }
+                        isExecuting = false;
+                    });
+                };
+
+                if (!this.commandEventListenerAdded) {
+                    commandButton.addEventListener('click', executeCommands);
+                    commandLabel.addEventListener('keypress', async (e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            await executeCommands();
+                        }
+                    });
+
+                    this.commandEventListenerAdded = true;
+                }
+            }
         }
+
     }
 
     async executeCommand(command) {
@@ -467,8 +483,8 @@ export default class MainScene extends Phaser.Scene {
     }
 
     playerAttack(player, lastActionMove, enemyGrp) {
-        console.log("attack = ", lastActionMove);
-        console.log(player.x, player.y);
+        // console.log("attack = ", lastActionMove);
+        // console.log(player.x, player.y);
 
         let attackPosition = { x: player.x, y: player.y };
 
@@ -499,7 +515,7 @@ export default class MainScene extends Phaser.Scene {
 
     onPlayerAttack(enemy) {
         enemy.health--;
-        console.log(enemy.health, enemy.maxHealth);
+        // console.log(enemy.health, enemy.maxHealth);
         this.playerAttackAni();
         this.updateHealthBar(enemy);
         if (enemy.health <= 0) {
@@ -533,7 +549,7 @@ export default class MainScene extends Phaser.Scene {
         let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
         const selectedCharacter = this.scene.settings.data.character;
         const newScore = { name: this.playerName, score: score, character: selectedCharacter };
-        
+
         // ตรวจสอบว่ามีข้อมูลซ้ำหรือไม่
         if (!scores.some(score => score.name === newScore.name && score.score === newScore.score && score.character === newScore.character)) {
             scores.push(newScore);
@@ -542,5 +558,5 @@ export default class MainScene extends Phaser.Scene {
             localStorage.setItem('playerScores', JSON.stringify(scores));
         }
     }
-    
+
 }

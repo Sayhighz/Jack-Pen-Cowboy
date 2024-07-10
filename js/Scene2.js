@@ -13,6 +13,8 @@ let enemyGrp = [];
 let coinsGrp = [];
 let timesOfCommand = 0;
 let isExecuting = false;
+let sceneone = false
+let scenetwo = true
 
 export default class Scene2 extends Phaser.Scene {
     constructor() {
@@ -47,8 +49,18 @@ export default class Scene2 extends Phaser.Scene {
         Player.preload(this);
         Enemy.preload(this);
         Coins.preload(this);
+
+        this.sendSceneOneDataToMainScene()
     }
-    
+
+    sendSceneOneDataToMainScene() {
+        const mainScene = this.scene.get('MainScene');
+        if (mainScene) {
+            mainScene.receiveSceneOneData(sceneone);
+        } else {
+            console.error('Main scene not found');
+        }
+    }
 
     create() {
         if (!this.eventListenersAdded) {
@@ -197,9 +209,9 @@ export default class Scene2 extends Phaser.Scene {
             enemy.healthBars.push(healthBar);
         }
 
-        if (enemy.health === 0) {
-            console.log("เลือดไม่เหลือ");
-        }
+        // if (enemy.health === 0) {
+        //     console.log("เลือดไม่เหลือ");
+        // }
     }
 
     createCoins(posX, posY) {
@@ -347,42 +359,47 @@ export default class Scene2 extends Phaser.Scene {
         const commandLabel = document.getElementById('command-label');
         const commandButton = document.getElementById('command-button');
 
-        const executeCommands = async () => {
-            if (isExecuting) {
-                console.log('คำสั่งกำลังทำงาน');
-                return;
-            }
-            isExecuting = true;
-
-            isRestarting = true;
-            this.scene.restart();
-            this.enemyReset();
-            this.score = 0;
-
-            this.events.once('create', async () => {
-                isRestarting = false;
-                const commands = commandLabel.value.toLowerCase().split('\n');
-                for (const command of commands) {
-                    if (command.trim() !== '' && !isRestarting) {
-                        timesOfCommand++;
-                        console.log(timesOfCommand);
-                        await this.executeCommand(command.trim());
+        if(sceneone === false){
+            console.log("scene 2 กำลังทำงาน")
+            if(scenetwo === true){
+                const executeCommands = async () => {
+                    if (isExecuting) {
+                        console.log('คำสั่งกำลังทำงาน');
+                        return;
                     }
+                    isExecuting = true;
+        
+                    isRestarting = true;
+                    this.scene.restart();
+                    this.enemyReset();
+                    this.score = 0;
+        
+                    this.events.once('create', async () => {
+                        isRestarting = false;
+                        const commands = commandLabel.value.toLowerCase().split('\n');
+                        for (const command of commands) {
+                            if (command.trim() !== '' && !isRestarting) {
+                                timesOfCommand++;
+                                console.log(timesOfCommand);
+                                await this.executeCommand(command.trim());
+                            }
+                        }
+                        isExecuting = false;
+                    });
+                };
+        
+                if (!this.commandEventListenerAdded) {
+                    commandButton.addEventListener('click', executeCommands);
+                    commandLabel.addEventListener('keypress', async (e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            await executeCommands();
+                        }
+                    });
+        
+                    this.commandEventListenerAdded = true;
                 }
-                isExecuting = false;
-            });
-        };
-
-        if (!this.commandEventListenerAdded) {
-            commandButton.addEventListener('click', executeCommands);
-            commandLabel.addEventListener('keypress', async (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    await executeCommands();
-                }
-            });
-
-            this.commandEventListenerAdded = true;
+            }
         }
     }
 
