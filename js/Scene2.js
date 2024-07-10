@@ -28,27 +28,29 @@ export default class Scene2 extends Phaser.Scene {
     }
 
     preload() {
-        console.log('StartMain2');
+        if(scenetwo === true){
+            console.log('StartMain2');
         
-        if (!this.textures.exists('heart')) {
-            this.load.image('heart', 'assets/images/ui_heart_full.png');
+            if (!this.textures.exists('heart')) {
+                this.load.image('heart', 'assets/images/ui_heart_full.png');
+            }
+            if (!this.textures.exists('coin')) {
+                this.load.image('coin', 'assets/coins/coin.png');
+            }
+            if (!this.textures.exists('tiles')) {
+                this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
+            }
+            if (!this.cache.tilemap.exists('map2')) {
+                this.load.tilemapTiledJSON('map2', 'assets/map/map2.json');
+            }
+            if (!this.textures.exists('crown')) {
+                this.load.image('crown', 'assets/images/crown_NBG.png');
+            }
+            
+            Player.preload(this);
+            Enemy.preload(this);
+            Coins.preload(this);
         }
-        if (!this.textures.exists('coin')) {
-            this.load.image('coin', 'assets/coins/coin.png');
-        }
-        if (!this.textures.exists('tiles')) {
-            this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
-        }
-        if (!this.cache.tilemap.exists('map2')) {
-            this.load.tilemapTiledJSON('map2', 'assets/map/map2.json');
-        }
-        if (!this.textures.exists('crown')) {
-            this.load.image('crown', 'assets/images/crown_NBG.png');
-        }
-        
-        Player.preload(this);
-        Enemy.preload(this);
-        Coins.preload(this);
 
         this.sendSceneOneDataToMainScene()
     }
