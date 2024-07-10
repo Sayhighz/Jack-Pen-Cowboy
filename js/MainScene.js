@@ -152,8 +152,6 @@ export default class MainScene extends Phaser.Scene {
         playerNameLabel.setOrigin(0, -1.3);
     }
 
-
-
     createPlayerHeart() {
         for (let i = 0; i < playerHeart; i++) {
             let heart = this.add.sprite(40 + (i * 50), 20, "heart");
@@ -343,6 +341,8 @@ export default class MainScene extends Phaser.Scene {
    
         const handleBack = () => {
             dialog.style.display = 'none';
+            playerHeart = 3;
+            score = 0;
             this.scene.start('StartScene');
             backButton.removeEventListener('click', handleBack);
         };
