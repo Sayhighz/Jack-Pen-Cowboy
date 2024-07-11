@@ -114,6 +114,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
+        
 
         this.crown = this.add.image(this.player.x, this.player.y - 10, 'crown');
         this.crown.setScale(0.05);
@@ -149,6 +150,7 @@ export default class MainScene extends Phaser.Scene {
             fontSize: '20px',
             fill: '#fff'
         });
+        this.player.speak(`Hi ${this.playerName}`);
         playerNameLabel.setOrigin(0, -1.3);
     }
 
@@ -218,6 +220,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     update() {
+        this.player.update(); // เพิ่มบรรทัดนี้
         this.crown.x = this.player.x;
         this.crown.y = this.player.y - 10;
 
@@ -244,7 +247,7 @@ export default class MainScene extends Phaser.Scene {
             // เช็คการชนกับกำแพง
             if ((bodyA.gameObject === this.player && bodyB.gameObject && bodyB.gameObject.tile && bodyB.gameObject.tile.properties.collides) ||
             (bodyB.gameObject === this.player && bodyA.gameObject && bodyA.gameObject.tile && bodyA.gameObject.tile.properties.collides)) {
-                console.log("Player hit a wall");
+                this.player.speak(`I can't go there`);
     
                 // หยุดการเคลื่อนไหวของผู้เล่น
                 this.player.stopMovement();
@@ -276,11 +279,13 @@ export default class MainScene extends Phaser.Scene {
                 playerHeart--;
                 this.player.stopMovement();
                 this.resetPlayer();
+                this.player.speak(`I'm dead`);
     
                 if (playerHeart <= 0) {
                     playerHeart = 0;
                     console.log("gameOver");
                     this.showGameOverDialog();
+                    isExecuting = false; // Stop executing command
                 } else {
                     this.resetCoins();
                     this.resetEnemies();

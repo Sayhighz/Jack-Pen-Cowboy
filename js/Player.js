@@ -9,6 +9,12 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.tileSize = 32; // ขนาดของ tile
         this.isMoving = false;
 
+        this.speechText = this.scene.add.text(this.x, this.y - 20, '', {
+            font: '16px Arial',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        }).setOrigin(0.5).setAlpha(0);
+
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
         const playerCollider = Bodies.circle(this.x, this.y, 6, { isSensor: false, label: 'playerCollider' });
@@ -35,6 +41,24 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         scene.load.atlas('elf', 'assets/testhero/elf/elf.png', 'assets/testhero/elf/elf_atlas.json');
         scene.load.animation('elf_anim', 'assets/testhero/elf/elf_anim.json');
+    }
+
+    speak(message) {
+        this.speechText.setText(message);
+        this.speechText.setAlpha(1);
+
+        // ซ่อนคำพูดหลังจากเวลาผ่านไป
+        this.scene.time.addEvent({
+            delay: 2000,
+            callback: () => {
+                this.speechText.setAlpha(0);
+            },
+            callbackScope: this
+        });
+    }
+
+    update() {
+        this.speechText.setPosition(this.x, this.y - 20);
     }
 
     moveLeft() {
