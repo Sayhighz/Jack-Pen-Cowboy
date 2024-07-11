@@ -6,7 +6,7 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
 
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
-        const enemyCollider = Bodies.circle(this.x, this.y, 6, { isSensor: false, label: 'enemyCollider' });
+        const enemyCollider = Bodies.circle(this.x, this.y, 12, { isSensor: false, label: 'enemyCollider' });
         const compoundBody = Body.create({
             parts: [enemyCollider],
             frictionAir: 0.35,

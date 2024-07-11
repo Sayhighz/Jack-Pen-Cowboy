@@ -8,13 +8,13 @@ import RankingScene from "./RankingScene.js";
 let playerHeart = 3;
 let heartGrp;
 let isRestarting = false;
+let isExecuting = false;
 let lastActionMove = "right";
 let scoreText;
 let score = 0;
 let enemyGrp = [];
 let coinsGrp = [];
 let timesOfCommand = 0;
-let isExecuting = false;
 let sceneone = true
 let scenetwo = false
 
@@ -128,7 +128,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.enemyAndCoinsPos()
 
-        this.matter.world.on('collisionstart', this.handleCollision, this);
+        // this.matter.world.on('collisionstart', this.handleCollision, this);
         this.setupCommandInput();
         this.matter.world.on('collisionstart', (event) => {
             event.pairs.forEach((pair) => {
@@ -223,39 +223,42 @@ export default class MainScene extends Phaser.Scene {
 
         scoreText.setText("SCORE : " + score)
 
-        if (this.player.x === 462 && this.player.y === 334) {
-            this.receiveSceneOneData()
-            console.log("แมพใหม่");
-            this.player.stopMovement();
 
-            console.log("Sending character data:", this.scene.settings.data.character);
-            console.log("Sending playerName:", this.scene.settings.data.playerName);
-            console.log("Sending playerX:", this.player.x);
-            console.log("Sending playerY:", this.player.y);
-            console.log("Sending playerHeart:", playerHeart);
-            console.log("Sending score:", score);
 
-            this.scene.start('Scene2', {
-                character: this.scene.settings.data.character,
-                playerName: this.scene.settings.data.playerName,
-                playerX: this.player.x,
-                playerY: this.player.y,
-                playerHeart: playerHeart,
-                score: score
-            });
-            return;
+
+    }
+
+    async performActionWithDelay(action, repetitions) {
+        for (let i = 0; i < repetitions; i++) {
+            if (!isExecuting) break; // หยุดทำงานถ้า isExecuting เป็น false
+            await this.performAction(action);
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
 
+    
     handleCollision(event) {
         event.pairs.forEach(pair => {
             const { bodyA, bodyB } = pair;
     
+            // เช็คการชนกับกำแพง
+            if ((bodyA.gameObject === this.player && bodyB.gameObject && bodyB.gameObject.tile && bodyB.gameObject.tile.properties.collides) ||
+            (bodyB.gameObject === this.player && bodyA.gameObject && bodyA.gameObject.tile && bodyA.gameObject.tile.properties.collides)) {
+                console.log("Player hit a wall");
+    
+                // หยุดการเคลื่อนไหวของผู้เล่น
+                this.player.stopMovement();
+                this.player.setVelocity(0, 0);
+    
+                isExecuting = false; // หยุดการทำงานของคำสั่ง
+                return; // ออกจากฟังก์ชันเมื่อชนกับกำแพง
+            }
+    
+            // เช็คการชนกับประตู
             if ((bodyA.gameObject === this.player && bodyB.gameObject && bodyB.gameObject.tile && bodyB.gameObject.tile.properties.isDoor) ||
                 (bodyB.gameObject === this.player && bodyA.gameObject && bodyA.gameObject.tile && bodyA.gameObject.tile.properties.isDoor)) {
-                console.log("แมพใหม่");
-                this.player.stopMovement();
-    
+                console.log("Entering new map");
+                // this.player.stopMovement();
                 this.scene.start('Scene2', {
                     character: this.scene.settings.data.character,
                     playerName: this.scene.settings.data.playerName,
@@ -267,51 +270,85 @@ export default class MainScene extends Phaser.Scene {
                 return;
             }
     
-            if ((bodyA.label === 'playerCollider' && bodyB.isStatic) || (bodyB.label === 'playerCollider' && bodyA.isStatic)) {
-                if (!isRestarting) {
-                    isRestarting = true;
-                    playerHeart--;
+            // เช็คการชนกับศัตรู
+            if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || 
+                (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
+                playerHeart--;
+                this.player.stopMovement();
+                this.resetPlayer();
     
-                    if (playerHeart <= 0) {
-                        playerHeart = 0;
-                        console.log("gameOver");
-                        this.showGameOverDialog();
-                    } else {
-                        this.updatePlayerHeart();
-                        this.scene.restart({
-                            character: this.scene.settings.data.character,
-                            playerName: this.scene.settings.data.playerName,
-                            playerHeart: playerHeart,
-                            score: score
-                        });
-                    }
-                }
-            }
-    
-            // ตรวจสอบการชนกับศัตรู
-            if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
-                if (!isRestarting) {
-                    isRestarting = true;
-                    playerHeart--;
-    
-                    if (playerHeart <= 0) {
-                        playerHeart = 0;
-                        console.log("gameOver");
-                        this.showGameOverDialog();
-                    } else {
-                        this.updatePlayerHeart();
-                        this.scene.restart({
-                            character: this.scene.settings.data.character,
-                            playerName: this.scene.settings.data.playerName,
-                            playerHeart: playerHeart,
-                            score: score
-                        });
-                    }
+                if (playerHeart <= 0) {
+                    playerHeart = 0;
+                    console.log("gameOver");
+                    this.showGameOverDialog();
+                } else {
+                    this.resetCoins();
+                    this.resetEnemies();
+                    this.updatePlayerHeart();
+                    score = 0;
                 }
             }
         });
     }
     
+    
+    
+    
+
+    checkCollision(x, y) {
+        const bodies = this.matter.world.localWorld.bodies;
+        for (let i = 0; i < bodies.length; i++) {
+            const body = bodies[i];
+            if (body.label === 'playerCollider' || body.label === 'playerSensor') continue;
+    
+            if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    
+
+    resetPlayer() {
+        this.player.stopMovement();
+        this.player.setPosition(110, 110); // ตำแหน่งเริ่มต้น
+        this.player.setVelocity(0, 0); // หยุดการเคลื่อนไหว
+    }
+    
+    
+
+    resetCoins() {
+        // ทำลายเหรียญทั้งหมด
+        coinsGrp.forEach(coin => coin.destroy());
+        // สร้างเหรียญใหม่
+        this.createCoins(142, 142);
+        this.createCoins(302, 142);
+        this.createCoins(302, 302);
+    }
+
+    resetEnemies() {
+        // ทำลายศัตรูและหลอดเลือดทั้งหมด
+        enemyGrp.forEach(enemy => {
+            if (enemy.healthBars) {
+                enemy.healthBars.forEach(healthBar => healthBar.destroy());
+            }
+            enemy.destroy();
+        });
+
+        // รีเซ็ตอาเรย์ศัตรู
+        enemyGrp = [];
+
+        // สร้างศัตรูใหม่
+        this.createEnemy(206, 206, 3);
+        this.createEnemy(174, 238, 4);
+        this.createEnemy(334, 142, 2);
+    }
+
+
+
+
     enemyReset() {
         for (let i = 0; i < enemyGrp.length; i++) {
             enemyGrp[i].health = enemyGrp[i].maxHealth;
@@ -324,13 +361,13 @@ export default class MainScene extends Phaser.Scene {
         const restartButton = document.getElementById('restart-button');
         const backButton = document.getElementById('back-button');
         const scoreText = document.getElementById('game-over-score');
-   
+
         const playerName = this.playerName;
-   
+
         scoreText.textContent = `แพ้แล้ว! ${playerName}, คะแนนของคุณคือ: ${score}`;
-   
+
         dialog.style.display = 'block';
-   
+
         const handleRestart = () => {
             dialog.style.display = 'none';
             playerHeart = 3;
@@ -338,7 +375,7 @@ export default class MainScene extends Phaser.Scene {
             this.scene.start('SelectScene');  // Go back to the character selection scene
             restartButton.removeEventListener('click', handleRestart);
         };
-   
+
         const handleBack = () => {
             dialog.style.display = 'none';
             playerHeart = 3;
@@ -346,16 +383,16 @@ export default class MainScene extends Phaser.Scene {
             this.scene.start('StartScene');
             backButton.removeEventListener('click', handleBack);
         };
-   
+
         restartButton.addEventListener('click', handleRestart);
         backButton.addEventListener('click', handleBack);
-   
+
         if (!this.isScoreSaved) { // เช็คว่าคะแนนถูกบันทึกหรือยัง
             this.savePlayerScore();
             this.isScoreSaved = true; // เปลี่ยนสถานะการบันทึกคะแนน
         }
     }
-    
+
 
 
     updatePlayerHeart() {
@@ -365,6 +402,11 @@ export default class MainScene extends Phaser.Scene {
             } else {
                 heartGrp.getChildren()[i].setVisible(true);
             }
+        }
+
+        if (playerHeart <= 0) {
+            console.log("gameOver");
+            this.showGameOverDialog();
         }
     }
 
@@ -386,24 +428,20 @@ export default class MainScene extends Phaser.Scene {
                         return;
                     }
                     isExecuting = true;
-
-                    isRestarting = true;
-                    this.scene.restart();
-                    this.enemyReset();
+                    this.resetPlayer();
+                    this.resetCoins();
+                    this.resetEnemies();
+                    // this.enemyReset();
                     score = 0;
 
-                    this.events.once('create', async () => {
-                        isRestarting = false;
-                        const commands = commandLabel.value.toLowerCase().split('\n');
-                        for (const command of commands) {
-                            if (command.trim() !== '' && !isRestarting) {
-                                timesOfCommand++;
-                                // console.log(timesOfCommand);
-                                await this.executeCommand(command.trim());
-                            }
+                    const commands = commandLabel.value.toLowerCase().split('\n');
+                    for (const command of commands) {
+                        if (command.trim() !== '') {
+                            timesOfCommand++;
+                            await this.executeCommand(command.trim());
                         }
-                        isExecuting = false;
-                    });
+                    }
+                    isExecuting = false;
                 };
 
                 if (!this.commandEventListenerAdded) {
@@ -419,8 +457,8 @@ export default class MainScene extends Phaser.Scene {
                 }
             }
         }
-
     }
+
 
     async executeCommand(command) {
         const match = command.match(/(\w+)\((\d*)\)/);
@@ -433,15 +471,10 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-    async performActionWithDelay(action, repetitions) {
-        for (let i = 0; i < repetitions; i++) {
-            if (isRestarting) break;
-            await this.performAction(action);
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }
-    }
+    
 
-    async performAction(action) {
+
+    performAction(action) {
         switch (action) {
             case 'left':
                 this.player.moveLeft();
@@ -478,13 +511,14 @@ export default class MainScene extends Phaser.Scene {
                 console.log('Unknown action');
         }
     }
+    
 
     playerAttack(player, lastActionMove, enemyGrp) {
-        // console.log("attack = ", lastActionMove);
-        // console.log(player.x, player.y);
-
+        console.log("Attack direction: ", lastActionMove);
+        console.log("Player position: ", player.x, player.y);
+    
         let attackPosition = { x: player.x, y: player.y };
-
+    
         switch (lastActionMove) {
             case "right":
                 attackPosition.x += 32;
@@ -499,36 +533,28 @@ export default class MainScene extends Phaser.Scene {
                 attackPosition.y += 32;
                 break;
         }
-
+    
+        console.log("Attack position: ", attackPosition.x, attackPosition.y);
+    
         for (let i = 0; i < enemyGrp.length; i++) {
-            if (enemyGrp[i].active == true) {
-                if (Math.round(attackPosition.x) == Math.round(enemyGrp[i].x) &&
-                    Math.round(attackPosition.y) == Math.round(enemyGrp[i].y)) {
+            if (enemyGrp[i].active) {
+                console.log("Enemy position: ", enemyGrp[i].x, enemyGrp[i].y);
+    
+                let distance = Phaser.Math.Distance.Between(attackPosition.x, attackPosition.y, enemyGrp[i].x, enemyGrp[i].y);
+    
+                if (distance <= 10) { // ระยะห่างในพิกเซลที่โจมตีจะโดน
+                    console.log("Hit enemy at position: ", enemyGrp[i].x, enemyGrp[i].y);
                     this.onPlayerAttack(enemyGrp[i]);
+                } else {
+                    console.log("Missed enemy at position: ", enemyGrp[i].x, enemyGrp[i].y);
                 }
             }
         }
     }
 
-    onPlayerAttack(enemy) {
-        enemy.health--;
-        // console.log(enemy.health, enemy.maxHealth);
-        this.playerAttackAni();
-        this.updateHealthBar(enemy);
-        if (enemy.health <= 0) {
-            this.clearHealthBars(enemy);
-            enemy.destroy();
-            score += 10;
-        }
-    }
+    
 
-    clearHealthBars(enemy) {
-        if (enemy.healthBars) {
-            enemy.healthBars.forEach(healthBar => healthBar.destroy());
-            enemy.healthBars = [];
-        }
-    }
-
+    
     playerAttackAni() {
         this.player.anims.play(`${this.player.animPrefix}_hit`);
         this.stopAnimation();
@@ -538,6 +564,29 @@ export default class MainScene extends Phaser.Scene {
         }, 300);
     }
 
+    onPlayerAttack(enemy) {
+        enemy.health--;
+        console.log(`Enemy health after attack: ${enemy.health}`); // เพิ่มดีบัก
+        this.playerAttackAni();
+        this.updateHealthBar(enemy);
+        if (enemy.health <= 0) {
+            this.clearHealthBars(enemy);
+            enemy.destroy();
+            score += 10;
+        }
+    }
+    
+    
+
+    clearHealthBars(enemy) {
+        if (enemy.healthBars) {
+            enemy.healthBars.forEach(healthBar => healthBar.destroy());
+            enemy.healthBars = [];
+        }
+    }
+
+
+
     stopAnimation() {
         this.player.anims.stop();
     }
@@ -546,7 +595,7 @@ export default class MainScene extends Phaser.Scene {
         let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
         const selectedCharacter = this.scene.settings.data.character;
         const newScore = { name: this.playerName, score: score, character: selectedCharacter };
-   
+
         // ตรวจสอบว่ามีข้อมูลซ้ำหรือไม่
         if (!scores.some(score => score.name === newScore.name && score.score === newScore.score && score.character === newScore.character)) {
             scores.push(newScore);
@@ -555,6 +604,6 @@ export default class MainScene extends Phaser.Scene {
             localStorage.setItem('playerScores', JSON.stringify(scores));
         }
     }
-   
+
 
 }
