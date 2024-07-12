@@ -9,7 +9,7 @@ export default class SelectScene extends Phaser.Scene {
 
     preload() {
         // โหลดภาพพื้นหลังและปุ่ม
-        this.load.image('ss', 'assets/images/ง่วง (1).jpg');
+        this.load.image('ss', 'assets/images/select-bg.webp');
         this.load.spritesheet('startButton', 'assets/images/play_button.png', { frameWidth: 190, frameHeight: 49 });
 
         // โหลดภาพตัวละคร

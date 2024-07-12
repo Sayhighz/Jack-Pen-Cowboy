@@ -7,7 +7,7 @@ export default class StartScene extends Phaser.Scene {
 
     preload() {
         // โหลดภาพพื้นหลังและปุ่ม
-        this.load.image('startBackground', 'assets/images/ง่วง.jpg');
+        this.load.image('startBackground', 'assets/images/start-bg.webp');
         this.load.spritesheet('startButton', 'assets/images/play_button.png', { frameWidth: 190, frameHeight: 49 });
         this.load.image('settingsButton', 'assets/images/options_button.png', { frameWidth: 190, frameHeight: 49 }); // โหลดภาพปุ่มใหม่
 
