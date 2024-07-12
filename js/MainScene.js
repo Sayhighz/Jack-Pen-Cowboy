@@ -333,20 +333,20 @@ export default class MainScene extends Phaser.Scene {
       }
 
       // เช็คการชนกับศัตรู
-      if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') || 
-      (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
-      playerHeart--;
-      this.player.stopMovement();
-      this.player.setVelocity(0, 0);
-      isExecuting = false; // หยุดการทำงานของคำสั่ง
+      if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') ||
+        (bodyB.label === 'playerCollider' && bodyA.label === 'enemyCollider')) {
+        playerHeart--;
+        this.player.stopMovement();
+        this.player.setVelocity(0, 0);
+        isExecuting = false; // หยุดการทำงานของคำสั่ง
 
-      this.player.speak(`I'm dead`);
+        this.player.speak(`I'm dead`);
 
-      if (playerHeart <= 0) {
+        if (playerHeart <= 0) {
           playerHeart = 0;
           console.log("gameOver");
           this.showGameOverDialog();
-      } else {
+        } else {
           this.resetPlayer();
           this.resetCoins();
           this.resetEnemies();
@@ -432,6 +432,10 @@ export default class MainScene extends Phaser.Scene {
       dialog.style.display = "none";
       playerHeart = 3;
       score = 0;
+
+      const commandLabel = document.getElementById("command-label");
+      commandLabel.value = ""; // ตั้งค่าเป็นค่าว่าง หรือค่าที่ต้องการเริ่มต้น
+      commandLabel.placeholder = "Enter your commands here...";
       this.scene.start("SelectScene"); // Go back to the character selection scene
       restartButton.removeEventListener("click", handleRestart);
     };
@@ -440,9 +444,19 @@ export default class MainScene extends Phaser.Scene {
       dialog.style.display = "none";
       playerHeart = 3;
       score = 0;
+      // ซ่อน command-container
+      const commandContainer = document.getElementById("command-container");
+      commandContainer.style.display = "none";
+      
+      // ตั้งค่าเริ่มต้นให้กับ command-label
+      const commandLabel = document.getElementById("command-label");
+      commandLabel.value = ""; // ตั้งค่าเป็นค่าว่าง หรือค่าที่ต้องการเริ่มต้น
+      commandLabel.placeholder = "Enter your commands here...";
+      
       this.scene.start("StartScene");
       backButton.removeEventListener("click", handleBack);
     };
+    
 
     restartButton.addEventListener("click", handleRestart);
     backButton.addEventListener("click", handleBack);
