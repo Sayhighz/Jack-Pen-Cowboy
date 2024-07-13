@@ -32,8 +32,8 @@ export default class SelectScene extends Phaser.Scene {
         background.setScale(scale).setScrollFactor(0);
     
         // เพิ่มปุ่มตัวละครพร้อมขนาดเริ่มต้น
-        this.characterButtons.knightt = this.add.sprite(this.scale.width / 2 - 100, this.scale.height / 2 + 90, 'knightt').setInteractive();
-        this.characterButtons.wizzard = this.add.sprite(this.scale.width / 2 + 100, this.scale.height / 2 + 90, 'wizzard').setInteractive();
+        this.characterButtons.knightt = this.add.sprite(this.scale.width / 2 - 160, this.scale.height / 2 + 90, 'knightt').setInteractive();
+        this.characterButtons.wizzard = this.add.sprite(this.scale.width / 2 + 160, this.scale.height / 2 + 90, 'wizzard').setInteractive();
         this.characterButtons.elff = this.add.sprite(this.scale.width / 2, this.scale.height / 2 + 90, 'elff').setInteractive();
     
         this.characterButtons.knightt.setScale(2);
@@ -67,7 +67,6 @@ export default class SelectScene extends Phaser.Scene {
         this.createStartButton();
     }
     
-
     createStartButton() {
         // ลบปุ่ม Start Game ถ้ามีอยู่ก่อนหน้า
         if (this.startButton) {
@@ -78,7 +77,7 @@ export default class SelectScene extends Phaser.Scene {
         this.startButton = this.add.text(this.scale.width / 2, this.scale.height, 'Start Game', {
             font: '20px Anton',
             fill: '#ffffff',
-            backgroundColor: '#000',
+            backgroundColor: 'rgba(60, 60, 60,0.6)',
             padding: { left: 10, right: 10, top: 10, bottom: 10 },
             align: 'center',
         })
@@ -103,7 +102,6 @@ export default class SelectScene extends Phaser.Scene {
         });
     }
     
-
     addHoverEffect(button, character) {
         const originalScaleX = button.scaleX;
         const originalScaleY = button.scaleY;
@@ -144,15 +142,23 @@ export default class SelectScene extends Phaser.Scene {
             this.profileInput.remove();
         }
     
-        let characterButton = this.characterButtons[character];
-        let inputY = characterButton.y - characterButton.displayHeight / 2 - 20;
+        let inputY = this.scale.height / 2 + 200; // เลื่อนตำแหน่ง Y ลงมาจากกึ่งกลางจออีก 50 พิกเซล
     
         this.profileInput = document.createElement('input');
         this.profileInput.type = 'text';
         this.profileInput.placeholder = 'Enter your name';
         this.profileInput.style.position = 'absolute';
         this.profileInput.style.top = `${this.scale.canvas.offsetTop + inputY}px`;
-        this.profileInput.style.left = `${this.scale.canvas.offsetLeft + characterButton.x - characterButton.displayWidth / 2}px`;
+        this.profileInput.style.left = `${this.scale.canvas.offsetLeft + this.scale.width / 2 + 145}px`; // เพิ่มตำแหน่ง X ไปทางขวา
+        this.profileInput.style.width = '200px'; // กำหนดขนาดกว้างของ input
+
+        // เพิ่มการตกแต่ง CSS
+        this.profileInput.style.border = '2px solid #000';
+        this.profileInput.style.borderRadius = '5px';
+        this.profileInput.style.fontSize = '1rem';
+        this.profileInput.style.backgroundColor = 'rgba(255, 255, 255,0.5)';
+        this.profileInput.style.textAlign = 'center';
+    
         document.body.appendChild(this.profileInput);
     }
     
