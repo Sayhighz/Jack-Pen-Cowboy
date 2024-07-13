@@ -142,16 +142,18 @@ export default class SelectScene extends Phaser.Scene {
             this.profileInput.remove();
         }
     
-        let inputY = this.scale.height / 2 + 200; // เลื่อนตำแหน่ง Y ลงมาจากกึ่งกลางจออีก 50 พิกเซล
+        let selectedButton = this.characterButtons[character];
+        let inputX = selectedButton.x - selectedButton.displayWidth / 2; // ตำแหน่ง X ของปุ่มตัวละครที่เลือก
+        let inputY = selectedButton.y + selectedButton.displayHeight / 2 + 20; // ตำแหน่ง Y ของปุ่มตัวละครที่เลือก + ระยะห่าง
     
         this.profileInput = document.createElement('input');
         this.profileInput.type = 'text';
         this.profileInput.placeholder = 'Enter your name';
         this.profileInput.style.position = 'absolute';
         this.profileInput.style.top = `${this.scale.canvas.offsetTop + inputY}px`;
-        this.profileInput.style.left = `${this.scale.canvas.offsetLeft + this.scale.width / 2 + 145}px`; // เพิ่มตำแหน่ง X ไปทางขวา
+        this.profileInput.style.left = `${this.scale.canvas.offsetLeft + inputX}px`;
         this.profileInput.style.width = '200px'; // กำหนดขนาดกว้างของ input
-
+    
         // เพิ่มการตกแต่ง CSS
         this.profileInput.style.border = '2px solid #000';
         this.profileInput.style.borderRadius = '5px';
@@ -161,6 +163,7 @@ export default class SelectScene extends Phaser.Scene {
     
         document.body.appendChild(this.profileInput);
     }
+    
     
     updateCharacterSelection() {
         // เคลียร์เอฟเฟกต์เรืองแสงทั้งหมด

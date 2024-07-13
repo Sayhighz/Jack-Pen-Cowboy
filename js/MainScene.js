@@ -709,15 +709,16 @@ export default class MainScene extends Phaser.Scene {
   }
 
   async executeCommand(command) {
-    const match = command.match(/(\w+)\((\d*)\)/);
+    const match = command.match(/player\.(\w+)\((\d*)\)/);
     if (match) {
-      const action = match[1];
-      const repetitions = match[2] ? parseInt(match[2], 10) : 1;
-      await this.performActionWithDelay(action, repetitions);
+        const action = match[1];
+        const repetitions = match[2] ? parseInt(match[2], 10) : 1;
+        await this.performActionWithDelay(action, repetitions);
     } else {
-      console.log("Invalid command");
+        console.log("Invalid command");
     }
-  }
+}
+
 
   performAction(action) {
     switch (action) {
