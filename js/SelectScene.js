@@ -65,6 +65,8 @@ export default class SelectScene extends Phaser.Scene {
     
         // สร้างปุ่ม Start Game ในตำแหน่งที่กำหนดในหน้าจอเกม
         this.createStartButton();
+
+        this.createTutorialButton();
     }
     
     createStartButton() {
@@ -92,6 +94,41 @@ export default class SelectScene extends Phaser.Scene {
                         this.profileInput.remove();
                         this.startButton.destroy();
                         this.startGame(playerName);
+                    } else {
+                        alert('Please enter your name');
+                    }
+                }
+            } else {
+                alert('Choose character first');
+            }
+        });
+    }
+
+    createTutorialButton() {
+        // ลบปุ่ม Tutorial Scene ถ้ามีอยู่ก่อนหน้า
+        if (this.tutorialButton) {
+            this.tutorialButton.destroy();
+        }
+    
+        // เพิ่มปุ่ม Tutorial Scene ที่ล่างซ้ายสุดของหน้าจอเกม
+        this.tutorialButton = this.add.text(100, this.scale.height - 50, 'Tutorial', {
+            font: '20px Anton',
+            fill: '#ffffff',
+            backgroundColor: 'rgba(60, 60, 60,0.6)',
+            padding: { left: 10, right: 10, top: 10, bottom: 10 },
+            align: 'center',
+        })
+        .setInteractive()
+        .setOrigin(0.5, 1.5);
+    
+        this.tutorialButton.on('pointerdown', () => {
+            if (this.selectedCharacter) {
+                if (this.profileInput) {
+                    const playerName = this.profileInput.value.trim();
+                    if (playerName) {
+                        this.profileInput.remove();
+                        this.tutorialButton.destroy();
+                        this.startTutorial(playerName);
                     } else {
                         alert('Please enter your name');
                     }
@@ -143,8 +180,8 @@ export default class SelectScene extends Phaser.Scene {
         }
     
         let selectedButton = this.characterButtons[character];
-        let inputX = selectedButton.x - selectedButton.displayWidth / 2 + 160; // ตำแหน่ง X ของปุ่มตัวละครที่เลือก
-        let inputY = selectedButton.y + selectedButton.displayHeight / 2 + 70; // ตำแหน่ง Y ของปุ่มตัวละครที่เลือก + ระยะห่าง
+        let inputX = selectedButton.x - selectedButton.displayWidth / 2 + selectedButton.displayWidth / 2; // ปรับตำแหน่ง X ให้ตรงกลาง
+        let inputY = selectedButton.y - selectedButton.displayHeight / 2 + 20; // ปรับตำแหน่ง Y ให้ไปอยู่เหนือหัวตัวละคร
     
         this.profileInput = document.createElement('input');
         this.profileInput.type = 'text';
@@ -165,6 +202,7 @@ export default class SelectScene extends Phaser.Scene {
     }
     
     
+    
     updateCharacterSelection() {
         // เคลียร์เอฟเฟกต์เรืองแสงทั้งหมด
         Object.keys(this.characterButtons).forEach(character => {
@@ -176,6 +214,14 @@ export default class SelectScene extends Phaser.Scene {
         // เพิ่มเอฟเฟกต์เรืองแสงให้กับตัวละครที่เลือก
         if (this.selectedCharacter) {
             this.characterButtons[this.selectedCharacter].setTint(0x00ff00);  // สีเขียวบอกว่าถูกเลือก
+        }
+    }
+    startTutorial(playerName) {
+        if (this.selectedCharacter) {
+            this.scene.start('TutorialScene', { character: this.selectedCharacter, playerName });
+        } else {
+            alert('Select Character First!!');
+            console.error('Error: dont choose character');
         }
     }
     

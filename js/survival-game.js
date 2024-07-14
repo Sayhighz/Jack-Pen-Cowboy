@@ -1,13 +1,14 @@
 import MainScene from "./MainScene.js";
 import StartScene from "./StartScene.js";
-import SelectScene  from "./SelectScene.js";
+import SelectScene from "./SelectScene.js";
 import RankingScene from "./RankingScene.js";
+import TurorialScene from "./TutorialScene.js";
 import Scene2 from "./Scene2.js";
 
 const config = {
     type: Phaser.AUTO,
     parent: 'survival-game',
-    scene: [StartScene, SelectScene, MainScene, Scene2, RankingScene],
+    scene: [StartScene, SelectScene, TurorialScene, MainScene, Scene2, RankingScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -18,8 +19,8 @@ const config = {
         default: 'matter',
         matter: {
             debug: {
-                showBody: false,  // Disable body debug drawing globally
-                showStaticBody: false,  // Disable static body debug drawing globally
+                showBody: true,  // Disable body debug drawing globally
+                showStaticBody: true,  // Disable static body debug drawing globally
             },
             gravity: { y: 0 },
         }

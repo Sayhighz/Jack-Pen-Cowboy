@@ -12,8 +12,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.speechText = this.scene.add.text(this.x, this.y - 20, '', {
             font: '16px Arial',
             fill: '#ffffff',
-            backgroundColor: '#000000'
-        }).setOrigin(0.5).setAlpha(0);
+            backgroundColor: '#25468797'
+        }).setOrigin(0.5).setAlpha(1);
 
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
