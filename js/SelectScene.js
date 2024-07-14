@@ -143,8 +143,8 @@ export default class SelectScene extends Phaser.Scene {
         }
     
         let selectedButton = this.characterButtons[character];
-        let inputX = selectedButton.x - selectedButton.displayWidth / 2; // ตำแหน่ง X ของปุ่มตัวละครที่เลือก
-        let inputY = selectedButton.y + selectedButton.displayHeight / 2 + 20; // ตำแหน่ง Y ของปุ่มตัวละครที่เลือก + ระยะห่าง
+        let inputX = selectedButton.x - selectedButton.displayWidth / 2 + 160; // ตำแหน่ง X ของปุ่มตัวละครที่เลือก
+        let inputY = selectedButton.y + selectedButton.displayHeight / 2 + 70; // ตำแหน่ง Y ของปุ่มตัวละครที่เลือก + ระยะห่าง
     
         this.profileInput = document.createElement('input');
         this.profileInput.type = 'text';
