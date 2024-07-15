@@ -189,15 +189,15 @@ export default class MainScene extends Phaser.Scene {
       });
     });
 
-        this.player.speak(`Hi ${this.playerName}`);
+    this.player.speak(`สวัสดี ${playerName}`);
 
     this.time.delayedCall(3000, () => {
-      this.player.speak(`ฉันจะสอนนายเกี่ยวกับวิธีการเล่นนะ`);
+      this.player.speak(`มาเริ่มกันเลยยยย`);
     });
 
-    this.time.delayedCall(6000, () => {
-      this.startTutorial();
-    });
+    // this.time.delayedCall(6000, () => {
+    //   this.startTutorial();
+    // });
 
     scoreText = this.add.text(this.cameras.main.width - 16, 16, "Score: 0", {
       fontSize: "28px",
