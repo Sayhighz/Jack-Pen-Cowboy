@@ -41,7 +41,7 @@ export default class Scene2 extends Phaser.Scene {
                 this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
             }
             if (!this.cache.tilemap.exists('map2')) {
-                this.load.tilemapTiledJSON('map2', 'assets/map/map2.json');
+                this.load.tilemapTiledJSON('map2', 'assets/map/newmap.json');
             }
             if (!this.textures.exists('crown')) {
                 this.load.image('crown', 'assets/images/crown_NBG.png');
@@ -90,6 +90,8 @@ export default class Scene2 extends Phaser.Scene {
 
         enemyGrp = [];
         coinsGrp = [];
+
+        isExecuting = false;
 
         this.isScoreSaved = false;
 
@@ -330,7 +332,19 @@ export default class Scene2 extends Phaser.Scene {
 
         dialog.style.display = 'block';
 
-        const handleBack = () => {
+        const handleRestart = () => {
+            dialog.style.display = "none";
+            this.playerHeart = 3;
+            this.score = 0;
+      
+            const commandLabel = document.getElementById("command-label");
+            commandLabel.value = ""; // ตั้งค่าเป็นค่าว่าง หรือค่าที่ต้องการเริ่มต้น
+            commandLabel.placeholder = "Enter your commands here...";
+            this.scene.start("SelectScene"); // Go back to the character selection scene
+            restartButton.removeEventListener("click", handleRestart);
+          };
+      
+          const handleBack = () => {
             dialog.style.display = "none";
             this.playerHeart = 3;
             this.score = 0;
@@ -353,21 +367,21 @@ export default class Scene2 extends Phaser.Scene {
       
           if (!this.isScoreSaved) {
             // เช็คว่าคะแนนถูกบันทึกหรือยัง
-            this.savePlayerScore();
+            this.savePlayerScore(finalScore);
             this.isScoreSaved = true; // เปลี่ยนสถานะการบันทึกคะแนน
-          }
-        }
-
-    savePlayerScore(finalScore) {
-        let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
-        const newScore = { name: this.playerName, score: finalScore, character: this.character };
-
-        if (!scores.some(score => score.name === newScore.name && score.score === newScore.score && score.character === newScore.character)) {
-            scores.push(newScore);
-            console.log("Scene2");
-            localStorage.setItem('playerScores', JSON.stringify(scores));
         }
     }
+
+        savePlayerScore(finalScore) {
+            let scores = JSON.parse(localStorage.getItem('playerScores')) || [];
+            const newScore = { name: this.playerName, score: finalScore, character: this.character };
+        
+            if (!scores.some(score => score.name === newScore.name && score.score === newScore.score && score.character === newScore.character)) {
+                scores.push(newScore);
+                console.log("Scene2");
+                localStorage.setItem('playerScores', JSON.stringify(scores));
+            }
+        }
 
     updatePlayerHeart() {
         for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
@@ -430,15 +444,15 @@ export default class Scene2 extends Phaser.Scene {
     }
 
     async executeCommand(command) {
-        const match = command.match(/(\w+)\((\d*)\)/);
+        const match = command.match(/player\.(\w+)\((\d*)\)/);
         if (match) {
-            const action = match[1];
-            const repetitions = match[2] ? parseInt(match[2], 10) : 1;
-            await this.performActionWithDelay(action, repetitions);
+          const action = match[1];
+          const repetitions = match[2] ? parseInt(match[2], 10) : 1;
+          await this.performActionWithDelay(action, repetitions);
         } else {
-            console.log("Invalid command");
+          console.log("Invalid command");
         }
-    }
+      }
 
     async performActionWithDelay(action, repetitions) {
         for (let i = 0; i < repetitions; i++) {
