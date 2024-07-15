@@ -65,11 +65,16 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         if (!this.isMoving) {
             this.isMoving = true;
             this.play(`${this.animPrefix}_run`);
-            this.flipX = true; // Flip the sprite to face left
-            this.setVelocityX(-2); // Move left with velocity
-            this.scene.time.delayedCall(300, () => {
-                this.stopMovement();
-            });
+            this.scene.tweens.add({
+                targets: this,
+                x: this.x - this.tileSize,
+                duration: 300,
+                onComplete: () => {
+                    this.isMoving = false;
+                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
+                    this.play(`${this.animPrefix}_idle`);
+                }
+            })
         }
     }
 
@@ -77,11 +82,16 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         if (!this.isMoving) {
             this.isMoving = true;
             this.play(`${this.animPrefix}_run`);
-            this.flipX = false; // Ensure the sprite is not flipped to face right
-            this.setVelocityX(2); // Move right with velocity
-            this.scene.time.delayedCall(300, () => {
-                this.stopMovement();
-            });
+            this.scene.tweens.add({
+                targets: this,
+                x: this.x + this.tileSize,
+                duration: 300,
+                onComplete: () => {
+                    this.isMoving = false;
+                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
+                    this.play(`${this.animPrefix}_idle`);
+                }
+            })
         }
     }
 
@@ -89,10 +99,16 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         if (!this.isMoving) {
             this.isMoving = true;
             this.play(`${this.animPrefix}_run`);
-            this.setVelocityY(-2); // Move up with velocity
-            this.scene.time.delayedCall(300, () => {
-                this.stopMovement();
-            });
+            this.scene.tweens.add({
+                targets: this,
+                y: this.y - this.tileSize,
+                duration: 300,
+                onComplete: () => {
+                    this.isMoving = false;
+                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
+                    this.play(`${this.animPrefix}_idle`);
+                }
+            })
         }
     }
 
@@ -100,10 +116,16 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         if (!this.isMoving) {
             this.isMoving = true;
             this.play(`${this.animPrefix}_run`);
-            this.setVelocityY(2); // Move down with velocity
-            this.scene.time.delayedCall(300, () => {
-                this.stopMovement();
-            });
+            this.scene.tweens.add({
+                targets: this,
+                y: this.y + this.tileSize,
+                duration: 300,
+                onComplete: () => {
+                    this.isMoving = false;
+                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
+                    this.play(`${this.animPrefix}_idle`);
+                }
+            })
         }
     }
 

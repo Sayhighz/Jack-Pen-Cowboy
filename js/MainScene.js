@@ -20,6 +20,7 @@ let coinsGrp = [];
 let timesOfCommand = 0;
 let sceneone = true;
 let scenetwo = false;
+let loop_repetitions = 1
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -301,6 +302,7 @@ export default class MainScene extends Phaser.Scene {
     scoreText.setText("SCORE : " + score);
     this.checkObjectives();
   }
+  
   toggleQuestInfo() {
     if (this.questInfoText && this.questBackground) {
       const visible = !this.questInfoText.visible;
@@ -315,10 +317,6 @@ export default class MainScene extends Phaser.Scene {
       }
     }
   }
-  
-  
-  
-  
   
   displayQuestInfo() {
     if (this.currentQuest) {
@@ -354,8 +352,6 @@ export default class MainScene extends Phaser.Scene {
     }
   }
   
-  
-  
   updateQuestInfo() {
     if (this.questInfoText && this.currentQuest) {
       const questText = `ภารกิจ: ${this.currentQuest.name}\nคำแนะนำ: ${this.currentQuest.description}`;
@@ -372,9 +368,6 @@ export default class MainScene extends Phaser.Scene {
     }
   }
   
-  
-  
-
   checkObjectives() {
     if (this.currentQuest) {
       this.currentQuest.checkCompletion();
@@ -385,7 +378,6 @@ export default class MainScene extends Phaser.Scene {
     }
   }
   
-
   giveReward() {
     console.log("Reward given!");
     score += 10
@@ -531,7 +523,6 @@ export default class MainScene extends Phaser.Scene {
     this.createEnemy(334, 142, 2);
   }
   
-
   enemyReset() {
     for (let i = 0; i < enemyGrp.length; i++) {
       enemyGrp[i].health = enemyGrp[i].maxHealth;
@@ -612,8 +603,6 @@ export default class MainScene extends Phaser.Scene {
   //   }
   // }
   
-  
-
   updatePlayerHeart() {
     for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
       if (playerHeart < i + 1) {
@@ -680,19 +669,68 @@ export default class MainScene extends Phaser.Scene {
           this.resetPlayer();
           this.resetCoins();
           this.resetEnemies();
-          // this.enemyReset();
           score = 0;
-
+    
           const commands = commandLabel.value.toLowerCase().split("\n");
-          for (const command of commands) {
-            if (command.trim() !== "") {
-              timesOfCommand++;
-              await this.executeCommand(command.trim());
+          console.log(commands);
+    
+          for (let i = 0; i < commands.length; i++) {
+            let originalText = commands[i].trim();
+            let loopMatch = originalText.match(/^player\.loop\((\d+)\)\s*\{$/);
+    
+            if (loopMatch) {
+              let loop_repetitions = parseInt(loopMatch[1]);
+              let loopCommands = [];
+              i++; // move to the next line
+    
+              // Collect loop commands
+              while (i < commands.length && commands[i].trim() !== "}") {
+                loopCommands.push(commands[i].trim());
+                i++;
+              }
+    
+              // Check if loop was properly closed with }
+              if (i >= commands.length || commands[i].trim() !== "}") {
+                console.error("Error: Missing closing } for player.loop");
+                alert("Error: Missing closing } for player.loop");
+                isExecuting = false;
+                return;
+              }
+    
+              // Execute loop commands
+              for (let j = 0; j < loop_repetitions; j++) {
+                for (const loopCommand of loopCommands) {
+                  if (loopCommand !== "") {
+                    timesOfCommand++;
+                    await this.executeCommand(loopCommand);
+                  }
+                }
+              }
+            } else if (/^player\.loop\((\d+)\)$/.test(originalText)) {
+              // If player.loop(n) is found without {, throw an error
+              console.error("Error: Missing opening { for player.loop");
+              alert("Error: Missing opening { for player.loop");
+              isExecuting = false;
+              return;
+            } else {
+              // Check if line contains only '{' which is invalid outside of player.loop
+              if (originalText === "{") {
+                console.error("Error: Unexpected '{' outside of player.loop");
+                alert("Error: Unexpected '{' outside of player.loop");
+                isExecuting = false;
+                return;
+              }
+    
+              if (originalText !== "") {
+                timesOfCommand++;
+                await this.executeCommand(originalText);
+              }
             }
           }
+    
           isExecuting = false;
         };
-
+    
         if (!this.commandEventListenerAdded) {
           commandButton.addEventListener("click", executeCommands);
           commandLabel.addEventListener("keypress", async (e) => {
@@ -701,18 +739,22 @@ export default class MainScene extends Phaser.Scene {
               await executeCommands();
             }
           });
-
+    
           this.commandEventListenerAdded = true;
         }
       }
     }
-  }
+  }      
 
   async executeCommand(command) {
     const match = command.match(/player\.(\w+)\((\d*)\)/);
     if (match) {
+      console.log(match)
         const action = match[1];
         const repetitions = match[2] ? parseInt(match[2], 10) : 1;
+        if(action === "loop"){
+          loop_repetitions = repetitions 
+        }
         await this.performActionWithDelay(action, repetitions);
     } else {
         console.log("Invalid command");
@@ -753,9 +795,15 @@ export default class MainScene extends Phaser.Scene {
       case "turn_down":
         lastActionMove = "down";
         break;
+      case "loop":
+        this.commandLoop()
       default:
         console.log("Unknown action");
     }
+  }
+
+  commandLoop(){
+    console.log("commandLoop is work")
   }
 
   playerAttack(player, lastActionMove, enemyGrp) {
