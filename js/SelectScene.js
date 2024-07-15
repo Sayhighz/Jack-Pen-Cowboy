@@ -111,7 +111,7 @@ export default class SelectScene extends Phaser.Scene {
         }
     
         // เพิ่มปุ่ม Tutorial Scene ที่ล่างซ้ายสุดของหน้าจอเกม
-        this.tutorialButton = this.add.text(100, this.scale.height - 50, 'Tutorial', {
+        this.tutorialButton = this.add.text(100, this.scale.height - 0, 'Tutorial', {
             font: '20px Anton',
             fill: '#ffffff',
             backgroundColor: 'rgba(60, 60, 60,0.6)',
