@@ -4,36 +4,45 @@ import SelectScene from "./SelectScene.js";
 import RankingScene from "./RankingScene.js";
 import TurorialScene from "./TutorialScene.js";
 import Scene2 from "./Scene2.js";
+import Scene3 from "./Scene3.js";
 
 const config = {
-    type: Phaser.AUTO,
-    parent: 'survival-game',
-    scene: [StartScene, SelectScene, TurorialScene, MainScene, Scene2, RankingScene],
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 512,
-        height: 512,
+  type: Phaser.AUTO,
+  parent: "survival-game",
+  scene: [
+    StartScene,
+    SelectScene,
+    TurorialScene,
+    MainScene,
+    Scene2,
+    Scene3,
+    RankingScene,
+  ],
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 512,
+    height: 512,
+  },
+  physics: {
+    default: "matter",
+    matter: {
+      debug: {
+        showBody: false, // Disable body debug drawing globally
+        showStaticBody: false, // Disable static body debug drawing globally
+      },
+      gravity: { y: 0 },
     },
-    physics: {
-        default: 'matter',
-        matter: {
-            debug: {
-                showBody: false,  // Disable body debug drawing globally
-                showStaticBody: false,  // Disable static body debug drawing globally
-            },
-            gravity: { y: 0 },
-        }
-    },
-    plugins: {
-        scene: [
-            {
-                plugin: PhaserMatterCollisionPlugin,
-                key: 'matterCollision',
-                mapping: 'matterCollision'
-            }
-        ]
-    }
+  },
+  plugins: {
+    scene: [
+      {
+        plugin: PhaserMatterCollisionPlugin,
+        key: "matterCollision",
+        mapping: "matterCollision",
+      },
+    ],
+  },
 };
 
 new Phaser.Game(config);
