@@ -6,7 +6,7 @@ import Coins from "./coins.js";
 import RankingScene from "./RankingScene.js";
 import Quest from "./Quest/Quest.js";
 import Objective from "./Quest/Objective.js";
-let tutorialCommands = ["player.down(2)", "player.left(5)", "player.down(5)", "player.right(8)", "player.down(5)","player.right(4)"];
+let tutorialCommands = ["player.down(2)", "player.left(5)", "player.down(5)", "player.right(8)", "player.down(5)", "player.right(4)"];
 let currentTutorialStep = 0;
 let tutorialText; // เพิ่มตัวแปรเพื่อเก็บข้อความ Tutorial ที่แสดงอยู่
 let playerHeart = 3;
@@ -72,7 +72,7 @@ export default class MainScene extends Phaser.Scene {
       this.setupCommandInput();
       this.eventListenersAdded = true;
     }
-    
+
 
     isExecuting = false;
 
@@ -218,10 +218,8 @@ export default class MainScene extends Phaser.Scene {
       }
     );
     playerNameLabel.setOrigin(1, 0); // ปรับการวางตำแหน่งให้ยึดตามขวาเหมือน scoreText
-
-
   }
-  
+
 
 
   startTutorial() {
@@ -270,13 +268,16 @@ export default class MainScene extends Phaser.Scene {
   enemyAndCoinsPos() {
     enemyGrp = [];
 
-    this.createEnemy(206, 206, 3);
-    this.createEnemy(174, 238, 4);
-    this.createEnemy(110, 175, 2);
+    // x: 270,
+    // y: 45,
 
-    this.createCoins(142, 142);
-    this.createCoins(302, 142);
-    this.createCoins(302, 302);
+    // this.createEnemy(206, 206, 3);
+    // this.createEnemy(270, 77, 4);
+    this.createEnemy(110, 173, 2);
+
+    this.createCoins(270, 109);
+    // this.createCoins(302, 142);
+    // this.createCoins(302, 302);
   }
 
   createEnemy(posX, posY, health) {
@@ -348,7 +349,7 @@ export default class MainScene extends Phaser.Scene {
     scoreText.setText("SCORE : " + score);
     this.checkObjectives();
   }
-  
+
   toggleQuestInfo() {
     if (this.questInfoText && this.questBackground) {
       const visible = !this.questInfoText.visible;
@@ -363,7 +364,7 @@ export default class MainScene extends Phaser.Scene {
       }
     }
   }
-  
+
   displayQuestInfo() {
     if (this.currentQuest) {
       const questText = `ภารกิจ: ${this.currentQuest.name}\nคำแนะนำ: ${this.currentQuest.description}`;
@@ -397,7 +398,7 @@ export default class MainScene extends Phaser.Scene {
       this.questBackground.setVisible(false);
     }
   }
-  
+
   updateQuestInfo() {
     if (this.questInfoText && this.currentQuest) {
       const questText = `ภารกิจ: ${this.currentQuest.name}\nคำแนะนำ: ${this.currentQuest.description}`;
@@ -413,7 +414,7 @@ export default class MainScene extends Phaser.Scene {
       this.questBackground.setDepth(1); // ตั้งค่าความลึกให้น้อยกว่าข้อความ
     }
   }
-  
+
   checkObjectives() {
     if (this.currentQuest) {
       this.currentQuest.checkCompletion();
@@ -423,7 +424,7 @@ export default class MainScene extends Phaser.Scene {
       this.updateQuestInfo();
     }
   }
-  
+
   giveReward() {
     console.log("Reward given!");
     score += 10
@@ -514,28 +515,29 @@ export default class MainScene extends Phaser.Scene {
     });
   }
 
-  checkCollision(x, y) {
-    const bodies = this.matter.world.localWorld.bodies;
-    for (let i = 0; i < bodies.length; i++) {
-      const body = bodies[i];
-      if (body.label === "playerCollider" || body.label === "playerSensor")
-        continue;
+  // checkCollision(x, y) {
+  //   const bodies = this.matter.world.localWorld.bodies;
+  //   for (let i = 0; i < bodies.length; i++) {
+  //     const body = bodies[i];
+  //     if (body.label === "playerCollider" || body.label === "playerSensor")
+  //       continue;
 
-      if (
-        Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, {
-          min: { x, y },
-          max: { x, y },
-        })
-      ) {
-        return false;
-      }
-    }
-    return true;
-  }
+  //     if (
+  //       Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, {
+  //         min: { x, y },
+  //         max: { x, y },
+  //       })
+  //     ) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // }
 
   resetPlayer() {
     this.player.stopMovement();
     this.player.setPosition(270, 43); // ตำแหน่งเริ่มต้น
+    console.log("กลับไปจุดเริ่มต้น")
     this.player.setVelocity(0, 0); // หยุดการเคลื่อนไหว
 
     if (this.currentQuest) {
@@ -548,9 +550,11 @@ export default class MainScene extends Phaser.Scene {
     // ทำลายเหรียญทั้งหมด
     coinsGrp.forEach((coin) => coin.destroy());
     // สร้างเหรียญใหม่
-    this.createCoins(142, 142);
-    this.createCoins(302, 142);
-    this.createCoins(302, 302);
+    this.createCoins(270, 109);
+    // this.createCoins(302, 142);
+    // this.createCoins(302, 302);
+
+    // this.enemyAndCoinsPos()
   }
 
   resetEnemies() {
@@ -566,11 +570,13 @@ export default class MainScene extends Phaser.Scene {
     enemyGrp = [];
 
     // สร้างศัตรูใหม่
-    this.createEnemy(206, 206, 3);
-    this.createEnemy(174, 238, 4);
+    // this.createEnemy(206, 206, 3);
+    // this.createEnemy(270, 77, 4);
     this.createEnemy(110, 175, 2);
+
+    // this.enemyAndCoinsPos()
   }
-  
+
   enemyReset() {
     for (let i = 0; i < enemyGrp.length; i++) {
       enemyGrp[i].health = enemyGrp[i].maxHealth;
@@ -650,7 +656,7 @@ export default class MainScene extends Phaser.Scene {
   //     this.questInfoText.setText(`ภารกิจ: ${this.currentQuest.name}\nคำแนะนำ: ${this.currentQuest.description}\n${objectivesText}`);
   //   }
   // }
-  
+
   updatePlayerHeart() {
     for (let i = heartGrp.getChildren().length - 1; i >= 0; i--) {
       if (playerHeart < i + 1) {
@@ -704,6 +710,7 @@ export default class MainScene extends Phaser.Scene {
   setupCommandInput() {
     const commandLabel = document.getElementById('command-label');
     const commandButton = document.getElementById('command-button');
+    let aiai = 5
 
     if (sceneone === true) {
       console.log("scene 1 กำลังทำงาน");
@@ -718,34 +725,35 @@ export default class MainScene extends Phaser.Scene {
           this.resetCoins();
           this.resetEnemies();
           score = 0;
-    
+
           const commands = commandLabel.value.toLowerCase().split("\n");
           console.log(commands);
-    
+
           for (let i = 0; i < commands.length; i++) {
             let originalText = commands[i].trim();
             let loopMatch = originalText.match(/^player\.loop\((\d+)\)\s*\{$/);
-    
+            let ifMatch = originalText.match(/^if\s*\(([^)]+)\)\s*\{$/);
+          
             if (loopMatch) {
               let loop_repetitions = parseInt(loopMatch[1]);
               let loopCommands = [];
-              i++; // move to the next line
-    
-              // Collect loop commands
+              i++; // เลื่อนไปยังบรรทัดถัดไป
+          
+              // เก็บคำสั่งใน loop
               while (i < commands.length && commands[i].trim() !== "}") {
                 loopCommands.push(commands[i].trim());
                 i++;
               }
-    
-              // Check if loop was properly closed with }
+          
+              // ตรวจสอบว่ามีการปิด loop อย่างถูกต้องด้วย }
               if (i >= commands.length || commands[i].trim() !== "}") {
                 console.error("Error: Missing closing } for player.loop");
                 alert("Error: Missing closing } for player.loop");
                 isExecuting = false;
                 return;
               }
-    
-              // Execute loop commands
+          
+              // รันคำสั่งใน loop
               for (let j = 0; j < loop_repetitions; j++) {
                 for (const loopCommand of loopCommands) {
                   if (loopCommand !== "") {
@@ -754,31 +762,67 @@ export default class MainScene extends Phaser.Scene {
                   }
                 }
               }
+            } else if (ifMatch) {
+              let condition = ifMatch[1];
+              console.log(condition)
+              let ifCommands = [];
+              i++; // เลื่อนไปยังบรรทัดถัดไป
+          
+              // เก็บคำสั่งใน if
+              while (i < commands.length && commands[i].trim() !== "}") {
+                ifCommands.push(commands[i].trim());
+                i++;
+              }
+          
+              // ตรวจสอบว่ามีการปิด if อย่างถูกต้องด้วย }
+              if (i >= commands.length || commands[i].trim() !== "}") {
+                console.error("Error: Missing closing } for if");
+                alert("Error: Missing closing } for if");
+                isExecuting = false;
+                return;
+              }
+          
+              // รันคำสั่งใน if ถ้าเงื่อนไขเป็นจริง
+              if (eval(condition)) {
+                for (const ifCommand of ifCommands) {
+                  if (ifCommand !== "") {
+                    timesOfCommand++;
+                    await this.executeCommand(ifCommand);
+                  }
+                }
+              }
             } else if (/^player\.loop\((\d+)\)$/.test(originalText)) {
-              // If player.loop(n) is found without {, throw an error
+              // ถ้าเจอ player.loop(n) โดยไม่มี {, แจ้งข้อผิดพลาด
               console.error("Error: Missing opening { for player.loop");
               alert("Error: Missing opening { for player.loop");
               isExecuting = false;
               return;
+            } else if (/^if\s*\(([^)]+)\)$/.test(originalText)) {
+              // ถ้าเจอ if(condition) โดยไม่มี {, แจ้งข้อผิดพลาด
+              console.error("Error: Missing opening { for if");
+              alert("Error: Missing opening { for if");
+              isExecuting = false;
+              return;
             } else {
-              // Check if line contains only '{' which is invalid outside of player.loop
+              // ตรวจสอบว่าบรรทัดมีเพียง '{' ซึ่งไม่ถูกต้องนอกเหนือจาก player.loop หรือ if
               if (originalText === "{") {
-                console.error("Error: Unexpected '{' outside of player.loop");
-                alert("Error: Unexpected '{' outside of player.loop");
+                console.error("Error: Unexpected '{' outside of player.loop or if");
+                alert("Error: Unexpected '{' outside of player.loop or if");
                 isExecuting = false;
                 return;
               }
-    
+          
               if (originalText !== "") {
                 timesOfCommand++;
                 await this.executeCommand(originalText);
               }
             }
           }
-    
+          
+
           isExecuting = false;
         };
-    
+
         if (!this.commandEventListenerAdded) {
           commandButton.addEventListener("click", executeCommands);
           commandLabel.addEventListener("keypress", async (e) => {
@@ -787,22 +831,22 @@ export default class MainScene extends Phaser.Scene {
               await executeCommands();
             }
           });
-    
+
           this.commandEventListenerAdded = true;
         }
+      }
     }
-  }      
-    }
+  }
   async executeCommand(command) {
     const match = command.match(/player\.(\w+)\((\d*)\)/);
     if (match) {
       console.log(match)
-        const action = match[1];
-        const repetitions = match[2] ? parseInt(match[2], 10) : 1;
-        if(action === "loop"){
-          loop_repetitions = repetitions 
-        }
-        await this.performActionWithDelay(action, repetitions);
+      const action = match[1];
+      const repetitions = match[2] ? parseInt(match[2], 10) : 1;
+      if (action === "loop") {
+        loop_repetitions = repetitions
+      }
+      await this.performActionWithDelay(action, repetitions);
     } else {
       console.log("Invalid command");
     }
@@ -849,13 +893,15 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
-  commandLoop(){
+  commandLoop() {
     console.log("commandLoop is work")
   }
 
   playerAttack(player, lastActionMove, enemyGrp) {
     console.log("Attack direction: ", lastActionMove);
     console.log("Player position: ", player.x, player.y);
+
+    console.log(enemyGrp)
 
     let attackPosition = { x: player.x, y: player.y };
 
@@ -910,18 +956,6 @@ export default class MainScene extends Phaser.Scene {
       this.player.anims.play(`${this.player.animPrefix}_idle`);
     }, 300);
   }
-
-  // onPlayerAttack(enemy) {
-  //   enemy.health--;
-  //   console.log(`Enemy health after attack: ${enemy.health}`); // เพิ่มดีบัก
-  //   this.playerAttackAni();
-  //   this.updateHealthBar(enemy);
-  //   if (enemy.health <= 0) {
-  //     this.clearHealthBars(enemy);
-  //     enemy.destroy();
-  //     score += 10;
-  //   }
-  // }
 
   clearHealthBars(enemy) {
     if (enemy.healthBars) {
