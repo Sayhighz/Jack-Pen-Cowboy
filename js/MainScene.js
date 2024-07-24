@@ -729,31 +729,48 @@ export default class MainScene extends Phaser.Scene {
           const commands = commandLabel.value.toLowerCase().split("\n");
           console.log(commands);
 
+          let isLoopOpen = false;
+          let isIfOpen = false;
+          let openLoops = 0;
+          let openIfs = 0;
+
+
+
           for (let i = 0; i < commands.length; i++) {
             let originalText = commands[i].trim();
             let loopMatch = originalText.match(/^player\.loop\((\d+)\)\s*\{$/);
             let ifMatch = originalText.match(/^if\s*\(([^)]+)\)\s*\{$/);
-          
+
             if (loopMatch) {
+              if (isLoopOpen || isIfOpen) {
+                console.error("Error: Nested loops or if statements not allowed.");
+                alert("Error: Nested loops or if statements not allowed.");
+                isExecuting = false;
+                return;
+              }
+              openLoops++;
+              isLoopOpen = true;
               let loop_repetitions = parseInt(loopMatch[1]);
               let loopCommands = [];
-              i++; // เลื่อนไปยังบรรทัดถัดไป
-          
-              // เก็บคำสั่งใน loop
+              i++;
+
               while (i < commands.length && commands[i].trim() !== "}") {
                 loopCommands.push(commands[i].trim());
                 i++;
               }
-          
-              // ตรวจสอบว่ามีการปิด loop อย่างถูกต้องด้วย }
+
               if (i >= commands.length || commands[i].trim() !== "}") {
                 console.error("Error: Missing closing } for player.loop");
                 alert("Error: Missing closing } for player.loop");
                 isExecuting = false;
                 return;
               }
-          
-              // รันคำสั่งใน loop
+
+              openLoops--;
+              if (openLoops === 0) {
+                isLoopOpen = false;
+              }
+
               for (let j = 0; j < loop_repetitions; j++) {
                 for (const loopCommand of loopCommands) {
                   if (loopCommand !== "") {
@@ -763,26 +780,35 @@ export default class MainScene extends Phaser.Scene {
                 }
               }
             } else if (ifMatch) {
+              if (isLoopOpen || isIfOpen) {
+                console.error("Error: Nested loops or if statements not allowed.");
+                alert("Error: Nested loops or if statements not allowed.");
+                isExecuting = false;
+                return;
+              }
+              openIfs++;
+              isIfOpen = true;
               let condition = ifMatch[1];
-              console.log(condition)
               let ifCommands = [];
-              i++; // เลื่อนไปยังบรรทัดถัดไป
-          
-              // เก็บคำสั่งใน if
+              i++;
+
               while (i < commands.length && commands[i].trim() !== "}") {
                 ifCommands.push(commands[i].trim());
                 i++;
               }
-          
-              // ตรวจสอบว่ามีการปิด if อย่างถูกต้องด้วย }
+
               if (i >= commands.length || commands[i].trim() !== "}") {
                 console.error("Error: Missing closing } for if");
                 alert("Error: Missing closing } for if");
                 isExecuting = false;
                 return;
               }
-          
-              // รันคำสั่งใน if ถ้าเงื่อนไขเป็นจริง
+
+              openIfs--;
+              if (openIfs === 0) {
+                isIfOpen = false;
+              }
+
               if (eval(condition)) {
                 for (const ifCommand of ifCommands) {
                   if (ifCommand !== "") {
@@ -792,33 +818,39 @@ export default class MainScene extends Phaser.Scene {
                 }
               }
             } else if (/^player\.loop\((\d+)\)$/.test(originalText)) {
-              // ถ้าเจอ player.loop(n) โดยไม่มี {, แจ้งข้อผิดพลาด
               console.error("Error: Missing opening { for player.loop");
               alert("Error: Missing opening { for player.loop");
               isExecuting = false;
               return;
             } else if (/^if\s*\(([^)]+)\)$/.test(originalText)) {
-              // ถ้าเจอ if(condition) โดยไม่มี {, แจ้งข้อผิดพลาด
               console.error("Error: Missing opening { for if");
               alert("Error: Missing opening { for if");
               isExecuting = false;
               return;
             } else {
-              // ตรวจสอบว่าบรรทัดมีเพียง '{' ซึ่งไม่ถูกต้องนอกเหนือจาก player.loop หรือ if
               if (originalText === "{") {
                 console.error("Error: Unexpected '{' outside of player.loop or if");
                 alert("Error: Unexpected '{' outside of player.loop or if");
                 isExecuting = false;
                 return;
               }
-          
+
               if (originalText !== "") {
                 timesOfCommand++;
                 await this.executeCommand(originalText);
               }
             }
           }
-          
+
+          // Final check to ensure all loops and ifs are properly closed
+          if (isLoopOpen || isIfOpen) {
+            console.error("Error: Unclosed loop or if block");
+            alert("Error: Unclosed loop or if block");
+            isExecuting = false;
+          }
+
+
+
 
           isExecuting = false;
         };
@@ -837,6 +869,7 @@ export default class MainScene extends Phaser.Scene {
       }
     }
   }
+
   async executeCommand(command) {
     const match = command.match(/player\.(\w+)\((\d*)\)/);
     if (match) {
