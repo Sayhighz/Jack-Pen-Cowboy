@@ -8,6 +8,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         this.tileSize = 32; // ขนาดของ tile
         this.isMoving = false;
+        this.targetX = x;
+        this.targetY = y;
 
         this.speechText = this.scene.add.text(this.x, this.y - 20, '', {
             font: '16px Arial',
@@ -17,12 +19,12 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         // Set up physics body
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
-        const playerCollider = Bodies.circle(this.x, this.y, 6, { isSensor: false, label: 'playerCollider' });
-        const playerSensor = Bodies.circle(this.x, this.y, 10, { isSensor: true, label: 'playerSensor' });
+        const playerCollider = Bodies.circle(this.x, this.y, 3, { isSensor: false, label: 'playerCollider' });
+        const playerSensor = Bodies.circle(this.x, this.y, 6, { isSensor: true, label: 'playerSensor' });
         const compoundBody = Body.create({
             parts: [playerCollider, playerSensor],
-            frictionAir: 0.01, // ลด frictionAir เพื่อให้เคลื่อนที่สมูทขึ้น
-            friction: 0.01 // ลด friction เพื่อให้เคลื่อนที่สมูทขึ้น
+            frictionAir: 0.01,
+            friction: 0.01
         });
         this.setExistingBody(compoundBody);
         this.setFixedRotation();
@@ -58,81 +60,57 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     update() {
+        if (this.isMoving) {
+            const deltaX = this.targetX - this.x;
+            const deltaY = this.targetY - this.y;
+
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            if (distance < 1) {
+                this.setVelocity(0, 0);
+                this.isMoving = false;
+                this.play(`${this.animPrefix}_idle`);
+            } else {
+                const speed = 2; // ความเร็วในการเคลื่อนที่
+                const angle = Math.atan2(deltaY, deltaX);
+                const velocityX = Math.cos(angle) * speed;
+                const velocityY = Math.sin(angle) * speed;
+                this.setVelocity(velocityX, velocityY);
+            }
+        }
+
         this.speechText.setPosition(this.x, this.y - 20);
     }
 
+    moveTo(targetX, targetY) {
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.isMoving = true;
+        this.play(`${this.animPrefix}_run`);
+    }
+
     moveLeft() {
-        if (!this.isMoving) {
-            this.isMoving = true;
-            this.play(`${this.animPrefix}_run`);
-            this.scene.tweens.add({
-                targets: this,
-                x: this.x - this.tileSize,
-                duration: 300,
-                onComplete: () => {
-                    this.isMoving = false;
-                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
-                    this.play(`${this.animPrefix}_idle`);
-                }
-            })
-        }
+        this.flipX = true
+        this.moveTo(this.x - this.tileSize, this.y);
     }
 
     moveRight() {
-        if (!this.isMoving) {
-            this.isMoving = true;
-            this.play(`${this.animPrefix}_run`);
-            this.scene.tweens.add({
-                targets: this,
-                x: this.x + this.tileSize,
-                duration: 300,
-                onComplete: () => {
-                    this.isMoving = false;
-                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
-                    this.play(`${this.animPrefix}_idle`);
-                }
-            })
-        }
+        this.flipX = false
+        this.moveTo(this.x + this.tileSize, this.y);
     }
 
     moveUp() {
-        if (!this.isMoving) {
-            this.isMoving = true;
-            this.play(`${this.animPrefix}_run`);
-            this.scene.tweens.add({
-                targets: this,
-                y: this.y - this.tileSize,
-                duration: 300,
-                onComplete: () => {
-                    this.isMoving = false;
-                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
-                    this.play(`${this.animPrefix}_idle`);
-                }
-            })
-        }
+        this.moveTo(this.x, this.y - this.tileSize);
     }
 
     moveDown() {
-        if (!this.isMoving) {
-            this.isMoving = true;
-            this.play(`${this.animPrefix}_run`);
-            this.scene.tweens.add({
-                targets: this,
-                y: this.y + this.tileSize,
-                duration: 300,
-                onComplete: () => {
-                    this.isMoving = false;
-                    console.log('Playing idle animation:', `${this.animPrefix}_idle`);
-                    this.play(`${this.animPrefix}_idle`);
-                }
-            })
-        }
+        this.moveTo(this.x, this.y + this.tileSize);
     }
 
     stopMovement() {
         this.setVelocity(0, 0);
         this.isMoving = false;
         this.anims.stop();
-        this.play(`${this.animPrefix}_idle`); // เล่นอนิเมชัน idle
+        this.play(`${this.animPrefix}_idle`);
     }
 }

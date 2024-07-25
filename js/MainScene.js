@@ -41,10 +41,17 @@ export default class MainScene extends Phaser.Scene {
         this.load.image("coin", "assets/coins/coin.png");
       }
       if (!this.textures.exists("tiles")) {
-        this.load.image("tiles", "assets/map/Dungeon_Tileset_at.png");
+        // this.load.image("tiles", "assets/map/newmap1/assets_spritesheet_v2_free.png");
+        this.load.image("HouseAndTree", "assets/map/newmap1/assets_spritesheet_v2_free.png");
+        this.load.image("dirt", "assets/map/newmap1/dirtpath_tiles.png");
+        this.load.image("fence", "assets/map/newmap1/fence_tiles.png");
+        this.load.image("fenceback", "assets/map/newmap1/fence_tiles.png");
+        this.load.image("ground", "assets/map/newmap1/water_and_island_tiles_v2.png");
+        this.load.image("water", "assets/map/newmap1/water_and_island_tiles_v2.png");
+        this.load.image("Door Layer", "assets/map/newmap1/dirtpath_tiles.png");
       }
       if (!this.cache.tilemap.exists("map")) {
-        this.load.tilemapTiledJSON("map", "assets/map/Tutorial Map.json");
+        this.load.tilemapTiledJSON("map", "assets/map/newmap1/GreenMap.json");
       }
       if (!this.textures.exists("crown")) {
         this.load.image("crown", "assets/images/crown_NBG.png");
@@ -87,27 +94,98 @@ export default class MainScene extends Phaser.Scene {
     this.createPlayerHeart();
 
     const map = this.make.tilemap({ key: "map" });
-    const tileset = map.addTilesetImage("Dungeon_Tileset_at", "tiles", 32, 32, 0, 0);
+    const waterset = map.addTilesetImage("water_and_island_tiles_v2", "water", 32, 32, 0, 0);
+    const groundset = map.addTilesetImage("water_and_island_tiles_v2", "ground", 32, 32, 0, 0);
+    const fencebackset = map.addTilesetImage("fence_tiles", "fenceback", 32, 32, 0, 0);
+    const fenceset = map.addTilesetImage("fence_tiles", "fence", 32, 32, 0, 0);
+    const HouseAndTreeset = map.addTilesetImage("assets_spritesheet_v2_free", "HouseAndTree", 32, 32, 0, 0);
+    const dirtset = map.addTilesetImage("dirtpath_tiles", "dirt", 32, 32, 0, 0);
+    const doorset = map.addTilesetImage("dirtpath_tiles", "Door Layer", 32, 32, 0, 0);
 
-    if (tileset) {
-      const layer1 = map.createLayer("Tile Layer 1", tileset, 0, 0);
+    // if (tileset) {
+    //   const layer1 = map.createLayer("Tile Layer 1", tileset, 0, 0);
+    //   // layer1.setCollisionByProperty({ collides: true });
+    //   this.matter.world.convertTilemapLayer(layer1);
+    // } else {
+    //   console.error(
+    //     "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+    //   );
+    // }
+
+    if (waterset) {
+      const layer1 = map.createLayer("water", waterset, 0, 0);
       layer1.setCollisionByProperty({ collides: true });
       this.matter.world.convertTilemapLayer(layer1);
     } else {
       console.error(
-        "Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'."
+        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+      );
+    }
+    if (groundset) {
+      const layer1 = map.createLayer("ground", groundset, 0, 0);
+      layer1.setCollisionByProperty({ collides: true });
+      this.matter.world.convertTilemapLayer(layer1);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+      );
+    }
+    if (fencebackset) {
+      const layer1 = map.createLayer("fenceback", fencebackset, 0, 0);
+      layer1.setCollisionByProperty({ collides: true });
+      this.matter.world.convertTilemapLayer(layer1);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+      );
+    }
+    if (fenceset) {
+      const layer1 = map.createLayer("fence", fenceset, 0, 0);
+      layer1.setCollisionByProperty({ collides: true });
+      this.matter.world.convertTilemapLayer(layer1);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+      );
+    }
+    if (doorset) {
+      const layer1 = map.createLayer("Door Layer", doorset, 0, 0);
+      layer1.setCollisionByProperty({ isDoor: true });
+      this.matter.world.convertTilemapLayer(layer1);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+      );
+    }
+    if (dirtset) {
+      const layer1 = map.createLayer("dirt", dirtset, 0, 0);
+      layer1.setCollisionByProperty({ collides: true });
+      this.matter.world.convertTilemapLayer(layer1);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+      );
+    }
+    if (HouseAndTreeset) {
+      const layer1 = map.createLayer("HouseAndTree", HouseAndTreeset, 0, 0);
+      layer1.setCollisionByProperty({ collides: true });
+      this.matter.world.convertTilemapLayer(layer1);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
       );
     }
 
-    if (tileset) {
-      const doorLayer = map.createLayer("Door Layer", tileset, 0, 0);
-      doorLayer.setCollisionByProperty({ isDoor: true });
-      this.matter.world.convertTilemapLayer(doorLayer);
-    } else {
-      console.error(
-        "Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'."
-      );
-    }
+
+    // if (tileset) {
+    //   const doorLayer = map.createLayer("Door Layer", tileset, 0, 0);
+    //   doorLayer.setCollisionByProperty({ isDoor: true });
+    //   this.matter.world.convertTilemapLayer(doorLayer);
+    // } else {
+    //   console.error(
+    //     "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+    //   );
+    // }
 
     this.matter.world.on("collisionstart", this.handleCollision, this);
 
@@ -151,8 +229,8 @@ export default class MainScene extends Phaser.Scene {
 
     this.player = new Player({
       scene: this,
-      x: 270,
-      y: 45,
+      x: 80,
+      y: 200,
       texture,
       frame: `${animPrefix}_f_idle_anim_f0`,
       animPrefix,
@@ -536,7 +614,7 @@ export default class MainScene extends Phaser.Scene {
 
   resetPlayer() {
     this.player.stopMovement();
-    this.player.setPosition(270, 43); // ตำแหน่งเริ่มต้น
+    this.player.setPosition(80, 200); // ตำแหน่งเริ่มต้น
     console.log("กลับไปจุดเริ่มต้น")
     this.player.setVelocity(0, 0); // หยุดการเคลื่อนไหว
 
