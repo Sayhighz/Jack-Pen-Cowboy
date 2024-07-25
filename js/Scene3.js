@@ -40,8 +40,8 @@ export default class Scene3 extends Phaser.Scene {
             if (!this.textures.exists('tiles')) {
                 this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
             }
-            if (!this.cache.tilemap.exists('map2')) {
-                this.load.tilemapTiledJSON('map2', 'assets/map/newmap.json');
+            if (!this.cache.tilemap.exists('map3')) {
+                this.load.tilemapTiledJSON('map3', 'assets/map/newmap.json');
             }
             if (!this.textures.exists('crown')) {
                 this.load.image('crown', 'assets/images/crown_NBG.png');

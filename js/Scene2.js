@@ -118,6 +118,17 @@ export default class Scene2 extends Phaser.Scene {
       );
     }
 
+
+    if (tileset) {
+      const doorLayer = map.createLayer("Door Layer", tileset, 0, 0);
+      doorLayer.setCollisionByProperty({ isDoor: true });
+      this.matter.world.convertTilemapLayer(doorLayer);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'."
+      );
+    }
+
     // this.matter.world.on('collisionstart', this.handleCollision, this);
 
     let texture, animPrefix;
@@ -316,8 +327,8 @@ export default class Scene2 extends Phaser.Scene {
           playerName: this.scene.settings.data.playerName,
           playerX: this.player.x,
           playerY: this.player.y,
-          playerHeart: playerHeart,
-          score: score,
+          playerHeart: this.playerHeart,
+          score: this.score,
         });
         return;
       }
