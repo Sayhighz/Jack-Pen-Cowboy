@@ -351,11 +351,11 @@ export default class MainScene extends Phaser.Scene {
 
     // this.createEnemy(206, 206, 3);
     // this.createEnemy(270, 77, 4);
-    this.createEnemy(110, 173, 2);
+    // this.createEnemy(110, 173, 2);
 
-    this.createCoins(270, 109);
-    // this.createCoins(302, 142);
-    // this.createCoins(302, 302);
+    this.createCoins(80, 360);
+    this.createCoins(432, 360);
+    this.createCoins(464, 72);
   }
 
   createEnemy(posX, posY, health) {
@@ -628,9 +628,9 @@ export default class MainScene extends Phaser.Scene {
     // ทำลายเหรียญทั้งหมด
     coinsGrp.forEach((coin) => coin.destroy());
     // สร้างเหรียญใหม่
-    this.createCoins(270, 109);
-    // this.createCoins(302, 142);
-    // this.createCoins(302, 302);
+    this.createCoins(80, 360);
+    this.createCoins(432, 360);
+    this.createCoins(464, 72);
 
     // this.enemyAndCoinsPos()
   }
