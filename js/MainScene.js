@@ -948,7 +948,65 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
+  checkPath(direction) {
+    let offsetX = 0, offsetY = 0;
+    switch (direction) {
+      case 'left':
+        offsetX = -32;
+        break;
+      case 'right':
+        offsetX = 32;
+        break;
+      case 'up':
+        offsetY = -32;
+        break;
+      case 'down':
+        offsetY = 32;
+        break;
+      default:
+        return false;
+    }
+
+    const x = this.player.x + offsetX;
+    const y = this.player.y + offsetY;
+    const bodies = this.matter.world.localWorld.bodies;
+    
+    for (let i = 0; i < bodies.length; i++) {
+      const body = bodies[i];
+      if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   async executeCommand(command) {
+    // ตรวจสอบและประมวลผลคำสั่ง if_path_to_
+    const ifElseMatch = command.match(/if_path_to_(left|right|up|down)_do\s*\{(.+)\}\s*else\s*\{(.+)\}/);
+    if (ifElseMatch) {
+      const direction = ifElseMatch[1];
+      const ifAction = ifElseMatch[2].trim();
+      const elseAction = ifElseMatch[3].trim();
+      if (this.checkPath(direction)) {
+        await this.executeCommand(ifAction);
+      } else {
+        await this.executeCommand(elseAction);
+      }
+      return; // ออกจากฟังก์ชันหลังจากดำเนินการคำสั่ง if_path_to_
+    }
+
+    // ตรวจสอบและประมวลผลคำสั่ง if_path_to_ แบบไม่มี else
+    const ifMatch = command.match(/if_path_to_(left|right|up|down)_do\s*\{(.+)\}/);
+    if (ifMatch) {
+      const direction = ifMatch[1];
+      const ifAction = ifMatch[2].trim();
+      if (this.checkPath(direction)) {
+        await this.executeCommand(ifAction);
+      }
+      return; // ออกจากฟังก์ชันหลังจากดำเนินการคำสั่ง if_path_to_
+    }
+
+    // ตรวจสอบและประมวลผลคำสั่งทั่วไป
     const match = command.match(/player\.(\w+)\((\d*)\)/);
     if (match) {
       console.log(match)
@@ -962,7 +1020,6 @@ export default class MainScene extends Phaser.Scene {
       console.log("Invalid command");
     }
   }
-
 
   performAction(action) {
     switch (action) {
