@@ -143,15 +143,6 @@ export default class MainScene extends Phaser.Scene {
         "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
       );
     }
-    if (fenceset) {
-      const layer1 = map.createLayer("fence", fenceset, 0, 0);
-      layer1.setCollisionByProperty({ collides: true });
-      this.matter.world.convertTilemapLayer(layer1);
-    } else {
-      console.error(
-        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
-      );
-    }
     if (doorset) {
       const layer1 = map.createLayer("Door Layer", doorset, 0, 0);
       layer1.setCollisionByProperty({ isDoor: true });
@@ -172,6 +163,15 @@ export default class MainScene extends Phaser.Scene {
     }
     if (HouseAndTreeset) {
       const layer1 = map.createLayer("HouseAndTree", HouseAndTreeset, 0, 0);
+      layer1.setCollisionByProperty({ collides: true });
+      this.matter.world.convertTilemapLayer(layer1);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+      );
+    }
+    if (fenceset) {
+      const layer1 = map.createLayer("fence", fenceset, 0, 0);
       layer1.setCollisionByProperty({ collides: true });
       this.matter.world.convertTilemapLayer(layer1);
     } else {
