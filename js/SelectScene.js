@@ -227,7 +227,7 @@ export default class SelectScene extends Phaser.Scene {
     
     startGame(playerName) {
         if (this.selectedCharacter) {
-            this.scene.start('Scene2', { character: this.selectedCharacter, playerName });
+            this.scene.start('MainScene', { character: this.selectedCharacter, playerName });
         } else {
             alert('Select Character First!!');
             console.error('Error: dont choose character');
