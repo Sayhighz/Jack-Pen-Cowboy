@@ -1001,9 +1001,9 @@ export default class MainScene extends Phaser.Scene {
     
     for (let i = 0; i < bodies.length; i++) {
       const body = bodies[i];
-      if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
-        return false;
-      }
+        if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+          return false;
+        }
     }
     return true;
   }
