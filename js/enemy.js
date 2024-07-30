@@ -19,8 +19,11 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
         scene.load.atlas('lizard', 'assets/enemies/lizard.png', 'assets/enemies/lizard_atlas.json');
         scene.load.animation('lizard_anim', 'assets/enemies/lizard_anim.json');
 
-        
+
         scene.load.atlas('skeleton', 'assets/enemies/skeleton.png', 'assets/enemies/skeleton_atlas.json');
         scene.load.animation('skeleton_anim', 'assets/enemies/skeleton_anim.json');
+
+        scene.load.atlas('ogre', 'assets/enemies/ogre.png', 'assets/enemies/ogre_atlas.json');
+        scene.load.animation('ogre_anim', 'assets/enemies/ogre_anim.json');
     }
 }

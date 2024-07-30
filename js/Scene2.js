@@ -284,10 +284,10 @@ export default class Scene2 extends Phaser.Scene {
     this.createEnemy(400, 142, 2, false); // Flip this enemy
     this.createEnemy(400, 112, 2, false); // Do not flip this enemy
 
-    this.createEnemy2(206, 305, 1, true); // Flip this enemy
-    this.createEnemy2(176, 305, 1, false); // Do not flip this enemy
-    this.createEnemy2(206, 335, 1, true); // Flip this enemy
-    this.createEnemy2(176, 335, 1, false); // Do not flip this enemy
+    this.createEnemy3(206, 300, 1, true); // Flip this enemy
+    this.createEnemy3(176, 300, 1, false); // Do not flip this enemy
+    this.createEnemy3(206, 330, 1, true); // Flip this enemy
+    this.createEnemy3(176, 330, 1, false); // Do not flip this enemy
 
   }
 
@@ -323,6 +323,28 @@ export default class Scene2 extends Phaser.Scene {
     });
     let enemy = this.enemy;
     enemy.anims.play("skeleton_idle", true);
+    enemy.health = health;
+    enemy.maxHealth = health;
+
+    // Flip the enemy if shouldFlip is true
+    if (shouldFlip) {
+      enemy.setFlipX(true);
+    }
+
+    this.updateHealthBar(enemy);
+    enemyGrp.push(enemy);
+  }
+
+  createEnemy3(posX, posY, health, shouldFlip = false) {
+    this.enemy = new Enemy({
+      scene: this,
+      x: posX,
+      y: posY,
+      texture: "ogre",
+      frame: "ogre_idle_anim_f0",
+    });
+    let enemy = this.enemy;
+    enemy.anims.play("orge_idle", true);
     enemy.health = health;
     enemy.maxHealth = health;
 
@@ -494,10 +516,10 @@ export default class Scene2 extends Phaser.Scene {
     this.createEnemy(400, 142, 2, false); // Flip this enemy
     this.createEnemy(400, 112, 2, false); // Do not flip this enemy
 
-    this.createEnemy2(206, 305, 1, true); // Flip this enemy
-    this.createEnemy2(176, 305, 1, false); // Do not flip this enemy
-    this.createEnemy2(206, 335, 1, true); // Flip this enemy
-    this.createEnemy2(176, 335, 1, false); // Do not flip this enemy
+    this.createEnemy3(206, 305, 1, true); // Flip this enemy
+    this.createEnemy3(176, 305, 1, false); // Do not flip this enemy
+    this.createEnemy3(206, 335, 1, true); // Flip this enemy
+    this.createEnemy3(176, 335, 1, false); // Do not flip this enemy
   }
 
   enemyReset() {
