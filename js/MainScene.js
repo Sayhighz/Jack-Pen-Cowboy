@@ -979,37 +979,44 @@ export default class MainScene extends Phaser.Scene {
 }
 
 
-  checkPath(direction) {
-    let offsetX = 0, offsetY = 0;
-    switch (direction) {
-      case 'left':
-        offsetX = -32;
-        break;
-      case 'right':
-        offsetX = 32;
-        break;
-      case 'up':
-        offsetY = -32;
-        break;
-      case 'down':
-        offsetY = 32;
-        break;
-      default:
-        return false;
-    }
+checkPath(direction) {
+  let offsetX = 0, offsetY = 0;
+  switch (direction) {
+    case 'left':
+      offsetX = -32;
+      break;
+    case 'right':
+      offsetX = 32;
+      break;
+    case 'up':
+      offsetY = -32;
+      break;
+    case 'down':
+      offsetY = 32;
+      break;
+    default:
+      return false;
+  }
 
-    const x = this.player.x + offsetX;
-    const y = this.player.y + offsetY;
-    const bodies = this.matter.world.localWorld.bodies;
-    
-    for (let i = 0; i < bodies.length; i++) {
-      const body = bodies[i];
+  const x = this.player.x + offsetX;
+  const y = this.player.y + offsetY;
+  const bodies = this.matter.world.localWorld.bodies;
+  
+  for (let i = 0; i < bodies.length; i++) {
+    const body = bodies[i];
+    // ตรวจสอบว่ามีเหรียญหรือไม่
+    if (body.gameObject && body.gameObject instanceof Coins) {
       if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
-        return false;
+        return true;
       }
     }
-    return true;
+    // ตรวจสอบว่ามีการชนกับสิ่งกีดขวางหรือไม่
+    if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+      return false;
+    }
   }
+  return true;
+}
 
   async executeCommand(command) {
     // ตรวจสอบและประมวลผลคำสั่ง if_path_to_
