@@ -507,9 +507,9 @@ export default class Scene2 extends Phaser.Scene {
     const commandLabel = document.getElementById('command-label');
     const commandButton = document.getElementById('command-button');
 
-    if (sceneone === true) {
+    if (scenetwo === true) {
         console.log("scene 1 กำลังทำงาน");
-        if (scenetwo === false) {
+        if (sceneone === false) {
             const executeCommands = async () => {
                 if (isExecuting) {
                     console.log("คำสั่งกำลังทำงาน");
@@ -519,7 +519,7 @@ export default class Scene2 extends Phaser.Scene {
                 this.resetPlayer();
                 this.resetCoins();
                 this.resetEnemies();
-                this.score = 0;
+                this.score = this.initialScore;
 
                 const commands = commandLabel.value.toLowerCase().split("\n");
                 console.log(commands);
