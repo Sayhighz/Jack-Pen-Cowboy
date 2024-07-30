@@ -142,7 +142,7 @@ export default class Scene3 extends Phaser.Scene {
             return;
         }
 
-        this.player = new Player({ scene: this, x: 465, y: 75, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
+        this.player = new Player({ scene: this, x: 495, y: 390, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
 
         this.score = this.initialScore;
@@ -168,9 +168,7 @@ export default class Scene3 extends Phaser.Scene {
 
         this.enemyPos();
 
-        this.createCoins(142, 142);
-        this.createCoins(302, 142);
-        this.createCoins(302, 302);
+        this.createCoins(80, 302);
 
         this.matter.world.on('collisionstart', this.handleCollision, this);
         this.setupCommandInput();
@@ -220,9 +218,7 @@ export default class Scene3 extends Phaser.Scene {
     enemyPos() {
         enemyGrp = [];
 
-        this.createEnemy(206, 206, 3);
-        this.createEnemy(174, 238, 4);
-        this.createEnemy(334, 142, 2);
+        this.createEnemy(206, 390, 3);
     }
 
     createEnemy(posX, posY, health) {
@@ -322,7 +318,7 @@ export default class Scene3 extends Phaser.Scene {
     }
 
     resetPlayer() {
-        this.player.setPosition(465, 75);
+        this.player.setPosition(495, 390);
         this.player.setVelocity(0, 0);
     }
 
@@ -330,9 +326,7 @@ export default class Scene3 extends Phaser.Scene {
         // ทำลายเหรียญทั้งหมด
         coinsGrp.forEach((coin) => coin.destroy());
         // สร้างเหรียญใหม่
-        this.createCoins(142, 142);
-        this.createCoins(302, 142);
-        this.createCoins(302, 302);
+        this.createCoins(80, 302);
       }
     
 
@@ -349,9 +343,7 @@ export default class Scene3 extends Phaser.Scene {
         enemyGrp = [];
     
         // สร้างศัตรูใหม่
-        this.createEnemy(206, 206, 3);
-        this.createEnemy(174, 238, 4);
-        this.createEnemy(334, 142, 2);
+        this.createEnemy(206, 390, 3);
       }
 
     enemyReset() {
