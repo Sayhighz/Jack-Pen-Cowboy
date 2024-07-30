@@ -43,6 +43,7 @@ export default class Scene3 extends Phaser.Scene {
             }
             if (!this.textures.exists('tiles')) {
                 this.load.image('tiles', 'assets/map/Full.png');
+                this.load.image('back', 'assets/map/Dungeon_Tileset_at.png');
             }
             if (!this.cache.tilemap.exists('map3')) {
                 this.load.tilemapTiledJSON('map3', 'assets/map/map3.json');
@@ -104,16 +105,26 @@ export default class Scene3 extends Phaser.Scene {
 
         const map = this.make.tilemap({ key: 'map3' });
         const tileset = map.addTilesetImage('Full', 'tiles', 32, 32, 0, 0);
+        const backset = map.addTilesetImage('Dungeon_Tileset_at', 'back', 32, 32, 0, 0);
+
+        if (backset) {
+            const layer1 = map.createLayer("back", backset, 0, 0);
+            layer1.setCollisionByProperty({ collides: true });
+            this.matter.world.convertTilemapLayer(layer1);
+        } else {
+            console.error("Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'.");
+        }
+        
 
         if (tileset) {
+            // const layer2 = map.createLayer('back', tileset, 0, 0);
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
+            const layer2 = map.createLayer('top', tileset, 0, 0);
             layer1.setCollisionByProperty({ collides: true });
             this.matter.world.convertTilemapLayer(layer1);
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
-
-        // this.matter.world.on('collisionstart', this.handleCollision, this);
 
         let texture, animPrefix;
 
