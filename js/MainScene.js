@@ -368,7 +368,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.createCoins(80, 360);
     this.createCoins(432, 360);
-    this.createCoins(464, 72);
+    this.createCoins(464, 60);
   }
 
   createEnemy(posX, posY, health) {
