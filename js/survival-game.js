@@ -28,8 +28,8 @@ const config = {
     default: "matter",
     matter: {
       debug: {
-        showBody: false, // Disable body debug drawing globally
-        showStaticBody: false, // Disable static body debug drawing globally
+        showBody: true, // Disable body debug drawing globally
+        showStaticBody: true, // Disable static body debug drawing globally
       },
       gravity: { y: 0 },
     },

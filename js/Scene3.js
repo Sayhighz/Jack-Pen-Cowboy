@@ -42,10 +42,10 @@ export default class Scene3 extends Phaser.Scene {
                 this.load.image('coin', 'assets/coins/coin.png');
             }
             if (!this.textures.exists('tiles')) {
-                this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
+                this.load.image('tiles', 'assets/map/Full.png');
             }
             if (!this.cache.tilemap.exists('map3')) {
-                this.load.tilemapTiledJSON('map3', 'assets/map/newmap.json');
+                this.load.tilemapTiledJSON('map3', 'assets/map/map3.json');
             }
             if (!this.textures.exists('crown')) {
                 this.load.image('crown', 'assets/images/crown_NBG.png');
@@ -103,7 +103,7 @@ export default class Scene3 extends Phaser.Scene {
         this.createPlayerHeart();
 
         const map = this.make.tilemap({ key: 'map3' });
-        const tileset = map.addTilesetImage('Dungeon_Tileset_at', 'tiles', 32, 32, 0, 0);
+        const tileset = map.addTilesetImage('Full', 'tiles', 32, 32, 0, 0);
 
         if (tileset) {
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
