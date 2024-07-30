@@ -131,7 +131,7 @@ export default class Scene3 extends Phaser.Scene {
             return;
         }
 
-        this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
+        this.player = new Player({ scene: this, x: 465, y: 75, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
 
         this.score = this.initialScore;
@@ -311,7 +311,7 @@ export default class Scene3 extends Phaser.Scene {
     }
 
     resetPlayer() {
-        this.player.setPosition(110, 110);
+        this.player.setPosition(465, 75);
         this.player.setVelocity(0, 0);
     }
 
@@ -604,16 +604,85 @@ export default class Scene3 extends Phaser.Scene {
         }
     }
 
-    async executeCommand(command) {
-        const match = command.match(/player\.(\w+)\((\d*)\)/);
-        if (match) {
-          const action = match[1];
-          const repetitions = match[2] ? parseInt(match[2], 10) : 1;
-          await this.performActionWithDelay(action, repetitions);
-        } else {
-          console.log("Invalid command");
+    checkPath(direction) {
+        let offsetX = 0, offsetY = 0;
+        switch (direction) {
+          case 'left':
+            offsetX = -32;
+            break;
+          case 'right':
+            offsetX = 32;
+            break;
+          case 'up':
+            offsetY = -32;
+            break;
+          case 'down':
+            offsetY = 32;
+            break;
+          default:
+            return false;
         }
+      
+        const x = this.player.x + offsetX;
+        const y = this.player.y + offsetY;
+        const bodies = this.matter.world.localWorld.bodies;
+        
+        for (let i = 0; i < bodies.length; i++) {
+          const body = bodies[i];
+          // ตรวจสอบว่ามีเหรียญหรือไม่
+          if (body.gameObject && body.gameObject instanceof Coins) {
+            if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+              return true;
+            }
+          }
+          // ตรวจสอบว่ามีการชนกับสิ่งกีดขวางหรือไม่
+          if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+            return false;
+          }
+        }
+        return true;
       }
+      
+        async executeCommand(command) {
+          // ตรวจสอบและประมวลผลคำสั่ง if_path_to_
+          const ifElseMatch = command.match(/if_path_to_(left|right|up|down)_do\s*\{(.+)\}\s*else\s*\{(.+)\}/);
+          if (ifElseMatch) {
+            const direction = ifElseMatch[1];
+            const ifAction = ifElseMatch[2].trim();
+            const elseAction = ifElseMatch[3].trim();
+            if (this.checkPath(direction)) {
+              await this.executeCommand(ifAction);
+            } else {
+              await this.executeCommand(elseAction);
+            }
+            return; // ออกจากฟังก์ชันหลังจากดำเนินการคำสั่ง if_path_to_
+          }
+      
+          // ตรวจสอบและประมวลผลคำสั่ง if_path_to_ แบบไม่มี else
+          const ifMatch = command.match(/if_path_to_(left|right|up|down)_do\s*\{(.+)\}/);
+          if (ifMatch) {
+            const direction = ifMatch[1];
+            const ifAction = ifMatch[2].trim();
+            if (this.checkPath(direction)) {
+              await this.executeCommand(ifAction);
+            }
+            return; // ออกจากฟังก์ชันหลังจากดำเนินการคำสั่ง if_path_to_
+          }
+      
+          // ตรวจสอบและประมวลผลคำสั่งทั่วไป
+          const match = command.match(/player\.(\w+)\((\d*)\)/);
+          if (match) {
+            console.log(match)
+            const action = match[1];
+            const repetitions = match[2] ? parseInt(match[2], 10) : 1;
+            if (action === "loop") {
+              loop_repetitions = repetitions
+            }
+            await this.performActionWithDelay(action, repetitions);
+          } else {
+            console.log("Invalid command");
+          }
+        }
 
     async performActionWithDelay(action, repetitions) {
         for (let i = 0; i < repetitions; i++) {
