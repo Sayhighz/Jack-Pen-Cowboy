@@ -1,0 +1,28 @@
+{
+    "anims": [
+        {
+            "key": "idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "vampire",
+                    "frame": "vampire_v2_1"
+                },
+                {
+                    "key": "vampire",
+                    "frame": "vampire_v2_2"
+                },
+                {
+                    "key": "vampire",
+                    "frame": "vampire_v2_3"
+                },
+                {
+                    "key": "vampire",
+                    "frame": "vampire_v2_4"
+                }
+            ]
+        }
+    ]
+}

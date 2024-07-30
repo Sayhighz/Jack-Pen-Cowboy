@@ -221,7 +221,7 @@ export default class MainScene extends Phaser.Scene {
     });
 
     const objectives = [
-      new Objective("Collect 1 coins", "Collect 1 coins to complete this objective."),
+      new Objective("Collect 3 coins", "Collect 3 coins to complete this objective."),
       new Objective("Defeat 1 enemies", "Defeat 1 enemies to complete this objective.")
     ];
 
@@ -282,17 +282,17 @@ export default class MainScene extends Phaser.Scene {
     //   this.startTutorial();
     // });
 
-    commandCountText = this.add.text(this.cameras.main.width / 2, 20, "0/6 คำสั่ง", {
+    commandCountText = this.add.text(this.cameras.main.width / 2, 20, "0/8 คำสั่ง", {
       fontSize: "20px",
-      fill: "#fff",
+      fill: "#000000",
     });
     commandCountText.setOrigin(0.5, 0); // ตั้งจุดเริ่มต้นของข้อความไว้ที่กึ่งกลางของแกน x และบนสุดของแกน y
     commandCountText.setDepth(2);
     
     
 
-    scoreText = this.add.text(this.cameras.main.width - 16, 16, "Score: 0", {
-      fontSize: "28px",
+    scoreText = this.add.text(this.cameras.main.width - 1, 1, "Score: 0", {
+      fontSize: "20px",
       fill: "#fff",
     });
     scoreText.setOrigin(1, 0);
@@ -300,12 +300,12 @@ export default class MainScene extends Phaser.Scene {
     this.playerName = playerName;
 
     const playerNameLabel = this.add.text(
-      this.cameras.main.width - 16, // x ตำแหน่งเดียวกับ scoreText
+      this.cameras.main.width - 1, // x ตำแหน่งเดียวกับ scoreText
       scoreText.y + scoreText.height - 1, // y อยู่ใต้ scoreText และห่างน้อยลง
       `Player: ${this.playerName}`,
       {
-        fontSize: "20px",
-        fill: "#fff",
+        fontSize: "16px",
+        fill: "#ff7b00",
       }
     );
     playerNameLabel.setOrigin(1, 0); // ปรับการวางตำแหน่งให้ยึดตามขวาเหมือน scoreText
@@ -362,7 +362,7 @@ export default class MainScene extends Phaser.Scene {
     // x: 270,
     // y: 45,
 
-    // this.createEnemy(206, 206, 3);
+     this.createEnemy(335, 110, 3,true);
     // this.createEnemy(270, 77, 4);
     // this.createEnemy(110, 173, 2);
 
@@ -371,7 +371,7 @@ export default class MainScene extends Phaser.Scene {
     this.createCoins(464, 60);
   }
 
-  createEnemy(posX, posY, health) {
+  createEnemy(posX, posY, health, shouldFlip = false) {
     this.enemy = new Enemy({
       scene: this,
       x: posX,
@@ -383,6 +383,11 @@ export default class MainScene extends Phaser.Scene {
     enemy.anims.play("lizard_idle", true);
     enemy.health = health;
     enemy.maxHealth = health;
+
+    // Flip the enemy if shouldFlip is true
+    if (shouldFlip) {
+      enemy.setFlipX(true);
+    }
 
     this.updateHealthBar(enemy);
     enemyGrp.push(enemy);
@@ -578,7 +583,7 @@ export default class MainScene extends Phaser.Scene {
                 score: score,
             });
         } else {
-            alert("ไม่สามารถไปด่านต่อไปได้ เนื่องจากคำสั่งเกิน 6 บรรทัด");
+            alert("ไม่สามารถไปด่านต่อไปได้ เนื่องจากคำสั่งเกิน 8 บรรทัด");
         }
         return;
     }
@@ -665,7 +670,7 @@ export default class MainScene extends Phaser.Scene {
     enemyGrp = [];
 
     // สร้างศัตรูใหม่
-    // this.createEnemy(206, 206, 3);
+    this.createEnemy(335, 110, 3,true);
     // this.createEnemy(270, 77, 4);
     // this.createEnemy(110, 175, 2);
 
@@ -773,8 +778,8 @@ export default class MainScene extends Phaser.Scene {
 
     // อัปเดตสถานะ Objective
     if (this.currentQuest) {
-      const collectCoinsObjective = this.currentQuest.objectives.find(obj => obj.name === "Collect 1 coins");
-      if (collectCoinsObjective && score >= 1) {
+      const collectCoinsObjective = this.currentQuest.objectives.find(obj => obj.name === "Collect 3 coins");
+      if (collectCoinsObjective && score >= 15) {
         collectCoinsObjective.complete();
       }
     }
@@ -785,22 +790,20 @@ export default class MainScene extends Phaser.Scene {
     this.playerAttackAni();
     this.updateHealthBar(enemy);
     if (enemy.health <= 0) {
-      this.clearHealthBars(enemy);
-      enemy.destroy();
-      score += 10;
+        this.clearHealthBars(enemy);
+        enemy.destroy();
+        score += 10;
 
-      // อัปเดตสถานะ Objective
-      if (this.currentQuest) {
-        const defeatEnemiesObjective = this.currentQuest.objectives.find(obj => obj.name === "Defeat 1 enemies");
-        if (defeatEnemiesObjective) {
-          const defeatedEnemiesCount = this.currentQuest.objectives.filter(obj => obj.isCompleted).length;
-          if (defeatedEnemiesCount >= 1) {
-            defeatEnemiesObjective.complete();
-          }
+        // อัปเดตสถานะ Objective
+        if (this.currentQuest) {
+            const defeatEnemiesObjective = this.currentQuest.objectives.find(obj => obj.name === "Defeat 1 enemies");
+            if (defeatEnemiesObjective) {
+                defeatEnemiesObjective.complete(); // อัปเดตสถานะให้ครบถ้วน
+            }
         }
-      }
     }
-  }
+}
+
 
   setupCommandInput() {
     const commandLabel = document.getElementById('command-label');
@@ -823,8 +826,8 @@ export default class MainScene extends Phaser.Scene {
                 const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
                 console.log(commands);
 
-                isCommandOverLimit = commands.length > 6;
-                commandCountText.setText(`${commands.length}/6 คำสั่ง`);
+                isCommandOverLimit = commands.length > 8;
+                commandCountText.setText(`${commands.length}/8 คำสั่ง`);
 
                 let isLoopOpen = false;
                 let isIfOpen = false;
@@ -958,9 +961,9 @@ export default class MainScene extends Phaser.Scene {
 
                 commandLabel.addEventListener("input", () => {
                   const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
-                  commandCountText.setText(`${commands.length}/6 คำสั่ง`);
+                  commandCountText.setText(`${commands.length}/8 คำสั่ง`);
 
-                  if (commands.length > 6) {
+                  if (commands.length > 8) {
                     commandLabel.style.color = 'red';
                     commandCountText.setColor('red');
                 } else {
@@ -976,37 +979,44 @@ export default class MainScene extends Phaser.Scene {
 }
 
 
-  checkPath(direction) {
-    let offsetX = 0, offsetY = 0;
-    switch (direction) {
-      case 'left':
-        offsetX = -32;
-        break;
-      case 'right':
-        offsetX = 32;
-        break;
-      case 'up':
-        offsetY = -32;
-        break;
-      case 'down':
-        offsetY = 32;
-        break;
-      default:
-        return false;
-    }
-
-    const x = this.player.x + offsetX;
-    const y = this.player.y + offsetY;
-    const bodies = this.matter.world.localWorld.bodies;
-    
-    for (let i = 0; i < bodies.length; i++) {
-      const body = bodies[i];
-        if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
-          return false;
-        }
-    }
-    return true;
+checkPath(direction) {
+  let offsetX = 0, offsetY = 0;
+  switch (direction) {
+    case 'left':
+      offsetX = -32;
+      break;
+    case 'right':
+      offsetX = 32;
+      break;
+    case 'up':
+      offsetY = -32;
+      break;
+    case 'down':
+      offsetY = 32;
+      break;
+    default:
+      return false;
   }
+
+  const x = this.player.x + offsetX;
+  const y = this.player.y + offsetY;
+  const bodies = this.matter.world.localWorld.bodies;
+  
+  for (let i = 0; i < bodies.length; i++) {
+    const body = bodies[i];
+    // ตรวจสอบว่ามีเหรียญหรือไม่
+    if (body.gameObject && body.gameObject instanceof Coins) {
+      if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+        return true;
+      }
+    }
+    // ตรวจสอบว่ามีการชนกับสิ่งกีดขวางหรือไม่
+    if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+      return false;
+    }
+  }
+  return true;
+}
 
   async executeCommand(command) {
     // ตรวจสอบและประมวลผลคำสั่ง if_path_to_

@@ -1,0 +1,28 @@
+{
+    "anims": [
+        {
+            "key": "idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "ice_zombie",
+                    "frame": "ice_zombie_anim_f0"
+                },
+                {
+                    "key": "ice_zombie",
+                    "frame": "ice_zombie_anim_f1"
+                },
+                {
+                    "key": "ice_zombie",
+                    "frame": "ice_zombie_anim_f2"
+                },
+                {
+                    "key": "ice_zombie",
+                    "frame": "ice_zombie_anim_f3"
+                }
+            ]
+        }
+    ]
+}

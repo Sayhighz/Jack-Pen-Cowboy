@@ -1,0 +1,28 @@
+{
+    "anims": [
+        {
+            "key": "idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "priest",
+                    "frame": "priest3_v1_1"
+                },
+                {
+                    "key": "priest",
+                    "frame": "priest3_v1_2"
+                },
+                {
+                    "key": "priest",
+                    "frame": "priest3_v1_3"
+                },
+                {
+                    "key": "priest",
+                    "frame": "priest3_v1_4"
+                }
+            ]
+        }
+    ]
+}

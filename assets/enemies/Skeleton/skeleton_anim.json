@@ -1,0 +1,28 @@
+{
+    "anims": [
+        {
+            "key": "idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "skeleton",
+                    "frame": "skeleton_v2_1"
+                },
+                {
+                    "key": "skeleton",
+                    "frame": "skeleton_v2_2"
+                },
+                {
+                    "key": "skeleton",
+                    "frame": "skeleton_v2_3"
+                },
+                {
+                    "key": "skeleton",
+                    "frame": "skeleton_v2_4"
+                }
+            ]
+        }
+    ]
+}

@@ -42,10 +42,11 @@ export default class Scene3 extends Phaser.Scene {
                 this.load.image('coin', 'assets/coins/coin.png');
             }
             if (!this.textures.exists('tiles')) {
-                this.load.image('tiles', 'assets/map/Dungeon_Tileset_at.png');
+                this.load.image('tiles', 'assets/map/Full.png');
+                this.load.image('back', 'assets/map/Dungeon_Tileset_at.png');
             }
             if (!this.cache.tilemap.exists('map3')) {
-                this.load.tilemapTiledJSON('map3', 'assets/map/newmap.json');
+                this.load.tilemapTiledJSON('map3', 'assets/map/map3.json');
             }
             if (!this.textures.exists('crown')) {
                 this.load.image('crown', 'assets/images/crown_NBG.png');
@@ -103,17 +104,27 @@ export default class Scene3 extends Phaser.Scene {
         this.createPlayerHeart();
 
         const map = this.make.tilemap({ key: 'map3' });
-        const tileset = map.addTilesetImage('Dungeon_Tileset_at', 'tiles', 32, 32, 0, 0);
+        const tileset = map.addTilesetImage('Full', 'tiles', 32, 32, 0, 0);
+        const backset = map.addTilesetImage('Dungeon_Tileset_at', 'back', 32, 32, 0, 0);
+
+        if (backset) {
+            const layer1 = map.createLayer("back", backset, 0, 0);
+            layer1.setCollisionByProperty({ collides: true });
+            this.matter.world.convertTilemapLayer(layer1);
+        } else {
+            console.error("Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'.");
+        }
+        
 
         if (tileset) {
+            // const layer2 = map.createLayer('back', tileset, 0, 0);
             const layer1 = map.createLayer('Tile Layer 1', tileset, 0, 0);
+            const layer2 = map.createLayer('top', tileset, 0, 0);
             layer1.setCollisionByProperty({ collides: true });
             this.matter.world.convertTilemapLayer(layer1);
         } else {
             console.error("Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'.");
         }
-
-        // this.matter.world.on('collisionstart', this.handleCollision, this);
 
         let texture, animPrefix;
 
@@ -131,7 +142,7 @@ export default class Scene3 extends Phaser.Scene {
             return;
         }
 
-        this.player = new Player({ scene: this, x: 110, y: 110, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
+        this.player = new Player({ scene: this, x: 495, y: 390, texture, frame: `${animPrefix}_f_idle_anim_f0`, animPrefix });
         this.player.anims.play(`${animPrefix}_idle`, true);
 
         this.score = this.initialScore;
@@ -157,9 +168,7 @@ export default class Scene3 extends Phaser.Scene {
 
         this.enemyPos();
 
-        this.createCoins(142, 142);
-        this.createCoins(302, 142);
-        this.createCoins(302, 302);
+        this.createCoins(80, 302);
 
         this.matter.world.on('collisionstart', this.handleCollision, this);
         this.setupCommandInput();
@@ -209,9 +218,7 @@ export default class Scene3 extends Phaser.Scene {
     enemyPos() {
         enemyGrp = [];
 
-        this.createEnemy(206, 206, 3);
-        this.createEnemy(174, 238, 4);
-        this.createEnemy(334, 142, 2);
+        this.createEnemy(206, 390, 3);
     }
 
     createEnemy(posX, posY, health) {
@@ -311,7 +318,7 @@ export default class Scene3 extends Phaser.Scene {
     }
 
     resetPlayer() {
-        this.player.setPosition(110, 110);
+        this.player.setPosition(495, 390);
         this.player.setVelocity(0, 0);
     }
 
@@ -319,9 +326,7 @@ export default class Scene3 extends Phaser.Scene {
         // ทำลายเหรียญทั้งหมด
         coinsGrp.forEach((coin) => coin.destroy());
         // สร้างเหรียญใหม่
-        this.createCoins(142, 142);
-        this.createCoins(302, 142);
-        this.createCoins(302, 302);
+        this.createCoins(80, 302);
       }
     
 
@@ -338,9 +343,7 @@ export default class Scene3 extends Phaser.Scene {
         enemyGrp = [];
     
         // สร้างศัตรูใหม่
-        this.createEnemy(206, 206, 3);
-        this.createEnemy(174, 238, 4);
-        this.createEnemy(334, 142, 2);
+        this.createEnemy(206, 390, 3);
       }
 
     enemyReset() {
@@ -604,16 +607,85 @@ export default class Scene3 extends Phaser.Scene {
         }
     }
 
-    async executeCommand(command) {
-        const match = command.match(/player\.(\w+)\((\d*)\)/);
-        if (match) {
-          const action = match[1];
-          const repetitions = match[2] ? parseInt(match[2], 10) : 1;
-          await this.performActionWithDelay(action, repetitions);
-        } else {
-          console.log("Invalid command");
+    checkPath(direction) {
+        let offsetX = 0, offsetY = 0;
+        switch (direction) {
+          case 'left':
+            offsetX = -32;
+            break;
+          case 'right':
+            offsetX = 32;
+            break;
+          case 'up':
+            offsetY = -32;
+            break;
+          case 'down':
+            offsetY = 32;
+            break;
+          default:
+            return false;
         }
+      
+        const x = this.player.x + offsetX;
+        const y = this.player.y + offsetY;
+        const bodies = this.matter.world.localWorld.bodies;
+        
+        for (let i = 0; i < bodies.length; i++) {
+          const body = bodies[i];
+          // ตรวจสอบว่ามีเหรียญหรือไม่
+          if (body.gameObject && body.gameObject instanceof Coins) {
+            if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+              return true;
+            }
+          }
+          // ตรวจสอบว่ามีการชนกับสิ่งกีดขวางหรือไม่
+          if (Phaser.Physics.Matter.Matter.Bounds.overlaps(body.bounds, { min: { x, y }, max: { x, y } })) {
+            return false;
+          }
+        }
+        return true;
       }
+      
+        async executeCommand(command) {
+          // ตรวจสอบและประมวลผลคำสั่ง if_path_to_
+          const ifElseMatch = command.match(/if_path_to_(left|right|up|down)_do\s*\{(.+)\}\s*else\s*\{(.+)\}/);
+          if (ifElseMatch) {
+            const direction = ifElseMatch[1];
+            const ifAction = ifElseMatch[2].trim();
+            const elseAction = ifElseMatch[3].trim();
+            if (this.checkPath(direction)) {
+              await this.executeCommand(ifAction);
+            } else {
+              await this.executeCommand(elseAction);
+            }
+            return; // ออกจากฟังก์ชันหลังจากดำเนินการคำสั่ง if_path_to_
+          }
+      
+          // ตรวจสอบและประมวลผลคำสั่ง if_path_to_ แบบไม่มี else
+          const ifMatch = command.match(/if_path_to_(left|right|up|down)_do\s*\{(.+)\}/);
+          if (ifMatch) {
+            const direction = ifMatch[1];
+            const ifAction = ifMatch[2].trim();
+            if (this.checkPath(direction)) {
+              await this.executeCommand(ifAction);
+            }
+            return; // ออกจากฟังก์ชันหลังจากดำเนินการคำสั่ง if_path_to_
+          }
+      
+          // ตรวจสอบและประมวลผลคำสั่งทั่วไป
+          const match = command.match(/player\.(\w+)\((\d*)\)/);
+          if (match) {
+            console.log(match)
+            const action = match[1];
+            const repetitions = match[2] ? parseInt(match[2], 10) : 1;
+            if (action === "loop") {
+              loop_repetitions = repetitions
+            }
+            await this.performActionWithDelay(action, repetitions);
+          } else {
+            console.log("Invalid command");
+          }
+        }
 
     async performActionWithDelay(action, repetitions) {
         for (let i = 0; i < repetitions; i++) {
