@@ -41,10 +41,12 @@ export default class Scene2 extends Phaser.Scene {
         this.load.image("coin", "assets/coins/coin.png");
       }
       if (!this.textures.exists("tiles")) {
-        this.load.image("tiles", "assets/map/Dungeon_Tileset_at.png");
+        this.load.image("tiles", "assets/map/newmap2/Dungeon_Tileset_at.png");
+        this.load.image("newlayer", "assets/map/newmap2/TX Props.png");
       }
       if (!this.cache.tilemap.exists("map2")) {
-        this.load.tilemapTiledJSON("map2", "assets/map/newmap.json");
+        this.load.tilemapTiledJSON("map2", "assets/map/newmap2/LoopMap.json");
+
       }
       if (!this.textures.exists("crown")) {
         this.load.image("crown", "assets/images/crown_NBG.png");
@@ -102,17 +104,35 @@ export default class Scene2 extends Phaser.Scene {
     this.createPlayerHeart();
 
     const map = this.make.tilemap({ key: "map2" });
-    const tileset = map.addTilesetImage(
-      "Dungeon_Tileset_at",
-      "tiles",
-      32,
-      32,
-      0,
-      0
-    );
+    const tileset = map.addTilesetImage("Dungeon_Tileset_at", "tiles", 32, 32, 0, 0);
+    const newlayerset = map.addTilesetImage("TX Props", "newlayer", 32, 32, 0, 0);
+
+
+    // if (waterset) {
+    //   const layer1 = map.createLayer("water", waterset, 0, 0);
+    //   layer1.setCollisionByProperty({ collides: true });
+    //   this.matter.world.convertTilemapLayer(layer1);
+    // } else {
+    //   console.error(
+    //     "Tileset not found. Check if the tileset name in the JSON matches 'assets_spritesheet_v2_free'."
+    //   );
+    // }
+
+
+
 
     if (tileset) {
       const layer1 = map.createLayer("Tile Layer 1", tileset, 0, 0);
+      layer1.setCollisionByProperty({ collides: true });
+      this.matter.world.convertTilemapLayer(layer1);
+    } else {
+      console.error(
+        "Tileset not found. Check if the tileset name in the JSON matches 'Dungeon_Tileset_at'."
+      );
+    }
+
+    if (newlayerset) {
+      const layer1 = map.createLayer("newlayer", newlayerset, 0, 0);
       layer1.setCollisionByProperty({ collides: true });
       this.matter.world.convertTilemapLayer(layer1);
     } else {
@@ -125,6 +145,7 @@ export default class Scene2 extends Phaser.Scene {
     if (tileset) {
       const doorLayer = map.createLayer("Door Layer", tileset, 0, 0);
       doorLayer.setCollisionByProperty({ isDoor: true });
+      doorLayer.setCollisionByProperty({ collides: true });
       this.matter.world.convertTilemapLayer(doorLayer);
     } else {
       console.error(
@@ -152,8 +173,8 @@ export default class Scene2 extends Phaser.Scene {
 
     this.player = new Player({
       scene: this,
-      x: 110,
-      y: 110,
+      x: 50,
+      y: 460,
       texture,
       frame: `${animPrefix}_f_idle_anim_f0`,
       animPrefix,
@@ -177,17 +198,20 @@ export default class Scene2 extends Phaser.Scene {
 
     const commandLabel = document.getElementById('command-label');
     if (commandLabel) {
-        commandLabel.value = commandLabel.value.trim();
-        commandLabel.value = '';
-        commandLabel.placeholder = "Enter your commands here...";
+      commandLabel.value = commandLabel.value.trim();
+      commandLabel.value = '';
+      commandLabel.placeholder = "Enter your commands here...";
     }
 
 
     this.enemyPos();
 
-    this.createCoins(142, 142);
-    this.createCoins(302, 142);
-    this.createCoins(302, 302);
+    this.createCoins(145, 180);
+    this.createCoins(335, 142);
+    this.createCoins(335, 270);
+    this.createCoins(240, 270);
+    this.createCoins(140, 270);
+    this.createCoins(240, 365);
 
     this.matter.world.on("collisionstart", this.handleCollision, this);
     this.setupCommandInput();
@@ -248,12 +272,26 @@ export default class Scene2 extends Phaser.Scene {
   enemyPos() {
     enemyGrp = [];
 
-    this.createEnemy(206, 206, 3);
-    this.createEnemy(174, 238, 4);
-    this.createEnemy(334, 142, 2);
+    // this.createCoins(145, 180);  
+    // this.createCoins(335, 142);
+    // this.createCoins(335, 270);
+    // this.createCoins(240, 270);
+    // this.createCoins(140, 270);
+    // this.createCoins(240, 365);
+
+    this.createEnemy(370, 142, 2, true); // Flip this enemy
+    this.createEnemy(370, 112, 2, true); // Do not flip this enemy
+    this.createEnemy(400, 142, 2, false); // Flip this enemy
+    this.createEnemy(400, 112, 2, false); // Do not flip this enemy
+
+    this.createEnemy2(206, 305, 1, true); // Flip this enemy
+    this.createEnemy2(176, 305, 1, false); // Do not flip this enemy
+    this.createEnemy2(206, 335, 1, true); // Flip this enemy
+    this.createEnemy2(176, 335, 1, false); // Do not flip this enemy
+
   }
 
-  createEnemy(posX, posY, health) {
+  createEnemy(posX, posY, health, shouldFlip = false) {
     this.enemy = new Enemy({
       scene: this,
       x: posX,
@@ -266,9 +304,37 @@ export default class Scene2 extends Phaser.Scene {
     enemy.health = health;
     enemy.maxHealth = health;
 
+    // Flip the enemy if shouldFlip is true
+    if (shouldFlip) {
+      enemy.setFlipX(true);
+    }
+
     this.updateHealthBar(enemy);
     enemyGrp.push(enemy);
   }
+
+  createEnemy2(posX, posY, health, shouldFlip = false) {
+    this.enemy = new Enemy({
+      scene: this,
+      x: posX,
+      y: posY,
+      texture: "skeleton",
+      frame: "skeleton_v2_1",
+    });
+    let enemy = this.enemy;
+    enemy.anims.play("skeleton_idle", true);
+    enemy.health = health;
+    enemy.maxHealth = health;
+
+    // Flip the enemy if shouldFlip is true
+    if (shouldFlip) {
+      enemy.setFlipX(true);
+    }
+
+    this.updateHealthBar(enemy);
+    enemyGrp.push(enemy);
+  }
+
 
   updateHealthBar(enemy) {
     if (enemy.healthBars) {
@@ -354,7 +420,7 @@ export default class Scene2 extends Phaser.Scene {
           bodyA.gameObject.tile.properties.isDoor)
       ) {
         console.log("Entering new map");
-        // this.player.stopMovement();
+        this.player.stopMovement();
         this.scene.start("Scene3", {
           character: this.scene.settings.data.character,
           playerName: this.scene.settings.data.playerName,
@@ -393,7 +459,7 @@ export default class Scene2 extends Phaser.Scene {
   }
 
   resetPlayer() {
-    this.player.setPosition(110, 110);
+    this.player.setPosition(50, 460);
     this.player.setVelocity(0, 0);
   }
 
@@ -401,9 +467,13 @@ export default class Scene2 extends Phaser.Scene {
     // ทำลายเหรียญทั้งหมด
     coinsGrp.forEach((coin) => coin.destroy());
     // สร้างเหรียญใหม่
-    this.createCoins(142, 142);
-    this.createCoins(302, 142);
-    this.createCoins(302, 302);
+
+    this.createCoins(145, 180);
+    this.createCoins(335, 142);
+    this.createCoins(335, 270);
+    this.createCoins(240, 270);
+    this.createCoins(140, 270);
+    this.createCoins(240, 365);
   }
 
   resetEnemies() {
@@ -419,9 +489,15 @@ export default class Scene2 extends Phaser.Scene {
     enemyGrp = [];
 
     // สร้างศัตรูใหม่
-    this.createEnemy(206, 206, 3);
-    this.createEnemy(174, 238, 4);
-    this.createEnemy(334, 142, 2);
+    this.createEnemy(370, 142, 2, true); // Flip this enemy
+    this.createEnemy(370, 112, 2, true); // Do not flip this enemy
+    this.createEnemy(400, 142, 2, false); // Flip this enemy
+    this.createEnemy(400, 112, 2, false); // Do not flip this enemy
+
+    this.createEnemy2(206, 305, 1, true); // Flip this enemy
+    this.createEnemy2(176, 305, 1, false); // Do not flip this enemy
+    this.createEnemy2(206, 335, 1, true); // Flip this enemy
+    this.createEnemy2(176, 335, 1, false); // Do not flip this enemy
   }
 
   enemyReset() {
@@ -527,173 +603,185 @@ export default class Scene2 extends Phaser.Scene {
     const commandButton = document.getElementById('command-button');
 
     if (scenetwo === true) {
-        console.log("scene 1 กำลังทำงาน");
-        if (sceneone === false) {
-            const executeCommands = async () => {
-                if (isExecuting) {
-                    console.log("คำสั่งกำลังทำงาน");
-                    return;
-                }
-                isExecuting = true;
-                this.resetPlayer();
-                this.resetCoins();
-                this.resetEnemies();
-                this.score = this.initialScore;
+      console.log("scene 2 กำลังทำงาน");
+      if (sceneone === false) {
+        const executeCommands = async () => {
+          if (isExecuting) {
+            console.log("คำสั่งกำลังทำงาน");
+            return;
+          }
+          isExecuting = true;
+          this.resetPlayer();
+          this.resetCoins();
+          this.resetEnemies();
+          this.score = this.initialScore;
 
-                const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
-                console.log(commands);
+          const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
 
-                isCommandOverLimit = commands.length > 6;
-                commandCountText.setText(`${commands.length}/6 คำสั่ง`);
-
-                let isLoopOpen = false;
-                let isIfOpen = false;
-                let openLoops = 0;
-                let openIfs = 0;
-
-                for (let i = 0; i < commands.length; i++) {
-                    let originalText = commands[i].trim();
-                    let loopMatch = originalText.match(/^loop\((\d+)\)\s*\{$/);
-                    let ifMatch = originalText.match(/^if\s*\(([^)]+)\)\s*\{$/);
-
-                    if (loopMatch) {
-                        if (isLoopOpen || isIfOpen) {
-                            console.error("Error: Nested loops or if statements not allowed.");
-                            alert("Error: Nested loops or if statements not allowed.");
-                            isExecuting = false;
-                            return;
-                        }
-                        openLoops++;
-                        isLoopOpen = true;
-                        let loop_repetitions = parseInt(loopMatch[1]);
-                        let loopCommands = [];
-                        i++;
-
-                        while (i < commands.length && commands[i].trim() !== "}") {
-                            loopCommands.push(commands[i].trim());
-                            i++;
-                        }
-
-                        if (i >= commands.length || commands[i].trim() !== "}") {
-                            console.error("Error: Missing closing } for loop");
-                            alert("Error: Missing closing } for loop");
-                            isExecuting = false;
-                            return;
-                        }
-
-                        openLoops--;
-                        if (openLoops === 0) {
-                            isLoopOpen = false;
-                        }
-
-                        for (let j = 0; j < loop_repetitions; j++) {
-                            for (const loopCommand of loopCommands) {
-                                if (loopCommand !== "") {
-                                    timesOfCommand++;
-                                    await this.executeCommand(loopCommand);
-                                }
-                            }
-                        }
-                    } else if (ifMatch) {
-                        if (isLoopOpen || isIfOpen) {
-                            console.error("Error: Nested loops or if statements not allowed.");
-                            alert("Error: Nested loops or if statements not allowed.");
-                            isExecuting = false;
-                            return;
-                        }
-                        openIfs++;
-                        isIfOpen = true;
-                        let condition = ifMatch[1];
-                        let ifCommands = [];
-                        i++;
-
-                        while (i < commands.length && commands[i].trim() !== "}") {
-                            ifCommands.push(commands[i].trim());
-                            i++;
-                        }
-
-                        if (i >= commands.length || commands[i].trim() !== "}") {
-                            console.error("Error: Missing closing } for if");
-                            alert("Error: Missing closing } for if");
-                            isExecuting = false;
-                            return;
-                        }
-
-                        openIfs--;
-                        if (openIfs === 0) {
-                            isIfOpen = false;
-                        }
-
-                        if (eval(condition)) {
-                            for (const ifCommand of ifCommands) {
-                                if (ifCommand !== "") {
-                                    timesOfCommand++;
-                                    await this.executeCommand(ifCommand);
-                                }
-                            }
-                        }
-                    } else if (/^loop\((\d+)\)$/.test(originalText)) {
-                        console.error("Error: Missing opening { for loop");
-                        alert("Error: Missing opening { for loop");
-                        isExecuting = false;
-                        return;
-                    } else if (/^if\s*\(([^)]+)\)$/.test(originalText)) {
-                        console.error("Error: Missing opening { for if");
-                        alert("Error: Missing opening { for if");
-                        isExecuting = false;
-                        return;
-                    } else {
-                        if (originalText === "{") {
-                            console.error("Error: Unexpected '{' outside of loop or if");
-                            alert("Error: Unexpected '{' outside of loop or if");
-                            isExecuting = false;
-                            return;
-                        }
-
-                        if (originalText !== "") {
-                            timesOfCommand++;
-                            await this.executeCommand(originalText);
-                        }
-                    }
-                }
-
-                // Final check to ensure all loops and ifs are properly closed
-                if (isLoopOpen || isIfOpen) {
-                    console.error("Error: Unclosed loop or if block");
-                    alert("Error: Unclosed loop or if block");
-                    isExecuting = false;
-                }
-
-                isExecuting = false;
-            };
-
-            if (!this.commandEventListenerAdded) {
-                commandButton.addEventListener("click", executeCommands);
-                commandLabel.addEventListener("keypress", async (e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        await executeCommands();
-                    }
-                });
-
-                commandLabel.addEventListener("input", () => {
-                  const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
-                  commandCountText.setText(`${commands.length}/6 คำสั่ง`);
-
-                  if (commands.length > 6) {
-                    commandLabel.style.color = 'red';
-                    commandCountText.setColor('red');
-                } else {
-                    commandLabel.style.color = 'black';
-                    commandCountText.setColor('white');
-                }
-            });
-
-                this.commandEventListenerAdded = true;
+          // คำสั่งเพิ่มเติมเพื่อนับบรรทัดของ loop เป็น 1 บรรทัด
+          let commandCount = 0;
+          commands.forEach(command => {
+            if (!command.trim().startsWith('loop')) {
+              commandCount++;
             }
+          });
+          commandCount += commands.filter(command => command.trim().startsWith('loop')).length;
+          commandCountText.setText(`${commandCount}/6 คำสั่ง`);
+
+          let isLoopOpen = false;
+          let isIfOpen = false;
+          let openLoops = 0;
+          let openIfs = 0;
+
+          for (let i = 0; i < commands.length; i++) {
+            let originalText = commands[i].trim();
+            let loopMatch = originalText.match(/^loop\((\d+)\)\s*\{$/);
+            let ifMatch = originalText.match(/^if\s*\(([^)]+)\)\s*\{$/);
+
+            if (loopMatch) {
+              if (isLoopOpen || isIfOpen) {
+                console.error("Error: Nested loops or if statements not allowed.");
+                alert("Error: Nested loops or if statements not allowed.");
+                isExecuting = false;
+                return;
+              }
+              openLoops++;
+              isLoopOpen = true;
+              let loop_repetitions = parseInt(loopMatch[1]);
+              let loopCommands = [];
+              i++;
+
+
+              while (i < commands.length && commands[i].trim() !== "}") {
+                loopCommands.push(commands[i].trim());
+                i++;
+              }
+
+
+              if (i >= commands.length || commands[i].trim() !== "}") {
+                console.error("Error: Missing closing } for loop"); alert("Error: Missing closing } for loop"); isExecuting = false; return;
+              }
+              openLoops--;
+              if (openLoops === 0) {
+                isLoopOpen = false;
+              }
+
+              for (let j = 0; j < loop_repetitions; j++) {
+                for (const loopCommand of loopCommands) {
+                  if (loopCommand !== "") {
+                    timesOfCommand++;
+                    await this.executeCommand(loopCommand);
+                  }
+                }
+              }
+            } else if (ifMatch) {
+              if (isLoopOpen || isIfOpen) {
+                console.error("Error: Nested loops or if statements not allowed.");
+                alert("Error: Nested loops or if statements not allowed.");
+                isExecuting = false;
+                return;
+              }
+              openIfs++;
+              isIfOpen = true;
+              let condition = ifMatch[1];
+              let ifCommands = [];
+              i++;
+
+              while (i < commands.length && commands[i].trim() !== "}") {
+                ifCommands.push(commands[i].trim());
+                i++;
+              }
+
+              if (i >= commands.length || commands[i].trim() !== "}") {
+                console.error("Error: Missing closing } for if");
+                alert("Error: Missing closing } for if");
+                isExecuting = false;
+                return;
+              }
+
+              openIfs--;
+              if (openIfs === 0) {
+                isIfOpen = false;
+              }
+
+              if (eval(condition)) {
+                for (const ifCommand of ifCommands) {
+                  if (ifCommand !== "") {
+                    timesOfCommand++;
+                    await this.executeCommand(ifCommand);
+                  }
+                }
+              }
+            } else if (/^loop\((\d+)\)$/.test(originalText)) {
+              console.error("Error: Missing opening { for loop");
+              alert("Error: Missing opening { for loop");
+              isExecuting = false;
+              return;
+            } else if (/^if\s*\(([^)]+)\)$/.test(originalText)) {
+              console.error("Error: Missing opening { for if");
+              alert("Error: Missing opening { for if");
+              isExecuting = false;
+              return;
+            } else {
+              if (originalText === "{") {
+                console.error("Error: Unexpected '{' outside of loop or if");
+                alert("Error: Unexpected '{' outside of loop or if");
+                isExecuting = false;
+                return;
+              }
+
+              if (originalText !== "") {
+                timesOfCommand++;
+                await this.executeCommand(originalText);
+              }
+            }
+          }
+
+          // Final check to ensure all loops and ifs are properly closed
+          if (isLoopOpen || isIfOpen) {
+            console.error("Error: Unclosed loop or if block");
+            alert("Error: Unclosed loop or if block");
+            isExecuting = false;
+          }
+
+          isExecuting = false;
+        };
+
+        if (!this.commandEventListenerAdded) {
+          commandButton.addEventListener("click", executeCommands);
+          commandLabel.addEventListener("keypress", async (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              await executeCommands();
+            }
+          });
+
+          commandLabel.addEventListener("input", () => {
+            const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
+            let commandCount = 0;
+            commands.forEach(command => {
+              if (!command.trim().startsWith('loop')) {
+                commandCount++;
+              }
+            });
+            commandCount += commands.filter(command => command.trim().startsWith('loop')).length;
+            commandCountText.setText(`${commandCount}/6 คำสั่ง`);
+
+            if (commands.length > 6) {
+              commandLabel.style.color = 'red';
+              commandCountText.setColor('red');
+            } else {
+              commandLabel.style.color = 'black';
+              commandCountText.setColor('white');
+            }
+          });
+
+          this.commandEventListenerAdded = true;
         }
+      }
     }
-}
+  }
+
 
 
   async executeCommand(command) {
