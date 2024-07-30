@@ -242,7 +242,7 @@ export default class Scene2 extends Phaser.Scene {
       this.cameras.main.width - 16,
       16,
       "Score: " + this.score,
-      { fontSize: "32px", fill: "#fff" }
+      { fontSize: "18px", fill: "#fff" }
     );
     scoreText.setOrigin(1, 0);
 
@@ -253,7 +253,7 @@ export default class Scene2 extends Phaser.Scene {
       scoreText.y + scoreText.height - 1, // y อยู่ใต้ scoreText และห่างน้อยลง
       `Player: ${this.playerName}`,
       {
-        fontSize: "20px",
+        fontSize: "16px",
         fill: "#fff",
       }
     );
