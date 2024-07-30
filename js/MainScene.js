@@ -21,7 +21,11 @@ let coinsGrp = [];
 let timesOfCommand = 0;
 let sceneone = true;
 let scenetwo = false;
+let scenethree = false;
 let loop_repetitions = 1
+let isCommandOverLimit = false;
+let commandCountText;
+
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -277,6 +281,15 @@ export default class MainScene extends Phaser.Scene {
     // this.time.delayedCall(6000, () => {
     //   this.startTutorial();
     // });
+
+    commandCountText = this.add.text(this.cameras.main.width / 2, 20, "0/6 คำสั่ง", {
+      fontSize: "20px",
+      fill: "#fff",
+    });
+    commandCountText.setOrigin(0.5, 0); // ตั้งจุดเริ่มต้นของข้อความไว้ที่กึ่งกลางของแกน x และบนสุดของแกน y
+    commandCountText.setDepth(2);
+    
+    
 
     scoreText = this.add.text(this.cameras.main.width - 16, 16, "Score: 0", {
       fontSize: "28px",
@@ -545,26 +558,30 @@ export default class MainScene extends Phaser.Scene {
       // เช็คการชนกับประตู
       if (
         (bodyA.gameObject === this.player &&
-          bodyB.gameObject &&
-          bodyB.gameObject.tile &&
-          bodyB.gameObject.tile.properties.isDoor) ||
+            bodyB.gameObject &&
+            bodyB.gameObject.tile &&
+            bodyB.gameObject.tile.properties.isDoor) ||
         (bodyB.gameObject === this.player &&
-          bodyA.gameObject &&
-          bodyA.gameObject.tile &&
-          bodyA.gameObject.tile.properties.isDoor)
-      ) {
-        console.log("Entering new map");
-        // this.player.stopMovement();
-        this.scene.start("Scene2", {
-          character: this.scene.settings.data.character,
-          playerName: this.scene.settings.data.playerName,
-          playerX: this.player.x,
-          playerY: this.player.y,
-          playerHeart: playerHeart,
-          score: score,
-        });
+            bodyA.gameObject &&
+            bodyA.gameObject.tile &&
+            bodyA.gameObject.tile.properties.isDoor)
+    ) {
+        if (!isCommandOverLimit) {
+            console.log("Entering new map");
+            // this.player.stopMovement();
+            this.scene.start("Scene2", {
+                character: this.scene.settings.data.character,
+                playerName: this.scene.settings.data.playerName,
+                playerX: this.player.x,
+                playerY: this.player.y,
+                playerHeart: playerHeart,
+                score: score,
+            });
+        } else {
+            alert("ไม่สามารถไปด่านต่อไปได้ เนื่องจากคำสั่งเกิน 6 บรรทัด");
+        }
         return;
-      }
+    }
 
       // เช็คการชนกับศัตรู
       if ((bodyA.label === 'playerCollider' && bodyB.label === 'enemyCollider') ||
@@ -650,7 +667,7 @@ export default class MainScene extends Phaser.Scene {
     // สร้างศัตรูใหม่
     // this.createEnemy(206, 206, 3);
     // this.createEnemy(270, 77, 4);
-    this.createEnemy(110, 175, 2);
+    // this.createEnemy(110, 175, 2);
 
     // this.enemyAndCoinsPos()
   }
@@ -788,165 +805,176 @@ export default class MainScene extends Phaser.Scene {
   setupCommandInput() {
     const commandLabel = document.getElementById('command-label');
     const commandButton = document.getElementById('command-button');
-    let aiai = 5
 
     if (sceneone === true) {
-      console.log("scene 1 กำลังทำงาน");
-      if (scenetwo === false) {
-        const executeCommands = async () => {
-          if (isExecuting) {
-            console.log("คำสั่งกำลังทำงาน");
-            return;
-          }
-          isExecuting = true;
-          this.resetPlayer();
-          this.resetCoins();
-          this.resetEnemies();
-          score = 0;
-
-          const commands = commandLabel.value.toLowerCase().split("\n");
-          console.log(commands);
-
-          let isLoopOpen = false;
-          let isIfOpen = false;
-          let openLoops = 0;
-          let openIfs = 0;
-
-
-
-          for (let i = 0; i < commands.length; i++) {
-            let originalText = commands[i].trim();
-            let loopMatch = originalText.match(/^player\.loop\((\d+)\)\s*\{$/);
-            let ifMatch = originalText.match(/^if\s*\(([^)]+)\)\s*\{$/);
-
-            if (loopMatch) {
-              if (isLoopOpen || isIfOpen) {
-                console.error("Error: Nested loops or if statements not allowed.");
-                alert("Error: Nested loops or if statements not allowed.");
-                isExecuting = false;
-                return;
-              }
-              openLoops++;
-              isLoopOpen = true;
-              let loop_repetitions = parseInt(loopMatch[1]);
-              let loopCommands = [];
-              i++;
-
-              while (i < commands.length && commands[i].trim() !== "}") {
-                loopCommands.push(commands[i].trim());
-                i++;
-              }
-
-              if (i >= commands.length || commands[i].trim() !== "}") {
-                console.error("Error: Missing closing } for player.loop");
-                alert("Error: Missing closing } for player.loop");
-                isExecuting = false;
-                return;
-              }
-
-              openLoops--;
-              if (openLoops === 0) {
-                isLoopOpen = false;
-              }
-
-              for (let j = 0; j < loop_repetitions; j++) {
-                for (const loopCommand of loopCommands) {
-                  if (loopCommand !== "") {
-                    timesOfCommand++;
-                    await this.executeCommand(loopCommand);
-                  }
+        console.log("scene 1 กำลังทำงาน");
+        if (scenetwo === false) {
+            const executeCommands = async () => {
+                if (isExecuting) {
+                    console.log("คำสั่งกำลังทำงาน");
+                    return;
                 }
-              }
-            } else if (ifMatch) {
-              if (isLoopOpen || isIfOpen) {
-                console.error("Error: Nested loops or if statements not allowed.");
-                alert("Error: Nested loops or if statements not allowed.");
-                isExecuting = false;
-                return;
-              }
-              openIfs++;
-              isIfOpen = true;
-              let condition = ifMatch[1];
-              let ifCommands = [];
-              i++;
+                isExecuting = true;
+                this.resetPlayer();
+                this.resetCoins();
+                this.resetEnemies();
+                score = 0;
 
-              while (i < commands.length && commands[i].trim() !== "}") {
-                ifCommands.push(commands[i].trim());
-                i++;
-              }
+                const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
+                console.log(commands);
 
-              if (i >= commands.length || commands[i].trim() !== "}") {
-                console.error("Error: Missing closing } for if");
-                alert("Error: Missing closing } for if");
-                isExecuting = false;
-                return;
-              }
+                isCommandOverLimit = commands.length > 6;
+                commandCountText.setText(`${commands.length}/6 คำสั่ง`);
 
-              openIfs--;
-              if (openIfs === 0) {
-                isIfOpen = false;
-              }
+                let isLoopOpen = false;
+                let isIfOpen = false;
+                let openLoops = 0;
+                let openIfs = 0;
 
-              if (eval(condition)) {
-                for (const ifCommand of ifCommands) {
-                  if (ifCommand !== "") {
-                    timesOfCommand++;
-                    await this.executeCommand(ifCommand);
-                  }
+                for (let i = 0; i < commands.length; i++) {
+                    let originalText = commands[i].trim();
+                    let loopMatch = originalText.match(/^loop\((\d+)\)\s*\{$/);
+                    let ifMatch = originalText.match(/^if\s*\(([^)]+)\)\s*\{$/);
+
+                    if (loopMatch) {
+                        if (isLoopOpen || isIfOpen) {
+                            console.error("Error: Nested loops or if statements not allowed.");
+                            alert("Error: Nested loops or if statements not allowed.");
+                            isExecuting = false;
+                            return;
+                        }
+                        openLoops++;
+                        isLoopOpen = true;
+                        let loop_repetitions = parseInt(loopMatch[1]);
+                        let loopCommands = [];
+                        i++;
+
+                        while (i < commands.length && commands[i].trim() !== "}") {
+                            loopCommands.push(commands[i].trim());
+                            i++;
+                        }
+
+                        if (i >= commands.length || commands[i].trim() !== "}") {
+                            console.error("Error: Missing closing } for loop");
+                            alert("Error: Missing closing } for loop");
+                            isExecuting = false;
+                            return;
+                        }
+
+                        openLoops--;
+                        if (openLoops === 0) {
+                            isLoopOpen = false;
+                        }
+
+                        for (let j = 0; j < loop_repetitions; j++) {
+                            for (const loopCommand of loopCommands) {
+                                if (loopCommand !== "") {
+                                    timesOfCommand++;
+                                    await this.executeCommand(loopCommand);
+                                }
+                            }
+                        }
+                    } else if (ifMatch) {
+                        if (isLoopOpen || isIfOpen) {
+                            console.error("Error: Nested loops or if statements not allowed.");
+                            alert("Error: Nested loops or if statements not allowed.");
+                            isExecuting = false;
+                            return;
+                        }
+                        openIfs++;
+                        isIfOpen = true;
+                        let condition = ifMatch[1];
+                        let ifCommands = [];
+                        i++;
+
+                        while (i < commands.length && commands[i].trim() !== "}") {
+                            ifCommands.push(commands[i].trim());
+                            i++;
+                        }
+
+                        if (i >= commands.length || commands[i].trim() !== "}") {
+                            console.error("Error: Missing closing } for if");
+                            alert("Error: Missing closing } for if");
+                            isExecuting = false;
+                            return;
+                        }
+
+                        openIfs--;
+                        if (openIfs === 0) {
+                            isIfOpen = false;
+                        }
+
+                        if (eval(condition)) {
+                            for (const ifCommand of ifCommands) {
+                                if (ifCommand !== "") {
+                                    timesOfCommand++;
+                                    await this.executeCommand(ifCommand);
+                                }
+                            }
+                        }
+                    } else if (/^loop\((\d+)\)$/.test(originalText)) {
+                        console.error("Error: Missing opening { for loop");
+                        alert("Error: Missing opening { for loop");
+                        isExecuting = false;
+                        return;
+                    } else if (/^if\s*\(([^)]+)\)$/.test(originalText)) {
+                        console.error("Error: Missing opening { for if");
+                        alert("Error: Missing opening { for if");
+                        isExecuting = false;
+                        return;
+                    } else {
+                        if (originalText === "{") {
+                            console.error("Error: Unexpected '{' outside of loop or if");
+                            alert("Error: Unexpected '{' outside of loop or if");
+                            isExecuting = false;
+                            return;
+                        }
+
+                        if (originalText !== "") {
+                            timesOfCommand++;
+                            await this.executeCommand(originalText);
+                        }
+                    }
                 }
-              }
-            } else if (/^player\.loop\((\d+)\)$/.test(originalText)) {
-              console.error("Error: Missing opening { for player.loop");
-              alert("Error: Missing opening { for player.loop");
-              isExecuting = false;
-              return;
-            } else if (/^if\s*\(([^)]+)\)$/.test(originalText)) {
-              console.error("Error: Missing opening { for if");
-              alert("Error: Missing opening { for if");
-              isExecuting = false;
-              return;
-            } else {
-              if (originalText === "{") {
-                console.error("Error: Unexpected '{' outside of player.loop or if");
-                alert("Error: Unexpected '{' outside of player.loop or if");
+
+                // Final check to ensure all loops and ifs are properly closed
+                if (isLoopOpen || isIfOpen) {
+                    console.error("Error: Unclosed loop or if block");
+                    alert("Error: Unclosed loop or if block");
+                    isExecuting = false;
+                }
+
                 isExecuting = false;
-                return;
-              }
+            };
 
-              if (originalText !== "") {
-                timesOfCommand++;
-                await this.executeCommand(originalText);
-              }
+            if (!this.commandEventListenerAdded) {
+                commandButton.addEventListener("click", executeCommands);
+                commandLabel.addEventListener("keypress", async (e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        await executeCommands();
+                    }
+                });
+
+                commandLabel.addEventListener("input", () => {
+                  const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
+                  commandCountText.setText(`${commands.length}/6 คำสั่ง`);
+
+                  if (commands.length > 6) {
+                    commandLabel.style.color = 'red';
+                    commandCountText.setColor('red');
+                } else {
+                    commandLabel.style.color = 'black';
+                    commandCountText.setColor('white');
+                }
+            });
+
+                this.commandEventListenerAdded = true;
             }
-          }
-
-          // Final check to ensure all loops and ifs are properly closed
-          if (isLoopOpen || isIfOpen) {
-            console.error("Error: Unclosed loop or if block");
-            alert("Error: Unclosed loop or if block");
-            isExecuting = false;
-          }
-
-
-
-
-          isExecuting = false;
-        };
-
-        if (!this.commandEventListenerAdded) {
-          commandButton.addEventListener("click", executeCommands);
-          commandLabel.addEventListener("keypress", async (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              await executeCommands();
-            }
-          });
-
-          this.commandEventListenerAdded = true;
         }
-      }
     }
-  }
+}
+
 
   checkPath(direction) {
     let offsetX = 0, offsetY = 0;
