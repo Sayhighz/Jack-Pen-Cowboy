@@ -12,8 +12,7 @@
 <body>
     <div class="container">
         <div id="game-wrapper" class="game-wrapper">
-            <div id="survival-game">
-            </div>
+            <div id="survival-game"></div>
         </div>
         <div id="command-container" class="command-container">
             <h2 id="command-label1">CODE QUEST</h2>
@@ -23,7 +22,6 @@
                     <p id="tutor">สวัสดีผู้กล้า คุณต้องการความช่วยเหลือหรอ? ลองจิ้มดูสิ</p>
                 </div>
             </div>
-            <!-- <div id="command-count" style="font-size: 16px; color: #fff; margin-top: 10px;">0/6 คำสั่ง</div> -->
             <div id="command-wrapper" class="command-wrapper">
                 <div id="line-numbers"></div>
                 <div id="command-label-container">
@@ -48,28 +46,54 @@
         </div>
     </div>
     <script>
+        let currentScene = 'map1';
+        let suggestionIndex = 0;
+    
+        const commandsMap = {
+            map1: ["player.down(steps)", "player.up(steps)", "player.left(steps)", "player.right(steps)", "player.attack(hits)"],
+            map2: ["player.down(steps)", "player.up(steps)", "player.left(steps)", "player.right(steps)", "player.attack(hits)", "loop(int){action}"],
+            map3: ["player.down(steps)", "player.up(steps)", "player.left(steps)", "player.right(steps)", "player.attack(hits)", "loop(int){action}", "if else()"]
+        };
+    
+        const updateSuggestions = (lastWord) => {
+            const commands = commandsMap[currentScene];
+            const matchedCommands = commands.filter(cmd => cmd.startsWith(lastWord));
+            suggestionsBox.innerHTML = matchedCommands.map((cmd, index) =>
+                `<div class="suggestion ${index === suggestionIndex ? 'selected' : ''}">
+            <span class="command">${cmd}</span>
+            <span class="press-tab">press tab</span>
+        </div>`).join('');
+            suggestionsBox.style.display = matchedCommands.length ? 'block' : 'none';
+        };
+    
+        window.switchScene = (sceneName) => {
+            currentScene = sceneName;
+            suggestionIndex = 0; // รีเซ็ต suggestionIndex ทุกครั้งที่เปลี่ยน scene
+            suggestionsBox.style.display = 'none'; // ซ่อนกล่องคำแนะนำเมื่อเปลี่ยน scene
+        };
+    
         const textarea = document.getElementById('command-label');
         const lineNumbers = document.getElementById('line-numbers');
         const suggestionsBox = document.getElementById('autocomplete-suggestions');
-
+    
         const updateLineNumbers = () => {
             const lines = textarea.value.split('\n').length;
             lineNumbers.innerHTML = Array(lines).fill().map((_, i) => i + 1).join('<br>');
         };
-
+    
         textarea.addEventListener('input', updateLineNumbers);
         textarea.addEventListener('scroll', () => {
             lineNumbers.scrollTop = textarea.scrollTop;
         });
-
+    
         updateLineNumbers();
-
+    
         let messages = [];
         let currentMessageIndex = 0;
-
+    
         const tutorialBox = document.getElementById('tutorial-box');
         const tutorialText = tutorialBox.querySelector('p');
-
+    
         fetch('messages.json')
             .then(response => response.json())
             .then(data => {
@@ -77,7 +101,7 @@
                 tutorialBox.style.display = 'block';
             })
             .catch(error => console.error('Error loading messages:', error));
-
+    
         tutorialBox.addEventListener('click', () => {
             if (messages.length > 0) {
                 tutorialText.classList.remove('fade-in');
@@ -93,22 +117,7 @@
                 }, { once: true });
             }
         });
-
-        const commands = ["player.down()", "player.up()", "player.left()", "player.right()", "player.attack()", "turn_right()", "turn_left()", "turn_up()", "turn_down()"];
-        let currentInput = '';
-        let suggestionIndex = 0; // Default to the first suggestion
-
-        const updateSuggestions = (lastWord) => {
-            const matchedCommands = commands.filter(cmd => cmd.startsWith(lastWord));
-            suggestionsBox.innerHTML = matchedCommands.map((cmd, index) =>
-                `<div class="suggestion ${index === suggestionIndex ? 'selected' : ''}">
-            <span class="command">${cmd}</span>
-            <span class="press-tab">press tab</span>
-        </div>`).join('');
-            suggestionsBox.style.display = matchedCommands.length ? 'block' : 'none';
-        };
-
-
+    
         const positionSuggestionsBox = () => {
             const textareaLineHeight = parseInt(window.getComputedStyle(textarea).lineHeight);
             const cursorPosition = textarea.selectionStart;
@@ -117,7 +126,7 @@
             const topPosition = textarea.offsetTop + (lineNumber + 1) * textareaLineHeight - textarea.scrollTop;
             suggestionsBox.style.top = `${topPosition}px`;
         };
-
+    
         textarea.addEventListener('input', function (event) {
             const cursorPos = textarea.selectionStart;
             const textBeforeCursor = textarea.value.substring(0, cursorPos);
@@ -131,8 +140,7 @@
                 suggestionsBox.style.display = 'none';
             }
         });
-
-
+    
         textarea.addEventListener('keydown', function (event) {
             const suggestions = suggestionsBox.querySelectorAll('.suggestion');
             if (event.key === 'Tab' && suggestions.length > 0) {
@@ -162,14 +170,8 @@
                 suggestionsBox.style.display = 'none';
             }
         });
-
-
-        // document.getElementById('start-button').addEventListener('click', ()=> {
-        //     document.getElementById('command-container').style.display = 'flex';
-        //     document.getElementById('tutorial-box').style.display = 'block';
-        //     this.style.display = 'none';
-        // });
     </script>
+    
     <script src="//cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser-matter-collision-plugin"></script>
     <script type="module" src="js/survival-game.js"></script>

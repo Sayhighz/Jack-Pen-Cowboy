@@ -16,6 +16,8 @@ let isExecuting = false;
 let sceneone = false;
 let scenetwo = false;
 let scenethree = true;
+let isCommandOverLimit = false;
+let commandCountText;
 
 
 export default class Scene3 extends Phaser.Scene {
@@ -144,6 +146,14 @@ export default class Scene3 extends Phaser.Scene {
             yoyo: true,
             repeat: -1
         });
+        window.switchScene('map3');
+
+        const commandLabel = document.getElementById('command-label');
+        if (commandLabel) {
+            commandLabel.value = commandLabel.value.trim();
+            commandLabel.value = '';
+            commandLabel.placeholder = "Enter your commands here...";
+        }
 
         this.enemyPos();
 
@@ -162,6 +172,13 @@ export default class Scene3 extends Phaser.Scene {
                 }
             });
         });
+
+        commandCountText = this.add.text(this.cameras.main.width / 2, 20, "0/6 คำสั่ง", {
+            fontSize: "20px",
+            fill: "#fff",
+          });
+          commandCountText.setOrigin(0.5, 0); // ตั้งจุดเริ่มต้นของข้อความไว้ที่กึ่งกลางของแกน x และบนสุดของแกน y
+          commandCountText.setDepth(2);
 
         scoreText = this.add.text(this.cameras.main.width - 16, 16, 'Score: ' + this.score, { fontSize: '32px', fill: '#fff' });
         scoreText.setOrigin(1, 0);
@@ -418,8 +435,8 @@ export default class Scene3 extends Phaser.Scene {
         const commandLabel = document.getElementById('command-label');
         const commandButton = document.getElementById('command-button');
     
-        if (sceneone === true) {
-            console.log("scene 1 กำลังทำงาน");
+        if (scenethree === true) {
+            console.log("scene 3 กำลังทำงาน");
             if (scenetwo === false) {
                 const executeCommands = async () => {
                     if (isExecuting) {
@@ -430,10 +447,13 @@ export default class Scene3 extends Phaser.Scene {
                     this.resetPlayer();
                     this.resetCoins();
                     this.resetEnemies();
-                    this.score = 0;
+                    this.score = this.initialScore;
     
-                    const commands = commandLabel.value.toLowerCase().split("\n");
+                    const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
                     console.log(commands);
+    
+                    isCommandOverLimit = commands.length > 6;
+                    commandCountText.setText(`${commands.length}/6 คำสั่ง`);
     
                     let isLoopOpen = false;
                     let isIfOpen = false;
@@ -564,6 +584,19 @@ export default class Scene3 extends Phaser.Scene {
                             await executeCommands();
                         }
                     });
+    
+                    commandLabel.addEventListener("input", () => {
+                      const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
+                      commandCountText.setText(`${commands.length}/6 คำสั่ง`);
+    
+                      if (commands.length > 6) {
+                        commandLabel.style.color = 'red';
+                        commandCountText.setColor('red');
+                    } else {
+                        commandLabel.style.color = 'black';
+                        commandCountText.setColor('white');
+                    }
+                });
     
                     this.commandEventListenerAdded = true;
                 }

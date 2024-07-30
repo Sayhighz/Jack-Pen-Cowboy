@@ -16,6 +16,8 @@ let isExecuting = false;
 let sceneone = false;
 let scenetwo = true;
 let scenethree = false;
+let isCommandOverLimit = false;
+let commandCountText;
 
 export default class Scene2 extends Phaser.Scene {
   constructor() {
@@ -171,6 +173,16 @@ export default class Scene2 extends Phaser.Scene {
       repeat: -1,
     });
 
+    window.switchScene('map2');
+
+    const commandLabel = document.getElementById('command-label');
+    if (commandLabel) {
+        commandLabel.value = commandLabel.value.trim();
+        commandLabel.value = '';
+        commandLabel.placeholder = "Enter your commands here...";
+    }
+
+
     this.enemyPos();
 
     this.createCoins(142, 142);
@@ -194,6 +206,13 @@ export default class Scene2 extends Phaser.Scene {
         }
       });
     });
+
+    commandCountText = this.add.text(this.cameras.main.width / 2, 20, "0/6 คำสั่ง", {
+      fontSize: "20px",
+      fill: "#fff",
+    });
+    commandCountText.setOrigin(0.5, 0); // ตั้งจุดเริ่มต้นของข้อความไว้ที่กึ่งกลางของแกน x และบนสุดของแกน y
+    commandCountText.setDepth(2);
 
     scoreText = this.add.text(
       this.cameras.main.width - 16,
@@ -521,8 +540,11 @@ export default class Scene2 extends Phaser.Scene {
                 this.resetEnemies();
                 this.score = this.initialScore;
 
-                const commands = commandLabel.value.toLowerCase().split("\n");
+                const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
                 console.log(commands);
+
+                isCommandOverLimit = commands.length > 6;
+                commandCountText.setText(`${commands.length}/6 คำสั่ง`);
 
                 let isLoopOpen = false;
                 let isIfOpen = false;
@@ -653,6 +675,19 @@ export default class Scene2 extends Phaser.Scene {
                         await executeCommands();
                     }
                 });
+
+                commandLabel.addEventListener("input", () => {
+                  const commands = commandLabel.value.toLowerCase().split("\n").filter(command => command.trim() !== "");
+                  commandCountText.setText(`${commands.length}/6 คำสั่ง`);
+
+                  if (commands.length > 6) {
+                    commandLabel.style.color = 'red';
+                    commandCountText.setColor('red');
+                } else {
+                    commandLabel.style.color = 'black';
+                    commandCountText.setColor('white');
+                }
+            });
 
                 this.commandEventListenerAdded = true;
             }
